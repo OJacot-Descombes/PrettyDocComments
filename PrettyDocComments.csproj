@@ -49,14 +49,16 @@
     <Compile Include="DocCommentLoader.cs" />
     <Compile Include="DocCommentRenderer.cs" />
     <Compile Include="FormatAccumulator.cs" />
-    <Compile Include="FormatParser.cs" />
+    <Compile Include="DocCommentParser.cs" />
     <Compile Include="FormatRun.cs" />
     <Compile Include="GlobalUsings.cs" />
+    <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PrettyDocCommentsPackage.cs" />
     <Compile Include="CommentAdornment.cs" />
     <Compile Include="CommentAdornmentTextViewCreationListener.cs" />
     <Compile Include="Helpers\Number.cs" />
+    <Compile Include="TextBlock.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">

@@ -8,35 +8,25 @@ namespace PrettyDocComments;
 
 internal sealed class DocCommentRenderer
 {
-    private static readonly Typeface _boldTypeFace;
     private static readonly ImmutableHashSet<string> _topLevelElements = new[] {
         "example", "exception", "include", "param", "permission", "remarks", "returns",
         "seealso", "summary", "typeparam", "value"
     }.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
 
     private readonly double _pixelsPerDip;
-    private readonly double _editorFontEmSize;
     private readonly double _normalEmSize;
     private readonly Pen _separatorPen;
 
     // Render context 
-    private double _x, _y, _indent;
-
-    static DocCommentRenderer()
-    {
-        var textFontFamily = new FontFamily("Segoe UI");
-        var fallbackTextFontFamily = new FontFamily("Arial");
-
-        _boldTypeFace = new Typeface(textFontFamily, FontStyles.Normal, FontWeights.Bold, FontStretches.Normal,
-            fallbackTextFontFamily);
-    }
+    private const char NonBreakingSpace = '\u00A0';
+    private const double BaseIndent = 3.0;
+    private double _y;
 
     public DocCommentRenderer(double pixelsPerDip, double editorFontEmSize, Pen separatorPen)
     {
         _separatorPen = separatorPen;
-        _editorFontEmSize = editorFontEmSize;
         _pixelsPerDip = pixelsPerDip;
-        _normalEmSize = 0.9 * _editorFontEmSize;
+        _normalEmSize = 0.9 * editorFontEmSize;
     }
 
     public void Render(DrawingContext dc, Rect bounds, IEnumerable<XNode> nodes)
@@ -45,8 +35,6 @@ internal sealed class DocCommentRenderer
         int blockNo = 0;
         foreach (XElement el in WrapTopLevelText(nodes)) {
             blockNo++;
-            _x = 3;
-            _indent = 3;
             if (blockNo > 1 && !IsBetweenFriendBlocks(el)) {
                 _y += 2;
                 dc.DrawLine(_separatorPen, new(0, _y), new(bounds.Width, _y));
@@ -70,14 +58,13 @@ internal sealed class DocCommentRenderer
                 case "exception":
                     string exeptionName = el.Attributes("cref").FirstOrDefault()?.Value;
                     if (String.IsNullOrWhiteSpace(exeptionName)) {
-                        el.AddFirst(new XElement("b", "Exception: "));
+                        RenderBlockWithCaption(dc, el, "Exception:");
                     } else {
-                        el.AddFirst(new XElement("b", new XElement("c", exeptionName), ": "));
+                        RenderBlockWithCaption(dc, el, CodeCaptionText(exeptionName + ":"));
                     }
-                    RenderBlock(dc, el);
                     break;
                 default:
-                    RenderBlock(dc, el);
+                    RenderBlock(dc, el, BaseIndent);
                     break;
             }
         }
@@ -111,51 +98,65 @@ internal sealed class DocCommentRenderer
         }
     }
 
+    private void RenderBlockWithCaption(DrawingContext dc, XElement element, FormattedText formattedCaption)
+    {
+        dc.DrawText(formattedCaption, new Point(BaseIndent, _y));
+        double blockIndent = 2 * _normalEmSize;
+        int firstLineIndentChars = (int)(3.7 * Math.Max(formattedCaption.Width - blockIndent, 42) / _normalEmSize) + 4;
+        element.AddFirst(new string(NonBreakingSpace, firstLineIndentChars));
+        RenderBlock(dc, element, BaseIndent + blockIndent);
+    }
+
     private void RenderBlockWithCaption(DrawingContext dc, XElement element, string caption)
     {
-        _indent += _editorFontEmSize;
-        FormattedText formattedText = BoldText(caption);
-        dc.DrawText(formattedText, new Point(_x, _y));
-        _x += formattedText.Width + _editorFontEmSize;
-        double oldY = _y;
-        RenderBlock(dc, element);
-        if (_y == oldY) {
-            _y += formattedText.Height;
-        }
+        RenderBlockWithCaption(dc, element, CaptionText(caption));
     }
 
     private void RenderBlockWithTitle(DrawingContext dc, XElement element, string title)
     {
-        FormattedText formattedText = BoldText(title);
-        dc.DrawText(formattedText, new Point(_x, _y));
+        FormattedText formattedText = CaptionText(title);
+        dc.DrawText(formattedText, new Point(BaseIndent, _y));
         _y += formattedText.Height;
-        RenderBlock(dc, element);
+        RenderBlock(dc, element, BaseIndent);
     }
 
-    private void RenderBlock(DrawingContext dc, XElement element)
+    private void RenderBlock(DrawingContext dc, XElement element, double indent)
     {
         var children = element.Nodes().ToList();
         if (children.Count > 0) {
             if (children[0] is XText first) {
-                first.Value = first.Value.TrimStart();
+                first.Value = first.Value.TrimStart(' ', '\t', '\r', '\n', '\v'); // Exclude non-breaking space.
             }
             if (children[children.Count - 1] is XText last) {
                 last.Value = last.Value.TrimEnd();
             }
-            RenderFormatted(dc, element);
+            RenderFormatted(dc, element, indent);
         }
     }
 
-    private void RenderFormatted(DrawingContext dc, XElement element)
+    private void RenderFormatted(DrawingContext dc, XElement element, double indent)
     {
-        var accumulator = new FormatAccumulator(_normalEmSize, _pixelsPerDip);
-        FormatParser.Instance.ParseElement(accumulator, element);
-        FormattedText formattedText = accumulator.GetFormattedText();
-        dc.DrawText(formattedText, new Point(Math.Max(_indent, _x), _y));
-        _y += formattedText.Height;
+        var parser = new DocCommentParser(_normalEmSize, _pixelsPerDip, indent);
+        foreach (TextBlock textBlock in parser.Parse(element)) {
+            if (textBlock.Background != null) {
+                const double Margin = 3.0;
+
+                dc.DrawRectangle(textBlock.Background, null,
+                    new Rect(textBlock.Left, _y, textBlock.Text.Width + 2 * Margin, textBlock.Text.Height + 2 * Margin));
+                dc.DrawText(textBlock.Text, new Point(textBlock.Left + Margin, _y + Margin));
+                _y += textBlock.Height + 2 * Margin;
+            } else {
+                dc.DrawText(textBlock.Text, new Point(textBlock.Left, _y));
+                _y += textBlock.Height;
+            }
+        }
     }
 
-    private FormattedText BoldText(string text) =>
-        new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            _boldTypeFace, _normalEmSize, Brushes.Black, _pixelsPerDip);
+    private FormattedText CaptionText(string text) =>
+        new(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
+            Options.CaptionsTypeFace, _normalEmSize, Brushes.Black, _pixelsPerDip);
+
+    private FormattedText CodeCaptionText(string text) =>
+        new(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
+            Options.CodeCaptionTypeFace, _normalEmSize, Brushes.Black, _pixelsPerDip);
 }

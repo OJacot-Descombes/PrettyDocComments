@@ -33,8 +33,6 @@ internal sealed class CommentAdornment
     private readonly IAdornmentLayer _layer;
     private readonly IWpfTextView _view;
     private readonly Regex _docCommentRecognizer;
-    private readonly Brush _brush;
-    private readonly Pen _pen;
     private readonly DocCommentRenderer _docCommentRenderer;
     private readonly double _averageCharWidth;
 
@@ -54,14 +52,7 @@ internal sealed class CommentAdornment
         _view.LayoutChanged += View_LayoutChanged;
         _view.Caret.PositionChanged += Caret_PositionChanged;
 
-        // Create the pen and brush to color the box behind the a's
-        _brush = Brushes.LightGoldenrodYellow;
-
-        var penBrush = Brushes.DarkKhaki;
-        _pen = new Pen(penBrush, 0.8);
-        _pen.Freeze();
-
-        _docCommentRenderer = new(VisualTreeHelper.GetDpi(_view.VisualElement).PixelsPerDip, editorFont.Size, _pen);
+        _docCommentRenderer = new(VisualTreeHelper.GetDpi(_view.VisualElement).PixelsPerDip, editorFont.Size, Options.CommentOutline);
         _averageCharWidth = GetAverageCharWidth(editorFont);
     }
 
@@ -265,7 +256,7 @@ internal sealed class CommentAdornment
     private void RenderDocComment(DrawingContext dc, DocComment docComment, IEnumerable<XNode> nodes)
     {
         dc.PushClip(new RectangleGeometry(docComment.Bounds));
-        dc.DrawRectangle(_brush, _pen, docComment.Bounds);
+        dc.DrawRectangle(Options.CommentBackground, Options.CommentOutline, docComment.Bounds);
         dc.PushTransform(new TranslateTransform(docComment.Bounds.X, docComment.Bounds.Y));
 
         _docCommentRenderer.Render(dc, docComment.Bounds, nodes);

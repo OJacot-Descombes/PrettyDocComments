@@ -6,18 +6,6 @@ namespace PrettyDocComments;
 
 internal class FormatAccumulator
 {
-    private static readonly Typeface _normalTypeFace;
-    private static readonly Typeface _codeTypeFace;
-
-    static FormatAccumulator()
-    {
-        _normalTypeFace = new Typeface(new FontFamily("Segoe UI"),
-            FontStyles.Normal, FontWeights.Normal, FontStretches.Normal, new FontFamily("Arial"));
-
-        _codeTypeFace = new Typeface(new FontFamily("Cascadia Mono"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal,
-            new FontFamily("Consolas"));
-    }
-
     public FormatAccumulator(double emSize, double pixelsPerDip)
     {
         _pixelsPerDip = pixelsPerDip;
@@ -35,6 +23,8 @@ internal class FormatAccumulator
     private bool _underline;
     private bool _code;
 
+    public bool HasText => _runs.Count > 0;
+
     public bool Bold { get => _bold; set => _bold = value; }
     public bool Italic { get => _italic; set => _italic = value; }
     public bool Strikethrough { get => _strikethrough; set => _strikethrough = value; }
@@ -50,12 +40,12 @@ internal class FormatAccumulator
     {
         string text = String.Concat(_runs.Select(r => r.Text));
         var formattedText = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            _normalTypeFace, _emSize, Brushes.Black, _pixelsPerDip);
+            Options.NormalTypeFace, _emSize, Brushes.Black, _pixelsPerDip);
         int startIndex = 0;
         foreach (var run in _runs) {
             int length = run.Text?.Length ?? 0;
 
-            formattedText.SetFontTypeface(run.Code ? _codeTypeFace : _normalTypeFace, startIndex, length);
+            formattedText.SetFontTypeface(run.Code ? Options.CodeTypeFace : Options.NormalTypeFace, startIndex, length);
             formattedText.SetFontStyle(run.Italic ? FontStyles.Italic : FontStyles.Normal, startIndex, length);
             formattedText.SetFontWeight(run.Bold ? FontWeights.Bold : FontWeights.Normal, startIndex, length);
 
@@ -70,6 +60,7 @@ internal class FormatAccumulator
 
             startIndex += length;
         }
+        _runs.Clear();
         return formattedText;
     }
 }
