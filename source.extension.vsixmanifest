@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.1" Language="en-US" Publisher="Olivier Jacot-Descombes" />
+        <DisplayName>Pretty Doc Comments</DisplayName>
+        <Description xml:space="preserve">Displays XML doc comments in a WYSIWYG manner. The aim of this extension is to reduce the visual noise in the editor produced by doc comments.
+
+Placing the caret on a doc comment line hides the WYSIWIG display and shows the original XML-tagged comment which can now be edited the usual way.</Description>
+        <PreviewImage>PrettyDocComments_200x200.png</PreviewImage>
+        <Tags>XML, doc, comments, doc comments, XML doc comments, C#, csharp, VB, Visual Basic, WYSIWYG, prettify.</Tags>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+    </Dependencies>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
+    </Assets>
+</PackageManifest>
