@@ -15,16 +15,14 @@ internal sealed class DocCommentRenderer
 
     private readonly double _pixelsPerDip;
     private readonly double _normalEmSize;
-    private readonly Pen _separatorPen;
 
     // Render context 
     private const char NonBreakingSpace = '\u00A0';
     private const double BaseIndent = 3.0;
     private double _y;
 
-    public DocCommentRenderer(double pixelsPerDip, double editorFontEmSize, Pen separatorPen)
+    public DocCommentRenderer(double pixelsPerDip, double editorFontEmSize)
     {
-        _separatorPen = separatorPen;
         _pixelsPerDip = pixelsPerDip;
         _normalEmSize = 0.9 * editorFontEmSize;
     }
@@ -37,7 +35,7 @@ internal sealed class DocCommentRenderer
             blockNo++;
             if (blockNo > 1 && !IsBetweenFriendBlocks(el)) {
                 _y += 2;
-                dc.DrawLine(_separatorPen, new(0, _y), new(bounds.Width, _y));
+                dc.DrawLine(Options.CommentSeparator, new(0, _y), new(bounds.Width, _y));
             }
             string tagName;
             tagName = el.Name.LocalName.ToLowerInvariant();

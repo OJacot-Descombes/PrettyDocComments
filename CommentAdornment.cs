@@ -52,7 +52,7 @@ internal sealed class CommentAdornment
         _view.LayoutChanged += View_LayoutChanged;
         _view.Caret.PositionChanged += Caret_PositionChanged;
 
-        _docCommentRenderer = new(VisualTreeHelper.GetDpi(_view.VisualElement).PixelsPerDip, editorFont.Size, Options.CommentOutline);
+        _docCommentRenderer = new(VisualTreeHelper.GetDpi(_view.VisualElement).PixelsPerDip, editorFont.Size);
         _averageCharWidth = GetAverageCharWidth(editorFont);
     }
 
@@ -61,20 +61,30 @@ internal sealed class CommentAdornment
         if (GetCaretRect() is Rect caretRect) {
             foreach (IAdornmentLayerElement element in _layer.Elements) {
                 if (element.Tag == this) {
-                    SetAdornmentVisibility(caretRect, element.Adornment);
+                    SetAdornmentVisibility(caretRect, element.Adornment, true);
                 }
             }
         }
     }
 
-    private static void SetAdornmentVisibility(Rect caretRect, UIElement element)
+    private void SetAdornmentVisibility(Rect caretRect, UIElement element, bool updateViewOnchange = false)
     {
         if (LogicalTreeHelper.GetParent(element) is Visual parent) {
             GeneralTransform gt = element.TransformToAncestor(parent);
             Rect elementRect = gt.TransformBounds(new Rect(element.RenderSize));
-            element.Visibility = caretRect.Top >= elementRect.Top && caretRect.Bottom <= elementRect.Bottom
-                ? Visibility.Hidden
-                : Visibility.Visible;
+            Visibility newVisibility = caretRect.Top >= elementRect.Top && caretRect.Bottom <= elementRect.Bottom
+                            ? Visibility.Hidden
+                            : Visibility.Visible;
+            if (newVisibility != element.Visibility) {
+                element.Visibility = newVisibility;
+
+                /*Test*/
+                LineTransformSource.AdornmentVisisble = newVisibility == Visibility.Visible;
+                if (updateViewOnchange) { // Trigger layout
+                    _view.ViewScroller.ScrollViewportVerticallyByPixels(0.001);
+                    _view.ViewScroller.ScrollViewportVerticallyByPixels(-0.001);
+                }
+            }
         }
     }
 
@@ -241,7 +251,7 @@ internal sealed class CommentAdornment
             removedCallback: null);
     }
 
-    // When an adornment is added, its RenderSize is not known yet. Therefore, its visibility cannot be determined
+    // When an adornment is added, its RenderSize is not known yet. Therefore, its new visibility cannot be determined
     // and we defer this task until we get the SizeChanged event.
     private void Image_SizeChanged(object sender, SizeChangedEventArgs e)
     {

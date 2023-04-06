@@ -52,6 +52,8 @@
     <Compile Include="DocCommentParser.cs" />
     <Compile Include="FormatRun.cs" />
     <Compile Include="GlobalUsings.cs" />
+    <Compile Include="LineTransformSource.cs" />
+    <Compile Include="LineTransformSourceProvider.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PrettyDocCommentsPackage.cs" />

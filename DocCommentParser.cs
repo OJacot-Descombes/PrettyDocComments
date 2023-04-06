@@ -10,6 +10,8 @@ internal sealed class DocCommentParser
     private readonly List<TextBlock> _textBlocks = new();
     private readonly double _emSize;
     private double _indent;
+    private int _listLevel = -1;
+    private static readonly string[] _levelBullets = { "●", "■", "○" };
 
     public DocCommentParser(double emSize, double pixelsPerDip, double indent)
     {
@@ -28,11 +30,14 @@ internal sealed class DocCommentParser
         _textBlocks.Clear();
     }
 
-    private void CloseBlock(double height, Brush background = default)
+    private TextBlock? CloseBlock(double height, Brush background = default)
     {
         if (_accumulator.HasText) {
-            _textBlocks.Add(new TextBlock(_accumulator.GetFormattedText(), _indent, height, background));
+            var textBlock = new TextBlock(_accumulator.GetFormattedText(), _indent, height, background);
+            _textBlocks.Add(textBlock);
+            return textBlock;
         }
+        return null;
     }
 
     private void CloseBlock(Brush background = default)
@@ -99,6 +104,15 @@ internal sealed class DocCommentParser
                         case "list" or "ul" or "ol" or "dl" or "menu":
                             ParseList(el, normalizedTag);
                             break;
+                        case "term" or "dt" when _listLevel >= 0:
+                            _accumulator.Bold = true;
+                            ParseElement(el);
+                            _accumulator.Add(" – ");
+                            _accumulator.Bold = false;
+                            break;
+                        case "description" when _listLevel >= 0:
+                            ParseElement(el);
+                            break;
                         default:
                             _accumulator.Add(el.ToString());
                             break;
@@ -138,15 +152,18 @@ internal sealed class DocCommentParser
 
         const string nul = null;
 
+        _listLevel++;
         string type = el.Attributes("type").FirstOrDefault()?.Value;
         (string bullet, string numberType) = (listTag, type) switch {
             ("list", "number") => (nul, "1"),
-            ("list", "table") => ("  ", nul),
-            ("ul", "square") => ("■ ", nul),
-            ("ul", "circle") => ("○ ", nul),
+            ("list", "table") => ("", nul),
+            ("list", "bullet") => ("●", nul),
+            ("ul", "disk") => ("●", nul),
+            ("ul", "square") => ("■", nul),
+            ("ul", "circle") => ("○", nul),
             ("ol", null) => (nul, "1"),
             ("ol", _) => (nul, type),
-            _ => ("● ", nul)
+            _ => (nul, nul)
         };
         int number = 1;
         foreach (var listItem in el.Elements()) {
@@ -157,34 +174,26 @@ internal sealed class DocCommentParser
                     _accumulator.Add("\r\n");
                 }
                 _accumulator.Underline = false;
-            } else { // item
-                _accumulator.Add(numberType switch {
-                    null => bullet,
+            } else { // textBlock
+                CloseBlock();
+                string actualBullet = numberType switch {
+                    null => bullet ?? _levelBullets[_listLevel % _levelBullets.Length],
                     "A" => Helpers.Number.ToAlphabet(number) + ". ",
                     "a" => Helpers.Number.ToAlphabet(number, lowerCase: true) + ". ",
                     "I" => Helpers.Number.ToRoman(number) + ". ",
                     "i" => Helpers.Number.ToRoman(number, lowerCase: true) + ". ",
                     _ => number.ToString() + ". "
-                }); ;
-                foreach (var itemNode in listItem.Nodes()) {
-                    switch (itemNode) {
-                        case XElement { Name.LocalName: "term" or "dt" } term:
-                            _accumulator.Bold = true;
-                            ParseElement(term);
-                            _accumulator.Add(" – ");
-                            _accumulator.Bold = false;
-                            break;
-                        case XElement itemEl:
-                            ParseElement(itemEl);
-                            break;
-                        case XText itemText:
-                            _accumulator.Add(itemText.Value);
-                            break;
-                    }
-                }
-                _accumulator.Add("\r\n");
+                };
+                _accumulator.Add(actualBullet);
+                TextBlock? textBlock = CloseBlock(height: 0.0);
+                double itemIndent = Math.Max(textBlock?.Text.Width ?? 0.0, _emSize) + 0.5 * _emSize;
+                _indent += itemIndent;
+                ParseElement(listItem);
+                CloseBlock();
+                _indent -= itemIndent;
                 number++;
             }
         }
+        _listLevel--;
     }
 }

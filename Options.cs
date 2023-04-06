@@ -14,6 +14,7 @@ internal static class Options
     public static readonly Brush CodeBackground = Brushes.Gainsboro;
 
     public static readonly Pen CommentOutline;
+    public static readonly Pen CommentSeparator;
 
     static Options()
     {
@@ -32,7 +33,10 @@ internal static class Options
         CodeCaptionTypeFace = new Typeface(new FontFamily("Cascadia Mono"),
             FontStyles.Normal, FontWeights.Bold, FontStretches.Normal, new FontFamily("Consolas"));
 
-        CommentOutline = new Pen(Brushes.DarkKhaki, 0.8);
+        CommentOutline = new Pen(Brushes.DarkKhaki, 2.0);
         CommentOutline.Freeze();
+
+        CommentSeparator = new Pen(Brushes.DarkKhaki, 0.5);
+        CommentSeparator.Freeze();
     }
 }
