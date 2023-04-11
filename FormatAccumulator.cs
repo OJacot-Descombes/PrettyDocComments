@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
+using PrettyDocComments.Helpers;
+using PrettyDocComments.Model;
 
 namespace PrettyDocComments;
 
@@ -22,6 +24,7 @@ internal class FormatAccumulator
     private bool _strikethrough;
     private bool _underline;
     private bool _code;
+    private Brush _textColor = Options.DefaultTextColor;
 
     public bool HasText => _runs.Count > 0;
 
@@ -30,10 +33,11 @@ internal class FormatAccumulator
     public bool Strikethrough { get => _strikethrough; set => _strikethrough = value; }
     public bool Underline { get => _underline; set => _underline = value; }
     public bool Code { get => _code; set => _code = value; }
+    public Brush TextColor { get => _textColor; set => _textColor = value; }
 
     public void Add(string text)
     {
-        _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code));
+        _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textColor));
     }
 
     public FormattedText GetFormattedText()
@@ -42,12 +46,13 @@ internal class FormatAccumulator
         var formattedText = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
             Options.NormalTypeFace, _emSize, Brushes.Black, _pixelsPerDip);
         int startIndex = 0;
-        foreach (var run in _runs) {
+        foreach (FormatRun run in _runs) {
             int length = run.Text?.Length ?? 0;
 
             formattedText.SetFontTypeface(run.Code ? Options.CodeTypeFace : Options.NormalTypeFace, startIndex, length);
             formattedText.SetFontStyle(run.Italic ? FontStyles.Italic : FontStyles.Normal, startIndex, length);
             formattedText.SetFontWeight(run.Bold ? FontWeights.Bold : FontWeights.Normal, startIndex, length);
+            formattedText.SetForegroundBrush(run.TextBrush, startIndex, length);
 
             var textDecorations = new TextDecorationCollection(2);
             if (run.Underline) {

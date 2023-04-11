@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -8,6 +7,9 @@ using System.Xml.Linq;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
+using PrettyDocComments.Helpers;
+using PrettyDocComments.Model;
+using PrettyDocComments.Services;
 
 namespace PrettyDocComments;
 
@@ -16,31 +18,17 @@ namespace PrettyDocComments;
 /// </summary>
 internal sealed class CommentAdornment
 {
-    private readonly struct DocComment
-    {
-        public DocComment(SnapshotSpan span, Rect bounds, string text)
-        {
-            Span = span;
-            Bounds = bounds;
-            Text = text;
-        }
-
-        public readonly SnapshotSpan Span;
-        public readonly Rect Bounds;
-        public readonly string Text;
-    }
 
     private readonly IAdornmentLayer _layer;
     private readonly IWpfTextView _view;
-    private readonly Regex _docCommentRecognizer;
     private readonly DocCommentRenderer _docCommentRenderer;
-    private readonly double _averageCharWidth;
+    private readonly Detector _detector;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CommentAdornment"/> class.
     /// </summary>
     /// <param name="view">Text view to create the adornment for</param>
-    public CommentAdornment(IWpfTextView view, Regex docCommentRecognizer, System.Drawing.Font editorFont)
+    public CommentAdornment(IWpfTextView view, Regex docCommentRegex, System.Drawing.Font editorFont)
     {
         if (view == null) {
             throw new ArgumentNullException("view");
@@ -48,12 +36,11 @@ internal sealed class CommentAdornment
         _layer = view.GetAdornmentLayer("TextAdornment");
 
         _view = view;
-        _docCommentRecognizer = docCommentRecognizer;
+        _detector = new Detector(view, docCommentRegex, editorFont);
         _view.LayoutChanged += View_LayoutChanged;
         _view.Caret.PositionChanged += Caret_PositionChanged;
 
         _docCommentRenderer = new(VisualTreeHelper.GetDpi(_view.VisualElement).PixelsPerDip, editorFont.Size);
-        _averageCharWidth = GetAverageCharWidth(editorFont);
     }
 
     private void Caret_PositionChanged(object sender, CaretPositionChangedEventArgs e)
@@ -117,8 +104,8 @@ internal sealed class CommentAdornment
         try {
             _layer.RemoveAdornmentsByTag(this);
 
-            foreach (DocComment docComment in GetDocComments(_view.TextSnapshot)) {
-                if (DocCommentLoader.Instance.TryLoad(docComment.Text, out IEnumerable<XNode> nodes)) {
+            foreach (OriginalComment docComment in _detector.GetVisibleComments(_view.TextSnapshot)) {
+                if (Xml.TryParseUnrootedNodes(docComment.Text, out IEnumerable<XNode> nodes)) {
                     CreateVisuals(docComment, nodes);
                 }
             }
@@ -129,99 +116,11 @@ internal sealed class CommentAdornment
         }
     }
 
-    private (int commentStart, int visibleStart, int visibleEnd) GetLineIndexRange(ITextSnapshot textSnapshot)
-    {
-        int visibleStart = _view.TextViewLines.FirstVisibleLine.Start.GetContainingLineNumber();
-        int visibleEnd = _view.TextViewLines.LastVisibleLine.Start.GetContainingLineNumber();
-
-        int commentStart = visibleStart;
-        if (commentStart < textSnapshot.LineCount) {
-            while (commentStart > 0 &&
-                _docCommentRecognizer.IsMatch(textSnapshot.GetLineFromLineNumber(commentStart).GetText())) {
-
-                commentStart--;
-            }
-        }
-
-        return (commentStart, visibleStart, visibleEnd);
-    }
-
-    private IEnumerable<DocComment> GetDocComments(ITextSnapshot textSnapshot)
-    {
-        int commentStartLineIndex = 0;
-        int maxTextLength = 0;
-        double left = -1;
-        bool isInComment = false;
-
-        var (commentStart, visibleStart, visibleEnd) = GetLineIndexRange(textSnapshot);
-        int lineIndex = commentStart;
-
-
-        SnapshotPoint visibleStartPoint = textSnapshot.GetLineFromLineNumber(visibleStart).Start;
-        TextBounds visibleStartBounds = _view.TextViewLines.GetCharacterBounds(visibleStartPoint);
-
-        SnapshotPoint visibleEndPoint = textSnapshot.GetLineFromLineNumber(visibleEnd).Start;
-        double visibleBottom = _view.TextViewLines.GetCharacterBounds(visibleEndPoint).Bottom;
-
-        StringBuilder sb = new();
-        while (lineIndex <= (isInComment ? textSnapshot.LineCount : Math.Min(visibleEnd, textSnapshot.LineCount))) {
-            ITextSnapshotLine textLine = textSnapshot.GetLineFromLineNumber(lineIndex);
-            string text = textLine.GetText();
-            Match match = _docCommentRecognizer.Match(text);
-            if (match.Success) {
-                if (!isInComment) { // Start of new doc comment.
-                    commentStartLineIndex = lineIndex;
-                    isInComment = true;
-                    maxTextLength = 0;
-                    left = -1;
-                }
-
-                string commentText = text.Substring(match.Groups[2].Index);
-                sb.AppendLine(commentText.Trim());
-                maxTextLength = Math.Max(maxTextLength, commentText.Length);
-                if (left == -1 && lineIndex >= visibleStart && lineIndex <= visibleEnd) {
-                    left = GetLeftBound(textSnapshot, lineIndex, match);
-                }
-            } else if (isInComment) { // Reached end of comment, return DocComment structure.
-                double top, bottom;
-                SnapshotPoint startPoint = textSnapshot.GetLineFromLineNumber(commentStartLineIndex).Start;
-                if (commentStartLineIndex >= visibleStart) {
-                    top = _view.TextViewLines.GetCharacterBounds(startPoint).Top;
-                } else { // Line is not in TextViewLines buffer. 
-                    top = visibleStartBounds.Top - _view.LineHeight * (visibleStart - commentStartLineIndex);
-                }
-
-                int previousIndex = lineIndex - 1;
-                SnapshotPoint endPoint = textSnapshot.GetLineFromLineNumber(previousIndex).Start;
-                if (previousIndex <= visibleEnd) {
-                    bottom = _view.TextViewLines.GetCharacterBounds(endPoint).Bottom;
-                } else {
-                    bottom = visibleBottom + _view.LineHeight * (previousIndex - visibleEnd);
-                }
-                var rect = new Rect(left, top, _averageCharWidth * (maxTextLength + 3), bottom - top);
-                var docComment = new DocComment(new SnapshotSpan(startPoint, endPoint), rect, sb.ToString());
-                yield return docComment;
-                isInComment = false;
-                sb.Clear();
-            }
-            lineIndex++;
-        }
-    }
-
-    private double GetLeftBound(ITextSnapshot textSnapshot, int lineIndex, Match match)
-    {
-        double left;
-        SnapshotPoint lineStart = textSnapshot.GetLineFromLineNumber(lineIndex).Start;
-        int commentLeftCharIndex = match.Groups[1].Index;
-        left = _view.TextViewLines.GetCharacterBounds(lineStart + commentLeftCharIndex).Left;
-        return left;
-    }
-
     /// <summary>
     /// Adds the scarlet box behind the 'a' characters within the given line
     /// </summary>
     /// <param name="line">Line to add the adornments</param>
-    private void CreateVisuals(DocComment docComment, IEnumerable<XNode> nodes)
+    private void CreateVisuals(OriginalComment docComment, IEnumerable<XNode> nodes)
     {
 
         var drawingGroup = new DrawingGroup();
@@ -263,23 +162,13 @@ internal sealed class CommentAdornment
         }
     }
 
-    private void RenderDocComment(DrawingContext dc, DocComment docComment, IEnumerable<XNode> nodes)
+    private void RenderDocComment(DrawingContext dc, OriginalComment docComment, IEnumerable<XNode> nodes)
     {
         dc.PushClip(new RectangleGeometry(docComment.Bounds));
         dc.DrawRectangle(Options.CommentBackground, Options.CommentOutline, docComment.Bounds);
         dc.PushTransform(new TranslateTransform(docComment.Bounds.X, docComment.Bounds.Y));
 
         _docCommentRenderer.Render(dc, docComment.Bounds, nodes);
-    }
-
-    private double GetAverageCharWidth(System.Drawing.Font font)
-    {
-        const string ExampleText = "The Quick Brown Fox Jumps Over The Lazy Dog";
-
-        using var bmp = new System.Drawing.Bitmap(1, 1);
-        using var g = System.Drawing.Graphics.FromImage(bmp);
-        System.Drawing.SizeF size = g.MeasureString(ExampleText, font);
-        return size.Width / ExampleText.Length;
     }
 }
 

@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 
-namespace PrettyDocComments;
+namespace PrettyDocComments.Helpers;
 
 internal static class Options
 {
@@ -12,6 +12,8 @@ internal static class Options
 
     public static readonly Brush CommentBackground = Brushes.LightGoldenrodYellow;
     public static readonly Brush CodeBackground = Brushes.Gainsboro;
+    public static readonly Brush DefaultTextColor = Brushes.Black;
+    public static readonly Brush CRefTextColor = Brushes.DarkSlateBlue;
 
     public static readonly Pen CommentOutline;
     public static readonly Pen CommentSeparator;

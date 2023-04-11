@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using System.Xml.Linq;
+using PrettyDocComments.Helpers;
 
 namespace PrettyDocComments;
 
@@ -113,6 +113,12 @@ internal sealed class DocCommentParser
                         case "description" when _listLevel >= 0:
                             ParseElement(el);
                             break;
+                        case "see" when el.Attribute("cref").Value is { Length: > 0 } crefText:
+                            var currentTextColor = _accumulator.TextColor;
+                            _accumulator.TextColor = Options.CRefTextColor;
+                            _accumulator.Add(crefText);
+                            _accumulator.TextColor = currentTextColor;
+                            break;
                         default:
                             _accumulator.Add(el.ToString());
                             break;
@@ -150,20 +156,20 @@ internal sealed class DocCommentParser
     {
         // The <list> tag denotes a doc-comment type list, other types (ul, ol, dl, menu) are HTML type lists.
 
-        const string nul = null;
+        const string Nul = null;
 
         _listLevel++;
         string type = el.Attributes("type").FirstOrDefault()?.Value;
         (string bullet, string numberType) = (listTag, type) switch {
-            ("list", "number") => (nul, "1"),
-            ("list", "table") => ("", nul),
-            ("list", "bullet") => ("●", nul),
-            ("ul", "disk") => ("●", nul),
-            ("ul", "square") => ("■", nul),
-            ("ul", "circle") => ("○", nul),
-            ("ol", null) => (nul, "1"),
-            ("ol", _) => (nul, type),
-            _ => (nul, nul)
+            ("list", "number") => (Nul, "1"),
+            ("list", "table") => ("", Nul),
+            ("list", "bullet") => ("●", Nul),
+            ("ul", "disk") => ("●", Nul),
+            ("ul", "square") => ("■", Nul),
+            ("ul", "circle") => ("○", Nul),
+            ("ol", null) => (Nul, "1"),
+            ("ol", _) => (Nul, type),
+            _ => (Nul, Nul)
         };
         int number = 1;
         foreach (var listItem in el.Elements()) {

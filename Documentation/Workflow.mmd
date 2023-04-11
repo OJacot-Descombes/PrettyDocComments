@@ -1,0 +1,35 @@
+﻿---
+title: Workflow of doc comment detection and rendering
+---
+flowchart TD
+    DEV([Editor view<br/><small>C# VB F# C++</small>]) ~~~ |<code>IWpfTextView</code>| DEV
+    DOC(["{ <code>OriginalComment</code> }"])
+    DXN(["{ <code>XNode</code> }"])
+    DTB(["{ <code>TextBlock</code> }"])
+    DRI(["{ <code>Shape</code> }"])
+    DA([Adorner])
+    DLT(["<code>LineTransform</code>"])
+
+    OD[Detect doc comments] ~~~ |Detector| OD
+    OPX[Parse XML text]
+    OCA[Compose adorner<br/><small>parse top-level XElements</small>]  ~~~ |<code>Composer</code>| OCA
+    OR[Render]
+    OCT[Calculate transform]
+    OFT[Format text<br/><small>parse low-level XNodes</small>]
+
+    DEV --> OD --> DOC --> OCA --> DRI --> OR --> DA
+    DRI --> OCT --> DLT
+    OCA --> OFT --> DTB --> OCA
+    OCA --> OPX --> DXN --> OCA
+
+    subgraph sub_op [Operation]
+        SO["&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"]
+    end    
+    subgraph sub_coll [Collection of Data]
+        SCD(["{ Data }"])
+    end    
+    subgraph sub_data [Data]
+        SD(["&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"])
+    end
+
+    sub_op ~~~ sub_data ~~~ sub_coll

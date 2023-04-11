@@ -5,7 +5,7 @@ namespace PrettyDocComments.Helpers;
 public static class Number
 {
     // See also: https://en.wikipedia.org/wiki/Roman_numerals
-    private static readonly (int number, string roman)[] Numbers = {
+    private static readonly (int number, string roman)[] _numbers = {
         (100_000, "ↈ"  ),
         ( 90_000, "ↂↈ"),
         ( 50_000, "ↇ"   ),
@@ -36,7 +36,7 @@ public static class Number
         var sb = new StringBuilder();
         int i = 0;
         while (n != 0) {
-            (int number, string roman) = Numbers[i];
+            (int number, string roman) = _numbers[i];
             if (n >= number) {
                 n -= number;
                 sb.Append(roman);
