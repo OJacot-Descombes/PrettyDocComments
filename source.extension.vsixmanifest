@@ -1,13 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.1" Language="en-US" Publisher="Olivier Jacot-Descombes" />
+        <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.1.2" Language="en-US" Publisher="Olivier Jacot-Descombes" />
         <DisplayName>Pretty Doc Comments</DisplayName>
-        <Description xml:space="preserve">Displays XML doc comments in a WYSIWYG manner. The aim of this extension is to reduce the visual noise in the editor produced by doc comments.
+        <Description xml:space="preserve">Displays XML doc comments in a nice way and reduces the visual noise in the editor. C#, VB, F# and C++ supported.
 
-Placing the caret on a doc comment line hides the WYSIWIG display and shows the original XML-tagged comment which can now be edited the usual way.</Description>
+When you place the caret on a comment, the original XML is displayed and can be edited in the usual way.</Description>
+        <Icon>PrettyDocComments.ico</Icon>
         <PreviewImage>PrettyDocComments_200x200.png</PreviewImage>
-        <Tags>XML, doc, comments, doc comments, XML doc comments, C#, csharp, VB, Visual Basic, WYSIWYG, prettify.</Tags>
+        <Tags>XML, doc, comments, doc comments, XML doc comments, C#, csharp, VB, Visual Basic, F#, fsharp, C++, WYSIWYG, prettify.</Tags>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace PrettyDocComments;
+namespace PrettyDocComments.Model;
 
 internal readonly struct TextBlock
 {

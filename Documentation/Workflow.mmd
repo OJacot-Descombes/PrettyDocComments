@@ -2,34 +2,39 @@
 title: Workflow of doc comment detection and rendering
 ---
 flowchart TD
-    DEV([Editor view<br/><small>C# VB F# C++</small>]) ~~~ |<code>IWpfTextView</code>| DEV
-    DOC(["{ <code>OriginalComment</code> }"])
-    DXN(["{ <code>XNode</code> }"])
-    DTB(["{ <code>TextBlock</code> }"])
-    DRI(["{ <code>Shape</code> }"])
-    DA([Adorner])
-    DLT(["<code>LineTransform</code>"])
+    D_Text(["<code>IWpfTextView.TextSnapshot</code><br/><small>C# VB F# C++</small>"])
+    OP_Loc["<code>Locator</code><br/><small>detects doc comments</small>"]
+    D_CmtStr(["<code>Comment&lt;string&gt;</code><br/><small>as XML</small>"])
+    OP_XParse["<code>XDocument.Parse</code>"]
+    D_CmtXNodes(["<code>Comment&lt;IEnumerable&lt;XNode&gt;&gt;</code>"])
+    OP_ShpParse["<code>ShapeParser</code>"]
+    D_CmtShapes(["<code>Comment&lt;List&lt;Shape&gt;&gt;</code>"])
+    OP_Render1["<code>Renderer.GetRenderInfo</code>"]
 
-    OD[Detect doc comments] ~~~ |Detector| OD
-    OPX[Parse XML text]
-    OCA[Compose adorner<br/><small>parse top-level XElements</small>]  ~~~ |<code>Composer</code>| OCA
-    OR[Render]
-    OCT[Calculate transform]
-    OFT[Format text<br/><small>parse low-level XNodes</small>]
+    D_AdornerRndrInf(["<code>List&lt;Comment&lt;RenderInfo&gt;&gt;</code><br/><small><code>Adorner.RenderingInformation</code></small>>"])
+    D_TextView(["<code>IWpfTextView.TextViewLines</code>"])
 
-    DEV --> OD --> DOC --> OCA --> DRI --> OR --> DA
-    DRI --> OCT --> DLT
-    OCA --> OFT --> DTB --> OCA
-    OCA --> OPX --> DXN --> OCA
+    OP_Render2["<code>Renderer.Render</code>"]
+    D_CmtImg(["<code>Comment&lt;Image&gt;</code>"])
 
-    subgraph sub_op [Operation]
-        SO["&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"]
-    end    
-    subgraph sub_coll [Collection of Data]
-        SCD(["{ Data }"])
-    end    
-    subgraph sub_data [Data]
-        SD(["&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"])
+    D_AdornerLyr(["<code>IAdornmentLayer</code>"])
+
+    D_Text --> SUB_LT --> D_AdornerRndrInf --> SUB_AD --> D_AdornerLyr
+    D_TextView --> SUB_AD
+
+    D_Text ~~~ SUB_Legend
+
+    subgraph SUB_Legend [Legend]
+     SO["&nbsp;Operation / Service&nbsp;"]
+     ~~~
+     SD(["&nbsp;&nbsp;&nbsp;&nbsp;Data&nbsp;&nbsp;&nbsp;&nbsp;"])
     end
 
-    sub_op ~~~ sub_data ~~~ sub_coll
+    subgraph SUB_LT ["<code>LineTransformSource</code>"]
+       OP_Loc --> D_CmtStr --> OP_XParse --> D_CmtXNodes -->
+       OP_ShpParse --> D_CmtShapes --> OP_Render1
+    end
+
+    subgraph SUB_AD ["<code>Adornment</code>"]
+        OP_Render2 --> D_CmtImg
+    end    

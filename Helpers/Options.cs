@@ -17,6 +17,7 @@ internal static class Options
 
     public static readonly Pen CommentOutline;
     public static readonly Pen CommentSeparator;
+    public static readonly Pen BoldCommentSeparator;
 
     static Options()
     {
@@ -40,5 +41,7 @@ internal static class Options
 
         CommentSeparator = new Pen(Brushes.DarkKhaki, 0.5);
         CommentSeparator.Freeze();
+
+        BoldCommentSeparator = CommentOutline;
     }
 }

@@ -15,5 +15,7 @@ internal abstract class Shape
 
     public double DeltaY { get; }
 
+    public double Bottom => _origin.Y + DeltaY;
+
     public abstract void Draw(DrawingContext dc);
 }

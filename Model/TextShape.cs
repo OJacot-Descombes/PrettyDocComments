@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace PrettyDocComments.Model;
 
-internal class TextShape : Shape
+internal sealed class TextShape : Shape
 {
     public TextShape(FormattedText text, Point origin, double deltaY)
         : base(origin, deltaY)
@@ -11,7 +11,7 @@ internal class TextShape : Shape
         _text = text;
     }
 
-    private FormattedText _text;
+    private readonly FormattedText _text;
 
     public override void Draw(DrawingContext dc)
     {

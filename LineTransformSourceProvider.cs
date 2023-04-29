@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
@@ -8,19 +10,23 @@ using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Outlining;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
+using PrettyDocComments.Services;
 
 namespace PrettyDocComments;
 
 /// <summary>
 /// Provides a <see cref="LineTransformSource"/> for each supported editor view and passes it a
-/// <see cref="CommentAdornment"/>, so that doc comments can be properly sized and rendered.
+/// <see cref="Adornment"/>, so that doc comments can be properly sized and rendered.
 /// </summary>
 [Export(typeof(ILineTransformSourceProvider))]
 [ContentType("code")]
 [TextViewRole(PredefinedTextViewRoles.Document)]
 internal sealed class LineTransformSourceProvider : ILineTransformSourceProvider
 {
-#pragma warning disable IDE0044, IDE0051 // Add readonly modifier, Remove unused private members.
+    private static readonly Regex _cSharpDocCommentRecoginzer = new(@"^\s*(///)([^/]|$)", RegexOptions.Compiled);
+    private static readonly Regex _visualBasicDocCommentRecoginzer = new(@"^\s*(''')([^/]|$)", RegexOptions.Compiled);
+
+#pragma warning disable IDE0044, IDE0051, CS0649, CS0169 // Add readonly modifier, Remove unused private members.
 
     /// <summary>
     /// Defines the adornment layer for the adornment. This layer is ordered after the text layer in the Z-order.
@@ -33,16 +39,23 @@ internal sealed class LineTransformSourceProvider : ILineTransformSourceProvider
     [Import]
     private IVsFontsAndColorsInformationService _fontsAndColorsInformationService;
 
-#pragma warning restore IDE0044, IDE0051
+#pragma warning restore  IDE0044, IDE0051, CS0649, CS0169
 
-    public ILineTransformSource Create(IWpfTextView textView)
+    public ILineTransformSource Create(IWpfTextView view)
     {
-        if (AdornmentFactory.Create(textView, GetEditorFont()) is { } adornment) {
-            return new LineTransformSource(textView, GetOutliningManager(textView), adornment);
+        Regex docCommentRegex = view.TextBuffer.ContentType.TypeName switch {
+            "CSharp" or "F#" or "C/C++" => _cSharpDocCommentRecoginzer,
+            "Basic" => _visualBasicDocCommentRecoginzer,
+            _ => null
+        };
+
+        if (docCommentRegex != null) {
+            return new LineTransformSource(view, GetOutliningManager(view), docCommentRegex, GetEditorFont());
         }
         return null;
     }
 
+    [SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "<Pending>")]
     private IOutliningManager GetOutliningManager(IWpfTextView textView) =>
         ((IComponentModel)ServiceProvider.GlobalProvider.GetService(typeof(SComponentModel)))
             ?.GetService<IOutliningManagerService>()?.GetOutliningManager(textView);

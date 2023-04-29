@@ -3,10 +3,10 @@ using System.Windows.Media;
 
 namespace PrettyDocComments.Model;
 
-internal class LineShape : Shape
+internal sealed class LineShape : Shape
 {
-    private Pen _pen;
-    private Point _endpoint;
+    private readonly Pen _pen;
+    private readonly Point _endpoint;
 
     public LineShape(Pen pen, Point origin, Point endpoint, double deltaY)
         : base(origin, deltaY)

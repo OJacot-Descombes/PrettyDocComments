@@ -1,8 +1,9 @@
 ﻿using System.Windows.Media;
 using System.Xml.Linq;
 using PrettyDocComments.Helpers;
+using PrettyDocComments.Model;
 
-namespace PrettyDocComments;
+namespace PrettyDocComments.Services;
 
 internal sealed class DocCommentParser
 {
@@ -103,6 +104,12 @@ internal sealed class DocCommentParser
                             break;
                         case "list" or "ul" or "ol" or "dl" or "menu":
                             ParseList(el, normalizedTag);
+                            break;
+                        case "para":
+                            ParseElement(TrimLineBreaks(el));
+                            CloseBlock();
+                            _accumulator.Add(" ");
+                            CloseBlock(height: _emSize / 2.5);
                             break;
                         case "term" or "dt" when _listLevel >= 0:
                             _accumulator.Bold = true;

@@ -46,17 +46,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AdornmentFactory.cs" />
-    <Compile Include="Model\Composer.cs" />
+    <Compile Include="Model\Comment.cs" />
+    <Compile Include="Model\RenderInfo.cs" />
     <Compile Include="Model\LineShape.cs" />
-    <Compile Include="Model\OriginalComment.cs" />
-    <Compile Include="DocCommentRenderer.cs" />
-    <Compile Include="FormatAccumulator.cs" />
-    <Compile Include="DocCommentParser.cs" />
+    <Compile Include="Model\FormatAccumulator.cs" />
+    <Compile Include="Services\DocCommentParser.cs" />
     <Compile Include="Model\FormatRun.cs" />
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="Helpers\Xml.cs" />
-    <Compile Include="LineTransformSource.cs" />
+    <Compile Include="Services\LineTransformSource.cs" />
     <Compile Include="LineTransformSourceProvider.cs" />
     <Compile Include="Helpers\Options.cs" />
     <Compile Include="Model\RectangleShape.cs" />
@@ -64,10 +62,12 @@
     <Compile Include="Model\TextShape.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PrettyDocCommentsPackage.cs" />
-    <Compile Include="CommentAdornment.cs" />
+    <Compile Include="Services\Adornment.cs" />
     <Compile Include="Helpers\Number.cs" />
-    <Compile Include="Services\Detector.cs" />
-    <Compile Include="TextBlock.cs" />
+    <Compile Include="Services\Locator.cs" />
+    <Compile Include="Services\Renderer.cs" />
+    <Compile Include="Services\ShapeParser.cs" />
+    <Compile Include="Model\TextBlock.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Documentation\Workflow.mmd" />
@@ -99,6 +99,11 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Documentation\Workflow.png" />
+    <Content Include="PrettyDocComments.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="PrettyDocComments_200x200.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -107,6 +112,11 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)$(OutDir)PrettyDocComments.vsix" "C:\Users\Oli\Documents\Proj\CySoft\Private_VSIX_Feed" /Y
+C:\Users\Oli\Documents\Proj\CySoft\Private_VSIX_Feed\PrivateGalleryCreator.exe --terminate
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

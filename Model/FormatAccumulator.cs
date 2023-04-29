@@ -2,9 +2,9 @@
 using System.Windows;
 using System.Windows.Media;
 using PrettyDocComments.Helpers;
-using PrettyDocComments.Model;
+using static System.Net.Mime.MediaTypeNames;
 
-namespace PrettyDocComments;
+namespace PrettyDocComments.Model;
 
 internal class FormatAccumulator
 {
@@ -48,12 +48,10 @@ internal class FormatAccumulator
         int startIndex = 0;
         foreach (FormatRun run in _runs) {
             int length = run.Text?.Length ?? 0;
-
             formattedText.SetFontTypeface(run.Code ? Options.CodeTypeFace : Options.NormalTypeFace, startIndex, length);
             formattedText.SetFontStyle(run.Italic ? FontStyles.Italic : FontStyles.Normal, startIndex, length);
             formattedText.SetFontWeight(run.Bold ? FontWeights.Bold : FontWeights.Normal, startIndex, length);
             formattedText.SetForegroundBrush(run.TextBrush, startIndex, length);
-
             var textDecorations = new TextDecorationCollection(2);
             if (run.Underline) {
                 textDecorations.Add(TextDecorations.Underline);

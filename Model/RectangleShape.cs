@@ -3,10 +3,10 @@ using System.Windows.Media;
 
 namespace PrettyDocComments.Model;
 
-internal class RectangleShape : Shape
+internal sealed class RectangleShape : Shape
 {
-    private Brush _brush;
-    private double _width, _height;
+    private readonly Brush _brush;
+    private readonly double _width, _height;
 
     public RectangleShape(Brush brush, Point origin, double width, double height, double deltaY)
         : base(origin, deltaY)
