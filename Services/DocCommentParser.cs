@@ -1,5 +1,6 @@
 ﻿using System.Windows.Media;
 using System.Xml.Linq;
+using Microsoft.VisualStudio.Text.Editor;
 using PrettyDocComments.Helpers;
 using PrettyDocComments.Model;
 
@@ -14,11 +15,11 @@ internal sealed class DocCommentParser
     private int _listLevel = -1;
     private static readonly string[] _levelBullets = { "●", "■", "○" };
 
-    public DocCommentParser(double emSize, double pixelsPerDip, double indent)
+    public DocCommentParser(double indent, IWpfTextView view)
     {
-        _accumulator = new FormatAccumulator(emSize, pixelsPerDip);
-        _emSize = emSize;
         _indent = indent;
+        _accumulator = new FormatAccumulator(view);
+        _emSize = view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * Options.FontScaling;
     }
 
     public IEnumerable<TextBlock> Parse(XElement node)

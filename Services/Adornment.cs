@@ -4,6 +4,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Formatting;
 using PrettyDocComments.Model;
 
 namespace PrettyDocComments.Services;
@@ -111,17 +112,17 @@ internal sealed class Adornment
                 bool isFirstCommentLineVisible = comment.FirstLineNumber >= firstVisibleLineNumber;
                 bool isLastCommentLineVisible = comment.LastLineNumber <= lastVisibleLineNumber;
                 if (isFirstCommentLineVisible && isLastCommentLineVisible) {
-                    top = viewLines.GetCharacterBounds(comment.Span.Start).Top;
-                    height = viewLines.GetCharacterBounds(comment.Span.End).Bottom - top;
+                    top = SafeGetCharacterBounds(comment.Span.Start).Top;
+                    height = SafeGetCharacterBounds(comment.Span.End).Bottom - top;
                     topPadding = Math.Max(0, height - comment.Data.CalculatedHeight);
                 } else if (isFirstCommentLineVisible) {
-                    top = viewLines.GetCharacterBounds(comment.Span.Start).Top;
+                    top = SafeGetCharacterBounds(comment.Span.Start).Top;
                     height = Math.Max(comment.Data.CalculatedHeight, viewLines.LastVisibleLine.Bottom - top);
                     topPadding = 0.0;
                 } else if (isLastCommentLineVisible) {
                     height = Math.Max(comment.Data.CalculatedHeight,
-                        viewLines.GetCharacterBounds(comment.Span.End).Bottom - viewLines.FirstVisibleLine.Top + 1);
-                    top = viewLines.GetCharacterBounds(comment.Span.End).Bottom - height;
+                        SafeGetCharacterBounds(comment.Span.End).Bottom - viewLines.FirstVisibleLine.Top + 1);
+                    top = SafeGetCharacterBounds(comment.Span.End).Bottom - height;
                     topPadding = Math.Max(0, height - comment.Data.CalculatedHeight);
                 } else { // Neither first or last line of comment are visible, use heuristics (not very precise).
                     top = _view.ViewportTop - _view.LineHeight * (firstVisibleLineNumber - comment.FirstLineNumber);
@@ -129,13 +130,13 @@ internal sealed class Adornment
                     topPadding = 0.0;
                 }
 
-                var renderedComment = _renderer.Render(comment, height, topPadding);
+                var renderedComment = _renderer.Render(comment, height, topPadding, _view);
                 Image image = renderedComment.Data;
                 Canvas.SetTop(image, top);
 
                 int lineNumber = Math.Max(comment.FirstLineNumber, firstVisibleLineNumber);
                 SnapshotPoint lineStart = _view.TextSnapshot.GetLineFromLineNumber(lineNumber).Start;
-                double left = viewLines.GetCharacterBounds(lineStart + comment.CommentLeftCharIndex).Left;
+                double left = SafeGetCharacterBounds(lineStart + comment.CommentLeftCharIndex).Left;
                 Canvas.SetLeft(image, left);
 
                 image.SizeChanged += Image_SizeChanged;
@@ -152,6 +153,15 @@ internal sealed class Adornment
 #if DEBUG
             MessageBox.Show(ex.ToString());
 #endif
+        }
+    }
+
+    private TextBounds SafeGetCharacterBounds(SnapshotPoint bufferPosition)
+    {
+        if (_view.TextViewLines is { IsValid: true } && _view.TextViewLines.ContainsBufferPosition(bufferPosition)) {
+            return _view.TextViewLines.GetCharacterBounds(bufferPosition);
+        } else {
+            return new TextBounds(0, 0, 10, 10, 0, 5);
         }
     }
 

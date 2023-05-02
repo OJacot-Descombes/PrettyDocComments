@@ -1,21 +1,18 @@
-﻿using System.Globalization;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
+using Microsoft.VisualStudio.Text.Editor;
 using PrettyDocComments.Helpers;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PrettyDocComments.Model;
 
 internal class FormatAccumulator
 {
-    public FormatAccumulator(double emSize, double pixelsPerDip)
+    public FormatAccumulator(IWpfTextView view)
     {
-        _pixelsPerDip = pixelsPerDip;
-        _emSize = emSize;
+        _view = view;
     }
 
-    private readonly double _emSize;
-    private readonly double _pixelsPerDip;
+    private readonly IWpfTextView _view;
 
     private readonly List<FormatRun> _runs = new();
 
@@ -43,8 +40,7 @@ internal class FormatAccumulator
     public FormattedText GetFormattedText()
     {
         string text = String.Concat(_runs.Select(r => r.Text));
-        var formattedText = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            Options.NormalTypeFace, _emSize, Brushes.Black, _pixelsPerDip);
+        FormattedText formattedText = Factory.CreateFormattedText(text, Options.NormalTypeFace, _view);
         int startIndex = 0;
         foreach (FormatRun run in _runs) {
             int length = run.Text?.Length ?? 0;

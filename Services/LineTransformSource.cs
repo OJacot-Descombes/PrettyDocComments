@@ -23,16 +23,14 @@ internal sealed class LineTransformSource : ILineTransformSource
     private readonly Locator _locator;
     private readonly ShapeParser _shapeParser;
 
-    public LineTransformSource(IWpfTextView view, IOutliningManager outliningManager,
-        Regex docCommentRegex, System.Drawing.Font editorFont)
+    public LineTransformSource(IWpfTextView view, IOutliningManager outliningManager, Regex docCommentRegex)
     {
         _outliningManager = outliningManager;
         _view = view;
         _adornment = new Adornment(view, _renderer);
 
-
-        _locator = new Locator(docCommentRegex, editorFont);
-        _shapeParser = new ShapeParser(VisualTreeHelper.GetDpi(_view.VisualElement).PixelsPerDip, editorFont.Size);
+        _locator = new Locator(docCommentRegex, view.FormattedLineSource.ColumnWidth);
+        _shapeParser = new ShapeParser(view);
     }
 
     public LineTransform GetLineTransform(ITextViewLine line, double yPosition, ViewRelativePosition placement)

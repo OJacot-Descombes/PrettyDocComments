@@ -1,16 +1,16 @@
-﻿using PrettyDocComments.Helpers;
-using PrettyDocComments.Model;
-using System.Xml.Linq;
-using System.Collections.Immutable;
-using System.Globalization;
-using System.Windows.Media;
+﻿using System.Collections.Immutable;
 using System.Windows;
+using System.Windows.Media;
+using System.Xml.Linq;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Utilities;
+using PrettyDocComments.Helpers;
+using PrettyDocComments.Model;
 
 namespace PrettyDocComments.Services;
 
 internal sealed class ShapeParser
 {
-    private const double BaseIndent = 3.0;
     private const char NonBreakingSpace = '\u00A0';
     private const string SubtitleIdentSpaces = "    ";
 
@@ -19,18 +19,20 @@ internal sealed class ShapeParser
         "seealso", "summary", "typeparam", "value"
     }.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
 
-    private readonly double _pixelsPerDip;
-    private readonly double _normalEmSize;
+    private readonly IWpfTextView _view;
+    private readonly double _emSize;
     private readonly double _initialY;
+    private readonly double _width;
 
     private double _y;
     private List<Shape> _shapes;
 
-    public ShapeParser(double pixelsPerDip, double editorFontEmSize, double initialY = 2)
+    public ShapeParser(IWpfTextView view)
     {
-        _initialY = initialY;
-        _pixelsPerDip = pixelsPerDip;
-        _normalEmSize = 0.8 * editorFontEmSize;
+        _view = view;
+        _initialY = Options.Padding.Top;
+        _emSize = view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * Options.FontScaling;
+        _width = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
     }
 
     /// <summary>
@@ -73,7 +75,7 @@ internal sealed class ShapeParser
                     ParseBlockWithTitle(el, "Remarks");
                     break;
                 case "example":
-                    ParseBlockWithTitle(el, "Example", _normalEmSize);
+                    ParseBlockWithTitle(el, "Example", _emSize);
                     break;
                 case "exception":
                     if (previousTagName != tagName) {
@@ -86,7 +88,7 @@ internal sealed class ShapeParser
                     ParseBlockWithCaption(el, SubtitleIdentSpaces + exeptionName + ":");
                     break;
                 default:
-                    ParseBlock(el, BaseIndent);
+                    ParseBlock(el, Options.Padding.Left);
                     break;
             }
             previousTagName = el.Name.LocalName;
@@ -130,7 +132,7 @@ internal sealed class ShapeParser
             ? Options.BoldCommentSeparator
             : Options.CommentSeparator;
         _y += 4.0;
-        _shapes.Add(new LineShape(commentSeparator, new(0, _y), new(comment.Width, _y), 4.0));
+        _shapes.Add(new LineShape(commentSeparator, new(0, _y), new(_width, _y), 4.0));
         _y += 2.0;
     }
 
@@ -138,17 +140,17 @@ internal sealed class ShapeParser
     {
         FormattedText formattedText = CaptionText(title);
         double deltaY = formattedText.Height;
-        _shapes.Add(new TextShape(formattedText, new Point(BaseIndent, _y), deltaY));
+        _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y), deltaY));
         _y += deltaY;
     }
 
     private void ParseBlockWithCaption(XElement element, FormattedText formattedCaption)
     {
-        _shapes.Add(new TextShape(formattedCaption, new Point(BaseIndent, _y), deltaY: 0));
-        double blockIndent = 3 * _normalEmSize;
-        int firstLineIndentChars = (int)(3.7 * Math.Max(formattedCaption.Width - blockIndent, 42) / _normalEmSize) + 4;
+        _shapes.Add(new TextShape(formattedCaption, new Point(Options.Padding.Left, _y), deltaY: 0));
+        double blockIndent = 3 * _emSize;
+        int firstLineIndentChars = (int)(3.7 * Math.Max(formattedCaption.Width - blockIndent, 42) / _emSize) + 4;
         element.AddFirst(new string(NonBreakingSpace, firstLineIndentChars));
-        ParseBlock(element, BaseIndent + blockIndent);
+        ParseBlock(element, Options.Padding.Left + blockIndent);
     }
 
     private void ParseBlockWithCaption(XElement element, string caption)
@@ -160,9 +162,9 @@ internal sealed class ShapeParser
     {
         FormattedText formattedText = CaptionText(title);
         double deltaY = formattedText.Height;
-        _shapes.Add(new TextShape(formattedText, new Point(BaseIndent, _y), deltaY));
+        _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y), deltaY));
         _y += deltaY;
-        ParseBlock(element, BaseIndent + blockIndent);
+        ParseBlock(element, Options.Padding.Left + blockIndent);
     }
 
     private void ParseBlock(XElement element, double indent)
@@ -181,19 +183,17 @@ internal sealed class ShapeParser
 
     private void ParseFormatted(XElement element, double indent)
     {
-        var parser = new DocCommentParser(_normalEmSize, _pixelsPerDip, indent);
+        var parser = new DocCommentParser(indent, _view);
         foreach (TextBlock textBlock in parser.Parse(element)) {
             if (textBlock.Background != null) {
-                const double Margin = 3.0;
-
-                double deltaY = textBlock.Height + 2 * Margin;
+                double deltaY = textBlock.Height + Options.Padding.GetHeight();
                 _shapes.Add(new RectangleShape(
                     textBlock.Background,
                     new Point(textBlock.Left, _y),
-                    textBlock.Text.Width + 2 * Margin,
-                    textBlock.Text.Height + 2 * Margin,
+                    textBlock.Text.Width + Options.Padding.GetWidth(),
+                    textBlock.Text.Height + Options.Padding.GetHeight(),
                     deltaY));
-                _shapes.Add(new TextShape(textBlock.Text, new Point(textBlock.Left + Margin, _y + Margin), deltaY: 0));
+                _shapes.Add(new TextShape(textBlock.Text, new Point(textBlock.Left + Options.Padding.Left, _y + Options.Padding.Top), deltaY: 0));
                 _y += deltaY;
             } else {
                 double deltaY = textBlock.Height;
@@ -203,12 +203,5 @@ internal sealed class ShapeParser
         }
     }
 
-    private FormattedText CaptionText(string text) =>
-        new(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            Options.CaptionsTypeFace, _normalEmSize, Brushes.Black, _pixelsPerDip);
-
-    private FormattedText CodeCaptionText(string text) =>
-        new(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-            Options.CodeCaptionTypeFace, _normalEmSize, Brushes.Black, _pixelsPerDip);
-
+    private FormattedText CaptionText(string text) => Factory.CreateFormattedText(text, Options.CaptionsTypeFace, _view);
 }

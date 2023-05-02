@@ -7,11 +7,11 @@ flowchart TD
     D_CmtStr(["<code>Comment&lt;string&gt;</code><br/><small>as XML</small>"])
     OP_XParse["<code>XDocument.Parse</code>"]
     D_CmtXNodes(["<code>Comment&lt;IEnumerable&lt;XNode&gt;&gt;</code>"])
-    OP_ShpParse["<code>ShapeParser</code>"]
+    OP_ShpParse["<code>ShapeParser</code><br/><small>Uses <code>DocCommentParser</code><br/>which in turn uses<br/><code>FormatAccumulator</code></small>"]
     D_CmtShapes(["<code>Comment&lt;List&lt;Shape&gt;&gt;</code>"])
     OP_Render1["<code>Renderer.GetRenderInfo</code>"]
 
-    D_AdornerRndrInf(["<code>List&lt;Comment&lt;RenderInfo&gt;&gt;</code><br/><small><code>Adorner.RenderingInformation</code></small>>"])
+    D_AdornerRndrInf(["<code>List&lt;Comment&lt;RenderInfo&gt;&gt;</code><br/><small><code>Adorner.RenderingInformation</code></small>"])
     D_TextView(["<code>IWpfTextView.TextViewLines</code>"])
 
     OP_Render2["<code>Renderer.Render</code>"]

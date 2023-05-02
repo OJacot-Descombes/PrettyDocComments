@@ -9,12 +9,12 @@ namespace PrettyDocComments.Services;
 internal sealed class Locator
 {
     private readonly Regex _docCommentRegex;
-    private readonly double _averageCharWidth;
+    private readonly double _charWidth;
 
-    public Locator(Regex docCommentRegex, System.Drawing.Font editorFont)
+    public Locator(Regex docCommentRegex, double charWidth)
     {
         _docCommentRegex = docCommentRegex;
-        _averageCharWidth = GetAverageCharWidth(editorFont);
+        _charWidth = charWidth;
     }
 
     public bool TryGetComment(ITextSnapshot textSnapshot, ITextViewLine line, out Comment<string> comment)
@@ -48,20 +48,10 @@ internal sealed class Locator
             }
             SnapshotPoint endPoint = textSnapshot.GetLineFromLineNumber(lastLineNumber).Start;
             comment = new Comment<string>(new SnapshotSpan(startPoint, endPoint), commentLeftCharIndex,
-                firstLineNumber, lastLineNumber, _averageCharWidth * (maxTextLength + 3), sb.ToString());
+                firstLineNumber, lastLineNumber, _charWidth * (maxTextLength + 3), sb.ToString());
             return true;
         }
         comment = default;
         return false;
-    }
-
-    private double GetAverageCharWidth(System.Drawing.Font font)
-    {
-        const string ExampleText = "The Quick Brown Fox Jumps Over The Lazy Dog";
-
-        using var bmp = new System.Drawing.Bitmap(1, 1);
-        using var g = System.Drawing.Graphics.FromImage(bmp);
-        System.Drawing.SizeF size = g.MeasureString(ExampleText, font);
-        return size.Width / ExampleText.Length;
     }
 }

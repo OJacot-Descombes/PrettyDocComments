@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Formatting;
 using PrettyDocComments.Helpers;
 using PrettyDocComments.Model;
 
@@ -20,11 +21,21 @@ internal sealed class Renderer
         return comment.ConvertTo(new RenderInfo(shapes, height, verticalScale));
     }
 
-    public Comment<Image> Render(Comment<RenderInfo> comment, double height, double topPadding)
+    public Comment<Image> Render(Comment<RenderInfo> comment, double height, double topPadding, IWpfTextView view)
     {
+        const int CollpasedTextSurplusLength = 10;
+
         var drawingGroup = new DrawingGroup();
         using (DrawingContext dc = drawingGroup.Open()) {
-            var rect = new Rect(0, 0, comment.Width, height);
+            double originalCommentWidth = comment.Width + CollpasedTextSurplusLength * view.FormattedLineSource.ColumnWidth;
+            double rectWidth = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
+
+            if (originalCommentWidth > rectWidth) {
+                var coverRect = new Rect(rectWidth, 0, originalCommentWidth - rectWidth, height);
+                dc.DrawRectangle(Brushes.White, null, coverRect);
+            }
+
+            var rect = new Rect(0, 0, rectWidth, height);
             dc.PushClip(new RectangleGeometry(rect));
             dc.DrawRectangle(Options.CommentBackground, Options.CommentOutline, rect);
             if (topPadding != 0.0) {
