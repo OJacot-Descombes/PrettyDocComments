@@ -13,7 +13,7 @@ using PrettyDocComments.Services;
 namespace PrettyDocComments;
 
 /// <summary>
-/// Provides a <see cref="LineTransformSource"/> for each supported editor view and passes it an i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i
+/// Provides a <see cref="LineTransformSource"/> for each supported editor view and passes it an
 /// <see cref="Adornment"/>, so that doc comments can be properly sized and rendered.
 /// </summary>
 [Export(typeof(ILineTransformSourceProvider))]

@@ -8,7 +8,7 @@ namespace PrettyDocComments.Helpers;
 
 internal static class Factory
 {
-    public static FormattedText CreateFormattedText(string text, Typeface typeface, IWpfTextView view)
+    public static FormattedText CreateFormattedText(string text, Typeface typeface, double indent, IWpfTextView view)
     {
         IFormattedLineSource formattedLineSource = view.FormattedLineSource;
         TextRunProperties defaultTextProperties = formattedLineSource.DefaultTextProperties;
@@ -21,7 +21,7 @@ internal static class Factory
             foreground: Options.DefaultTextColor,
             pixelsPerDip: VisualTreeHelper.GetDpi(view.VisualElement).PixelsPerDip
         ) {
-            MaxTextWidth = Options.CommentWidthInColumns * formattedLineSource.ColumnWidth - Options.Padding.GetWidth()
+            MaxTextWidth = Math.Max(Options.CommentWidthInColumns * formattedLineSource.ColumnWidth - indent - Options.Padding.GetWidth(), 50)
         };
     }
 }

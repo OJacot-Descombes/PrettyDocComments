@@ -7,15 +7,54 @@ namespace PrettyDocComments.Model;
 
 internal class FormatAccumulator
 {
-    public FormatAccumulator(IWpfTextView view)
+    public FormatAccumulator(IWpfTextView view, double indent)
     {
         _view = view;
+        _indent = indent;
     }
 
     private readonly IWpfTextView _view;
 
     private readonly List<FormatRun> _runs = new();
 
+    public readonly struct Memento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+
+        private readonly double _indent;
+        private readonly bool _bold;
+        private readonly bool _italic;
+        private readonly bool _strikethrough;
+        private readonly bool _underline;
+        private readonly bool _code;
+        private readonly Brush _textColor;
+
+        internal Memento(FormatAccumulator originator)
+        {
+            _originator = originator;
+
+            _indent = originator._indent;
+            _bold = originator._bold;
+            _italic = originator._italic;
+            _strikethrough = originator._strikethrough;
+            _underline = originator._underline;
+            _code = originator._code;
+            _textColor = originator._textColor;
+        }
+
+        void IDisposable.Dispose()
+        {
+            _originator._indent = _indent;
+            _originator._bold = _bold;
+            _originator._italic = _italic;
+            _originator._strikethrough = _strikethrough;
+            _originator._underline = _underline;
+            _originator._code = _code;
+            _originator._textColor = _textColor;
+        }
+    }
+
+    private double _indent;
     private bool _bold;
     private bool _italic;
     private bool _strikethrough;
@@ -23,14 +62,17 @@ internal class FormatAccumulator
     private bool _code;
     private Brush _textColor = Options.DefaultTextColor;
 
-    public bool HasText => _runs.Count > 0;
-
+    public double Indent { get => _indent; set => _indent = value; }
     public bool Bold { get => _bold; set => _bold = value; }
     public bool Italic { get => _italic; set => _italic = value; }
     public bool Strikethrough { get => _strikethrough; set => _strikethrough = value; }
     public bool Underline { get => _underline; set => _underline = value; }
     public bool Code { get => _code; set => _code = value; }
     public Brush TextColor { get => _textColor; set => _textColor = value; }
+
+    public bool HasText => _runs.Count > 0;
+
+    public Memento CreateFormatScope() => new(this);
 
     public void Add(string text)
     {
@@ -39,8 +81,10 @@ internal class FormatAccumulator
 
     public FormattedText GetFormattedText()
     {
+        _runs[0].TrimStart();
+        _runs[_runs.Count - 1].TrimEnd();
         string text = String.Concat(_runs.Select(r => r.Text));
-        FormattedText formattedText = Factory.CreateFormattedText(text, Options.NormalTypeFace, _view);
+        FormattedText formattedText = Factory.CreateFormattedText(text, Options.NormalTypeFace, _indent, _view);
         int startIndex = 0;
         foreach (FormatRun run in _runs) {
             int length = run.Text?.Length ?? 0;

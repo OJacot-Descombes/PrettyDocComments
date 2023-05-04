@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Windows;
 using System.Windows.Media;
 using System.Xml.Linq;
@@ -12,7 +13,7 @@ namespace PrettyDocComments.Services;
 internal sealed class ShapeParser
 {
     private const char NonBreakingSpace = '\u00A0';
-    private const string SubtitleIdentSpaces = "    ";
+    private const string SubtitleIdentSpaces = "      ";
 
     private static readonly ImmutableHashSet<string> _topLevelElements = new[] {
         "example", "exception", "include", "param", "permission", "remarks", "returns",
@@ -51,7 +52,7 @@ internal sealed class ShapeParser
             blockNo++;
             string tagName = el.Name.LocalName.ToLowerInvariant();
             if (blockNo > 1 && !IsBetweenFriendBlocks(el)) {
-                AddSeparator(comment, previousTagName, tagName);
+                AddSeparator(previousTagName, tagName);
             }
             switch (tagName) {
                 case "param":
@@ -59,23 +60,23 @@ internal sealed class ShapeParser
                         AddMainTitle("Parameters");
                     }
                     string title = SubtitleIdentSpaces + el.Attributes("name").FirstOrDefault()?.Value ?? tagName;
-                    ParseBlockWithCaption(el, title + ":");
+                    ParseBlockWithInlineHeading(el, title + ":");
                     break;
                 case "typeparam":
                     if (previousTagName != tagName) {
                         AddMainTitle("Type parameters");
                     }
                     title = SubtitleIdentSpaces + el.Attributes("name").FirstOrDefault()?.Value ?? tagName;
-                    ParseBlockWithCaption(el, title + ":");
+                    ParseBlockWithInlineHeading(el, title + ":");
                     break;
                 case "returns":
-                    ParseBlockWithCaption(el, "Returns");
+                    ParseBlockWithInlineHeading(el, "Returns");
                     break;
                 case "remarks":
                     ParseBlockWithTitle(el, "Remarks");
                     break;
                 case "example":
-                    ParseBlockWithTitle(el, "Example", _emSize);
+                    ParseBlockWithTitle(el, "Example", 1.7 * _emSize);
                     break;
                 case "exception":
                     if (previousTagName != tagName) {
@@ -85,7 +86,7 @@ internal sealed class ShapeParser
                     if (String.IsNullOrWhiteSpace(exeptionName)) {
                         exeptionName = "Exception";
                     }
-                    ParseBlockWithCaption(el, SubtitleIdentSpaces + exeptionName + ":");
+                    ParseBlockWithInlineHeading(el, SubtitleIdentSpaces + exeptionName + ":");
                     break;
                 default:
                     ParseBlock(el, Options.Padding.Left);
@@ -126,7 +127,7 @@ internal sealed class ShapeParser
         }
     }
 
-    private void AddSeparator(Comment<IEnumerable<XNode>> comment, string previousTagName, string tagName)
+    private void AddSeparator(string previousTagName, string tagName)
     {
         Pen commentSeparator = tagName == "summary" || previousTagName == "summary"
             ? Options.BoldCommentSeparator
@@ -144,18 +145,14 @@ internal sealed class ShapeParser
         _y += deltaY;
     }
 
-    private void ParseBlockWithCaption(XElement element, FormattedText formattedCaption)
+    private void ParseBlockWithInlineHeading(XElement element, string caption)
     {
+        FormattedText formattedCaption = CaptionText(caption);
         _shapes.Add(new TextShape(formattedCaption, new Point(Options.Padding.Left, _y), deltaY: 0));
-        double blockIndent = 3 * _emSize;
+        double blockIndent = 4 * _emSize;
         int firstLineIndentChars = (int)(3.7 * Math.Max(formattedCaption.Width - blockIndent, 42) / _emSize) + 4;
         element.AddFirst(new string(NonBreakingSpace, firstLineIndentChars));
         ParseBlock(element, Options.Padding.Left + blockIndent);
-    }
-
-    private void ParseBlockWithCaption(XElement element, string caption)
-    {
-        ParseBlockWithCaption(element, CaptionText(caption));
     }
 
     private void ParseBlockWithTitle(XElement element, string title, double blockIndent = 0.0)
@@ -169,20 +166,6 @@ internal sealed class ShapeParser
 
     private void ParseBlock(XElement element, double indent)
     {
-        var children = element.Nodes().ToList();
-        if (children.Count > 0) {
-            if (children[0] is XText first) {
-                first.Value = first.Value.TrimStart(' ', '\t', '\r', '\n', '\v'); // Exclude non-breaking space.
-            }
-            if (children[children.Count - 1] is XText last) {
-                last.Value = last.Value.TrimEnd();
-            }
-            ParseFormatted(element, indent);
-        }
-    }
-
-    private void ParseFormatted(XElement element, double indent)
-    {
         var parser = new DocCommentParser(indent, _view);
         foreach (TextBlock textBlock in parser.Parse(element)) {
             if (textBlock.Background != null) {
@@ -190,10 +173,15 @@ internal sealed class ShapeParser
                 _shapes.Add(new RectangleShape(
                     textBlock.Background,
                     new Point(textBlock.Left, _y),
-                    textBlock.Text.Width + Options.Padding.GetWidth(),
+                    textBlock.Text.MaxTextWidth + Options.Padding.Right,
                     textBlock.Text.Height + Options.Padding.GetHeight(),
                     deltaY));
-                _shapes.Add(new TextShape(textBlock.Text, new Point(textBlock.Left + Options.Padding.Left, _y + Options.Padding.Top), deltaY: 0));
+                _shapes.Add(
+                    new TextShape(
+                        textBlock.Text,
+                        new Point(textBlock.Left + Options.Padding.Left, _y + Options.Padding.Top),
+                        deltaY: 0)
+                );
                 _y += deltaY;
             } else {
                 double deltaY = textBlock.Height;
@@ -203,5 +191,6 @@ internal sealed class ShapeParser
         }
     }
 
-    private FormattedText CaptionText(string text) => Factory.CreateFormattedText(text, Options.CaptionsTypeFace, _view);
+    private FormattedText CaptionText(string text)
+        => Factory.CreateFormattedText(text, Options.CaptionsTypeFace, 0.0, _view);
 }

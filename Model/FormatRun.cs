@@ -4,7 +4,7 @@ namespace PrettyDocComments.Model;
 
 internal sealed class FormatRun
 {
-    private readonly string _text;
+    private string _text;
     private readonly bool _bold;
     private readonly bool _italic;
     private readonly bool _strikethrough;
@@ -30,6 +30,16 @@ internal sealed class FormatRun
     public bool Underline => _underline;
     public bool Code => _code;
     public Brush TextBrush => _textBrush;
+
+    public void TrimStart()
+    {
+        _text = _text.TrimStart(' ', '\n', '\r', '\t', '\f');
+    }
+
+    public void TrimEnd()
+    {
+        _text = _text.TrimEnd(' ', '\n', '\r', '\t', '\f');
+    }
 
     public override string ToString()
     {

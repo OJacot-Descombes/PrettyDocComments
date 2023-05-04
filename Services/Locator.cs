@@ -42,13 +42,17 @@ internal sealed class Locator
                 }
                 lastLineNumber = lineNumber;
                 string commentText = text.Substring(match.Groups[2].Index);
-                sb.AppendLine(commentText.Trim());
+                if (commentText.Length > 0 && commentText[0] == ' ') {
+                    commentText = commentText.Substring(1);
+                }
+                sb.AppendLine(commentText);
                 maxTextLength = Math.Max(maxTextLength, commentText.Length);
                 lineNumber++;
             }
             SnapshotPoint endPoint = textSnapshot.GetLineFromLineNumber(lastLineNumber).Start;
             comment = new Comment<string>(new SnapshotSpan(startPoint, endPoint), commentLeftCharIndex,
-                firstLineNumber, lastLineNumber, _charWidth * (maxTextLength + 3), sb.ToString());
+                firstLineNumber, lastLineNumber, _charWidth * (maxTextLength + 3),
+                sb.Replace("&nbsp;", "\u00A0").ToString());
             return true;
         }
         comment = default;
