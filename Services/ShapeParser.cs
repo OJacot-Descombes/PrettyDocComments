@@ -129,7 +129,7 @@ internal sealed class ShapeParser
 
     private void AddSeparator(string previousTagName, string tagName)
     {
-        Pen commentSeparator = tagName == "summary" || previousTagName == "summary"
+        Pen commentSeparator = tagName is "summary" or "value" || previousTagName is "summary" or "value"
             ? Options.BoldCommentSeparator
             : Options.CommentSeparator;
         _y += 4.0;
@@ -157,10 +157,7 @@ internal sealed class ShapeParser
 
     private void ParseBlockWithTitle(XElement element, string title, double blockIndent = 0.0)
     {
-        FormattedText formattedText = CaptionText(title);
-        double deltaY = formattedText.Height;
-        _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y), deltaY));
-        _y += deltaY;
+        AddMainTitle(title);
         ParseBlock(element, Options.Padding.Left + blockIndent);
     }
 

@@ -9,10 +9,13 @@ internal readonly struct RenderInfo
 
     public readonly double VerticalScale;
 
-    public RenderInfo(List<Shape> shapes, double calculatedHeight, double verticalScale)
+    public readonly bool ContainsErrorHint;
+
+    public RenderInfo(List<Shape> shapes, double calculatedHeight, double verticalScale, bool containsErrorHint = false)
     {
         Shapes = shapes;
         CalculatedHeight = calculatedHeight;
         VerticalScale = verticalScale;
+        ContainsErrorHint = containsErrorHint;
     }
 }

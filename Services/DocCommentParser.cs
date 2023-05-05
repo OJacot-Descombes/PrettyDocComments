@@ -101,18 +101,11 @@ internal sealed class DocCommentParser
                                 CloseBlock(Options.CodeBackground);
                             }
                             break;
+                        case "remarks":
+                            ParseWithTitle(el, "Remarks");
+                            break;
                         case "example":
-                            CloseBlock();
-                            using (var scope = _accumulator.CreateFormatScope()) {
-                                _accumulator.Bold = true;
-                                _accumulator.Add("Example: ");
-                            }
-                            CloseBlock();
-                            using (var scope = _accumulator.CreateFormatScope()) {
-                                _accumulator.Indent += 1.7 * _emSize;
-                                ParseElement(el);
-                                CloseBlock();
-                            }
+                            ParseWithTitle(el, "Example: ", 1.7 * _emSize);
                             break;
                         case "list" or "ul" or "ol" or "dl" or "menu":
                             ParseList(el, normalizedTag);
@@ -133,11 +126,11 @@ internal sealed class DocCommentParser
                         case "description" when _listLevel >= 0:
                             ParseElement(el);
                             break;
-                        case "see" when el.Attribute("cref").Value is { Length: > 0 } crefText:
-                            using (var scope = _accumulator.CreateFormatScope()) {
-                                _accumulator.TextColor = Options.CRefTextColor;
-                                _accumulator.Add(crefText);
-                            }
+                        case "paramref":
+                            Reference(el, "name");
+                            break;
+                        case "see":
+                            Reference(el, "cref");
                             break;
                         default:
                             _accumulator.Add(NormalizeSpace(el.ToString(), normalizeWS));
@@ -151,8 +144,36 @@ internal sealed class DocCommentParser
         }
     }
 
+    private void Reference(XElement el, string attributeName)
+    {
+        string text = el.Attribute(attributeName).Value is { Length: > 0 } attributeValue
+            ? attributeValue
+            : el.Name.LocalName;
+        using (var scope = _accumulator.CreateFormatScope()) {
+            _accumulator.TextColor = Options.SpecialTextColor;
+            _accumulator.Add(text);
+        }
+    }
+
+    private void ParseWithTitle(XElement el, string title, double indent = 0.0)
+    {
+        CloseBlock();
+        using (var scope = _accumulator.CreateFormatScope()) {
+            _accumulator.Bold = true;
+            _accumulator.Add(title);
+        }
+        CloseBlock();
+        using (var scope = _accumulator.CreateFormatScope()) {
+            _accumulator.Indent += indent;
+            ParseElement(el);
+            CloseBlock();
+        }
+    }
+
     private void ParseList(XElement el, string listTag)
     {
+        // TODO: correctly display table-type lists http://www.blackwasp.co.uk/DocumentationLists_2.aspx.
+
         // The <list> tag denotes a doc-comment type list, other types (ul, ol, dl, menu) are HTML type lists.
 
         const string Nul = null;

@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
@@ -63,8 +64,25 @@ internal sealed class LineTransformSource : ILineTransformSource
         if (_locator.TryGetComment(_view.TextSnapshot, line, out Comment<string> commentWithXmlText) &&
             Xml.TryParseUnrootedNodes(commentWithXmlText.Data, out var nodes)) {
 
-            var commentWithShapes = _shapeParser.Parse(commentWithXmlText.ConvertTo(nodes));
-            commentWithRenderInfo = _renderer.GetRenderInfo(commentWithShapes, _view);
+            if (Xml.LastXmlException is not null) {
+                double columnWidth = _view.FormattedLineSource.ColumnWidth;
+                var origin = new Point(
+                    x: (commentWithXmlText.CommentLeftCharIndex + Xml.LastXmlException.LinePosition - 2) * columnWidth,
+                    y: Xml.LastXmlException.LineNumber * _view.FormattedLineSource.LineHeight - 3
+                );
+                var errorInfo = new RenderInfo(
+                    new List<Shape> {
+                        new RectangleShape(Brushes.Red, origin, width: columnWidth, height: 2, deltaY: 2)
+                    },
+                    calculatedHeight: (commentWithXmlText.LastLineNumber - commentWithXmlText.FirstLineNumber + 1) * _view.FormattedLineSource.LineHeight,
+                    verticalScale: 1.0,
+                    containsErrorHint: true
+                );
+                commentWithRenderInfo = commentWithXmlText.ConvertTo(errorInfo);
+            } else {
+                var commentWithShapes = _shapeParser.Parse(commentWithXmlText.ConvertTo(nodes));
+                commentWithRenderInfo = _renderer.GetRenderInfo(commentWithShapes, _view);
+            }
             _adornment.RenderingInformation.Add(commentWithRenderInfo);
             return true;
         }

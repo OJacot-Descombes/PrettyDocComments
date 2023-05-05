@@ -27,17 +27,21 @@ internal sealed class Renderer
 
         var drawingGroup = new DrawingGroup();
         using (DrawingContext dc = drawingGroup.Open()) {
-            double originalCommentWidth = comment.Width + CollpasedTextSurplusLength * view.FormattedLineSource.ColumnWidth;
-            double rectWidth = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
+            if (comment.Data.ContainsErrorHint) {
+                double width = comment.Width + view.FormattedLineSource.ColumnWidth;
+                dc.DrawRectangle(null, Options.ErrorOutline, new Rect(0, 0, width, height));
+            } else {
+                double originalCommentWidth = comment.Width + CollpasedTextSurplusLength * view.FormattedLineSource.ColumnWidth;
+                double rectWidth = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
+                if (originalCommentWidth > rectWidth) {
+                    var coverRect = new Rect(rectWidth, 0, originalCommentWidth - rectWidth, height);
+                    dc.DrawRectangle(Brushes.White, null, coverRect);
+                }
 
-            if (originalCommentWidth > rectWidth) {
-                var coverRect = new Rect(rectWidth, 0, originalCommentWidth - rectWidth, height);
-                dc.DrawRectangle(Brushes.White, null, coverRect);
+                var rect = new Rect(0, 0, rectWidth, height);
+                dc.PushClip(new RectangleGeometry(rect));
+                dc.DrawRectangle(Options.CommentBackground, Options.CommentOutline, rect);
             }
-
-            var rect = new Rect(0, 0, rectWidth, height);
-            dc.PushClip(new RectangleGeometry(rect));
-            dc.DrawRectangle(Options.CommentBackground, Options.CommentOutline, rect);
             if (topPadding != 0.0) {
                 dc.PushTransform(new TranslateTransform(0, topPadding));
             }

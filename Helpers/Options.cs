@@ -12,11 +12,12 @@ internal static class Options
     public static readonly Brush CommentBackground = Brushes.LightGoldenrodYellow;
     public static readonly Brush CodeBackground = Brushes.Gainsboro;
     public static readonly Brush DefaultTextColor = Brushes.Black;
-    public static readonly Brush CRefTextColor = Brushes.DarkSlateBlue;
+    public static readonly Brush SpecialTextColor = Brushes.DarkSlateBlue;
 
     public static readonly Pen CommentOutline;
     public static readonly Pen CommentSeparator;
     public static readonly Pen BoldCommentSeparator;
+    public static readonly Pen ErrorOutline;
 
     public static readonly int CommentWidthInColumns = 80;
 
@@ -46,6 +47,9 @@ internal static class Options
 
         CommentSeparator = new Pen(Brushes.DarkKhaki, 0.5);
         CommentSeparator.Freeze();
+
+        ErrorOutline = new Pen(Brushes.Red, 2.0);
+        ErrorOutline.Freeze();
 
         BoldCommentSeparator = CommentOutline;
     }
