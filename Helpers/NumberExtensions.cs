@@ -2,7 +2,7 @@
 
 namespace PrettyDocComments.Helpers;
 
-public static class Number
+public static class NumberExtensions
 {
     // See also: https://en.wikipedia.org/wiki/Roman_numerals
     private static readonly (int number, string roman)[] _numbers = {
@@ -31,7 +31,7 @@ public static class Number
 
 
     // Improved version of https://www.c-sharpcorner.com/article/convert-numbers-to-roman-characters-in-c-sharp/
-    public static string ToRoman(int n, bool lowerCase = false)
+    public static string ToRoman(this int n, bool lowerCase = false)
     {
         var sb = new StringBuilder();
         int i = 0;
@@ -50,7 +50,7 @@ public static class Number
         return sb.ToString();
     }
 
-    public static string ToAlphabet(int num, bool lowerCase = false)
+    public static string ToAlphabet(this int num, bool lowerCase = false)
     {
         if (lowerCase) {
             return ((char)('a' + num - 1)).ToString();

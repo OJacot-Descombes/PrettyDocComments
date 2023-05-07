@@ -2,7 +2,6 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Formatting;
 using PrettyDocComments.Helpers;
 using PrettyDocComments.Model;
 

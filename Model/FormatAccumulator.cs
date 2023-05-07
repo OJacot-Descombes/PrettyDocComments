@@ -17,39 +17,113 @@ internal class FormatAccumulator
 
     private readonly List<FormatRun> _runs = new();
 
-    public readonly struct Memento : IDisposable
+    public readonly struct IndentMemento : IDisposable
     {
         private readonly FormatAccumulator _originator;
 
         private readonly double _indent;
-        private readonly bool _bold;
-        private readonly bool _italic;
-        private readonly bool _strikethrough;
-        private readonly bool _underline;
-        private readonly bool _code;
-        private readonly Brush _textColor;
 
-        internal Memento(FormatAccumulator originator)
+        internal IndentMemento(FormatAccumulator originator, double deltaIndent)
         {
             _originator = originator;
-
             _indent = originator._indent;
+            originator._indent += deltaIndent;
+        }
+
+        void IDisposable.Dispose() => _originator._indent = _indent;
+    }
+
+    public readonly struct BoldMemento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+
+        private readonly bool _bold;
+
+        internal BoldMemento(FormatAccumulator originator)
+        {
+            _originator = originator;
             _bold = originator._bold;
+            originator._bold = true;
+        }
+
+        void IDisposable.Dispose() => _originator._bold = _bold;
+    }
+
+    public readonly struct ItalicMemento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+
+        private readonly bool _italic;
+
+        internal ItalicMemento(FormatAccumulator originator)
+        {
+            _originator = originator;
             _italic = originator._italic;
+            originator._italic = true;
+        }
+
+        void IDisposable.Dispose() => _originator._italic = _italic;
+    }
+
+    public readonly struct StrikethroughMemento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+        private readonly bool _strikethrough;
+
+        internal StrikethroughMemento(FormatAccumulator originator)
+        {
+            _originator = originator;
             _strikethrough = originator._strikethrough;
+            originator._strikethrough = true;
+        }
+
+        void IDisposable.Dispose() => _originator._strikethrough = _strikethrough;
+    }
+
+    public readonly struct UnderlineMemento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+        private readonly bool _underline;
+
+        internal UnderlineMemento(FormatAccumulator originator)
+        {
+            _originator = originator;
             _underline = originator._underline;
+            originator._underline = true;
+        }
+
+        void IDisposable.Dispose() => _originator._underline = _underline;
+    }
+
+    public readonly struct CodeMemento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+        private readonly bool _code;
+
+        internal CodeMemento(FormatAccumulator originator)
+        {
+            _originator = originator;
             _code = originator._code;
+            originator._code = true;
+        }
+
+        void IDisposable.Dispose() => _originator._code = _code;
+    }
+
+    public readonly struct TextColorMemento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+        private readonly Brush _textColor;
+
+        internal TextColorMemento(FormatAccumulator originator, Brush textColor)
+        {
+            _originator = originator;
             _textColor = originator._textColor;
+            originator._textColor = textColor;
         }
 
         void IDisposable.Dispose()
         {
-            _originator._indent = _indent;
-            _originator._bold = _bold;
-            _originator._italic = _italic;
-            _originator._strikethrough = _strikethrough;
-            _originator._underline = _underline;
-            _originator._code = _code;
             _originator._textColor = _textColor;
         }
     }
@@ -62,17 +136,23 @@ internal class FormatAccumulator
     private bool _code;
     private Brush _textColor = Options.DefaultTextColor;
 
-    public double Indent { get => _indent; set => _indent = value; }
-    public bool Bold { get => _bold; set => _bold = value; }
-    public bool Italic { get => _italic; set => _italic = value; }
-    public bool Strikethrough { get => _strikethrough; set => _strikethrough = value; }
-    public bool Underline { get => _underline; set => _underline = value; }
-    public bool Code { get => _code; set => _code = value; }
-    public Brush TextColor { get => _textColor; set => _textColor = value; }
+    public double Indent { get => _indent; }
+    public bool Bold { get => _bold; }
+    public bool Italic { get => _italic; }
+    public bool Strikethrough { get => _strikethrough; }
+    public bool Underline { get => _underline; }
+    public bool Code { get => _code; }
+    public Brush TextColor { get => _textColor; }
 
     public bool HasText => _runs.Count > 0;
 
-    public Memento CreateFormatScope() => new(this);
+    public IndentMemento CreateIndentScope(double deltaIndent) => new(this, deltaIndent);
+    public BoldMemento CreateBoldScope() => new(this);
+    public ItalicMemento CreateItalicScope() => new(this);
+    public StrikethroughMemento CreateStrikethroughScope() => new(this);
+    public UnderlineMemento CreateUnderlineScope() => new(this);
+    public CodeMemento CreateCodeScope() => new(this);
+    public TextColorMemento CreateTextColorScope(Brush textColor) => new(this, textColor);
 
     public void Add(string text)
     {
@@ -84,7 +164,7 @@ internal class FormatAccumulator
         _runs[0].TrimStart();
         _runs[_runs.Count - 1].TrimEnd();
         string text = String.Concat(_runs.Select(r => r.Text));
-        FormattedText formattedText = Factory.CreateFormattedText(text, Options.NormalTypeFace, _indent, _view);
+        FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, _indent, _view);
         int startIndex = 0;
         foreach (FormatRun run in _runs) {
             int length = run.Text?.Length ?? 0;

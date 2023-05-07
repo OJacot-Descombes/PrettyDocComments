@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Windows;
 using System.Windows.Media;
 using System.Xml.Linq;
@@ -16,7 +15,7 @@ internal sealed class ShapeParser
     private const string SubtitleIdentSpaces = "      ";
 
     private static readonly ImmutableHashSet<string> _topLevelElements = new[] {
-        "example", "exception", "include", "param", "permission", "remarks", "returns",
+        "example", "exception", "param", "permission", "remarks", "returns",
         "seealso", "summary", "typeparam", "value"
     }.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
 
@@ -55,6 +54,19 @@ internal sealed class ShapeParser
                 AddSeparator(previousTagName, tagName);
             }
             switch (tagName) {
+                case "example":
+                    ParseBlockWithTitle(el, "Example", 1.7 * _emSize);
+                    break;
+                case "exception":
+                    if (previousTagName != tagName) {
+                        AddMainTitle("Exceptions");
+                    }
+                    string exeptionName = el.Attributes("cref").FirstOrDefault()?.Value;
+                    if (String.IsNullOrWhiteSpace(exeptionName)) {
+                        exeptionName = "Exception";
+                    }
+                    ParseBlockWithInlineHeading(el, SubtitleIdentSpaces + exeptionName + ":");
+                    break;
                 case "param":
                     if (previousTagName != tagName) {
                         AddMainTitle("Parameters");
@@ -75,18 +87,11 @@ internal sealed class ShapeParser
                 case "remarks":
                     ParseBlockWithTitle(el, "Remarks");
                     break;
-                case "example":
-                    ParseBlockWithTitle(el, "Example", 1.7 * _emSize);
-                    break;
-                case "exception":
+                case "seealso":
                     if (previousTagName != tagName) {
-                        AddMainTitle("Exceptions");
+                        AddMainTitle("See also");
                     }
-                    string exeptionName = el.Attributes("cref").FirstOrDefault()?.Value;
-                    if (String.IsNullOrWhiteSpace(exeptionName)) {
-                        exeptionName = "Exception";
-                    }
-                    ParseBlockWithInlineHeading(el, SubtitleIdentSpaces + exeptionName + ":");
+                    ParseSeealsoBlock(el);
                     break;
                 default:
                     ParseBlock(el, Options.Padding.Left);
@@ -100,7 +105,8 @@ internal sealed class ShapeParser
             node is XElement { Name.LocalName: var e } &&
             (
                 p is "param" && e is "param" ||
-                p is "typeparam" && e is "typeparam"
+                p is "typeparam" && e is "typeparam" ||
+                p is "seealso" && e is "seealso"
             );
 
 
@@ -188,6 +194,22 @@ internal sealed class ShapeParser
         }
     }
 
-    private FormattedText CaptionText(string text)
-        => Factory.CreateFormattedText(text, Options.CaptionsTypeFace, 0.0, _view);
+    private void ParseSeealsoBlock(XElement el)
+    {
+        if (String.IsNullOrWhiteSpace(el.Value)) { // There is no text, just add the attribute values(s).
+            string text = "● " + String.Join(" ", el.Attributes().Select(a => a.Value));
+            FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, 0.0, _view);
+            _shapes.Add(new TextShape(
+                formattedText, new Point(Options.Padding.Left, _y),
+                formattedText.Height)
+            );
+            _y += formattedText.Height;
+        } else {
+            FormattedText formattedText = "●".AsFormatted(Options.NormalTypeFace, 0.0, _view);
+            _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y), 0.0));
+            ParseBlock(el, 1.3 * _emSize);
+        }
+    }
+
+    private FormattedText CaptionText(string text) => text.AsFormatted(Options.CaptionsTypeFace, 0.0, _view);
 }

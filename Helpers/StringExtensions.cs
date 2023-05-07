@@ -6,9 +6,9 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace PrettyDocComments.Helpers;
 
-internal static class Factory
+internal static class StringExtensions
 {
-    public static FormattedText CreateFormattedText(string text, Typeface typeface, double indent, IWpfTextView view)
+    public static FormattedText AsFormatted(this string text, Typeface typeface, double indent, IWpfTextView view)
     {
         IFormattedLineSource formattedLineSource = view.FormattedLineSource;
         TextRunProperties defaultTextProperties = formattedLineSource.DefaultTextProperties;

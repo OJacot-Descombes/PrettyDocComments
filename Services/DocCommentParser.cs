@@ -63,40 +63,34 @@ internal sealed class DocCommentParser
                             _accumulator.Add("\r\n");
                             break;
                         case "b" or "strong":
-                            using (var scope = _accumulator.CreateFormatScope()) {
-                                _accumulator.Bold = true;
+                            using (var scope = _accumulator.CreateBoldScope()) {
                                 ParseElement(el);
                             }
                             break;
                         case "i":
-                            using (var scope = _accumulator.CreateFormatScope()) {
-                                _accumulator.Italic = true;
+                            using (var scope = _accumulator.CreateItalicScope()) {
                                 ParseElement(el);
                             }
                             break;
                         case "u":
-                            using (var scope = _accumulator.CreateFormatScope()) {
-                                _accumulator.Underline = true;
+                            using (var scope = _accumulator.CreateUnderlineScope()) {
                                 ParseElement(el);
                             }
                             break;
                         case "s" or "strike":
-                            using (var scope = _accumulator.CreateFormatScope()) {
-                                _accumulator.Strikethrough = true;
+                            using (var scope = _accumulator.CreateStrikethroughScope()) {
                                 ParseElement(el);
                             }
                             break;
                         case "c":
-                            using (var scope = _accumulator.CreateFormatScope()) {
-                                _accumulator.Code = true;
+                            using (var scope = _accumulator.CreateCodeScope()) {
                                 ParseElement(el, normalizeWS: false);
                             }
                             break;
                         case "code":
                             CloseBlock();
-                            using (var scope = _accumulator.CreateFormatScope()) {
-                                _accumulator.Code = true;
-                                _accumulator.Indent += _emSize;
+                            using (var codeScope = _accumulator.CreateCodeScope())
+                            using (var indentScope = _accumulator.CreateIndentScope(_emSize)) {
                                 ParseElement(el, normalizeWS: false);
                                 CloseBlock(Options.CodeBackground);
                             }
@@ -117,8 +111,7 @@ internal sealed class DocCommentParser
                             CloseBlock(height: _emSize / 2.5);
                             break;
                         case "term" or "dt" when _listLevel >= 0:
-                            using (var scope = _accumulator.CreateFormatScope()) {
-                                _accumulator.Bold = true;
+                            using (var scope = _accumulator.CreateBoldScope()) {
                                 ParseElement(el);
                                 _accumulator.Add(" – ");
                             }
@@ -126,11 +119,18 @@ internal sealed class DocCommentParser
                         case "description" when _listLevel >= 0:
                             ParseElement(el);
                             break;
-                        case "paramref":
-                            Reference(el, "name");
+                        case "paramref" or "typeparamref":
+                            Reference(el); // "name"
                             break;
                         case "see":
-                            Reference(el, "cref");
+                            Reference(el); // "cref", "langword", "href"
+                            break;
+                        case "include":
+                            using (var scope = _accumulator.CreateTextColorScope(Options.SpecialTextColor)) {
+                                _accumulator.Add("include(");
+                                _accumulator.Add(String.Join(" ", el.Attributes().Select(a => $"{a.Name}='{a.Value}'")));
+                                _accumulator.Add(")");
+                            }
                             break;
                         default:
                             _accumulator.Add(NormalizeSpace(el.ToString(), normalizeWS));
@@ -144,27 +144,25 @@ internal sealed class DocCommentParser
         }
     }
 
-    private void Reference(XElement el, string attributeName)
+    private void Reference(XElement el)
     {
-        string text = el.Attribute(attributeName).Value is { Length: > 0 } attributeValue
-            ? attributeValue
-            : el.Name.LocalName;
-        using (var scope = _accumulator.CreateFormatScope()) {
-            _accumulator.TextColor = Options.SpecialTextColor;
-            _accumulator.Add(text);
-        }
+        string text = String.IsNullOrEmpty(el.Value)
+            ? el.Attributes().FirstOrDefault()?.Value is { Length: > 0 } attributeValue
+                  ? attributeValue
+                  : el.Name.LocalName
+            : el.Value;
+        using var scope = _accumulator.CreateTextColorScope(Options.SpecialTextColor);
+        _accumulator.Add(text);
     }
 
     private void ParseWithTitle(XElement el, string title, double indent = 0.0)
     {
         CloseBlock();
-        using (var scope = _accumulator.CreateFormatScope()) {
-            _accumulator.Bold = true;
+        using (var scope = _accumulator.CreateBoldScope()) {
             _accumulator.Add(title);
         }
         CloseBlock();
-        using (var scope = _accumulator.CreateFormatScope()) {
-            _accumulator.Indent += indent;
+        using (var scope = _accumulator.CreateIndentScope(indent)) {
             ParseElement(el);
             CloseBlock();
         }
@@ -195,28 +193,25 @@ internal sealed class DocCommentParser
         foreach (var listItem in el.Elements()) {
             if (listItem.Name.LocalName == "listheader") {
                 CloseBlock();
-                using (var scope = _accumulator.CreateFormatScope()) {
-                    _accumulator.Underline = true;
-                    foreach (var headerElement in listItem.Elements()) {
-                        ParseElement(headerElement);
-                        _accumulator.Add("\r\n");
-                    }
+                using var scope = _accumulator.CreateUnderlineScope();
+                foreach (var headerElement in listItem.Elements()) {
+                    ParseElement(headerElement);
+                    _accumulator.Add("\r\n");
                 }
             } else { // textBlock
                 CloseBlock();
                 string actualBullet = numberType switch {
                     null => bullet ?? _levelBullets[_listLevel % _levelBullets.Length],
-                    "A" => Helpers.Number.ToAlphabet(number) + ". ",
-                    "a" => Helpers.Number.ToAlphabet(number, lowerCase: true) + ". ",
-                    "I" => Helpers.Number.ToRoman(number) + ". ",
-                    "i" => Helpers.Number.ToRoman(number, lowerCase: true) + ". ",
+                    "A" => number.ToAlphabet() + ". ",
+                    "a" => number.ToAlphabet(lowerCase: true) + ". ",
+                    "I" => number.ToRoman() + ". ",
+                    "i" => number.ToRoman(lowerCase: true) + ". ",
                     _ => number.ToString() + ". "
                 };
                 _accumulator.Add(actualBullet);
                 TextBlock? textBlock = CloseBlock(height: 0.0);
                 double itemIndent = type == "table" ? 0.0 : Math.Max(textBlock?.Text.Width ?? 0.0, _emSize) + 0.5 * _emSize;
-                using (var scope = _accumulator.CreateFormatScope()) {
-                    _accumulator.Indent += itemIndent;
+                using (var scope = _accumulator.CreateIndentScope(itemIndent)) {
                     ParseElement(listItem);
                     CloseBlock();
                 };

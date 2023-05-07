@@ -46,7 +46,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Helpers\Factory.cs" />
+    <Compile Include="Helpers\StringExtensions.cs" />
     <Compile Include="Model\Comment.cs" />
     <Compile Include="Model\RenderInfo.cs" />
     <Compile Include="Model\LineShape.cs" />
@@ -64,7 +64,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PrettyDocCommentsPackage.cs" />
     <Compile Include="Services\Adornment.cs" />
-    <Compile Include="Helpers\Number.cs" />
+    <Compile Include="Helpers\NumberExtensions.cs" />
     <Compile Include="Services\Locator.cs" />
     <Compile Include="Services\Renderer.cs" />
     <Compile Include="Services\ShapeParser.cs" />
