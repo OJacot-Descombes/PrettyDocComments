@@ -2,15 +2,17 @@
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Editor;
 using PrettyDocComments.Helpers;
+using PrettyDocComments.Model;
 
-namespace PrettyDocComments.Model;
+namespace PrettyDocComments.Services;
 
 internal class FormatAccumulator
 {
-    public FormatAccumulator(IWpfTextView view, double indent)
+    public FormatAccumulator(IWpfTextView view, double indent, double width)
     {
         _view = view;
         _indent = indent;
+        _width = width;
     }
 
     private readonly IWpfTextView _view;
@@ -31,6 +33,22 @@ internal class FormatAccumulator
         }
 
         void IDisposable.Dispose() => _originator._indent = _indent;
+    }
+
+    public readonly struct WidthMemento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+
+        private readonly double _width;
+
+        internal WidthMemento(FormatAccumulator originator, double width)
+        {
+            _originator = originator;
+            _width = originator._width;
+            originator._width = width;
+        }
+
+        void IDisposable.Dispose() => _originator._width = _width;
     }
 
     public readonly struct BoldMemento : IDisposable
@@ -129,6 +147,7 @@ internal class FormatAccumulator
     }
 
     private double _indent;
+    private double _width;
     private bool _bold;
     private bool _italic;
     private bool _strikethrough;
@@ -137,6 +156,7 @@ internal class FormatAccumulator
     private Brush _textColor = Options.DefaultTextColor;
 
     public double Indent { get => _indent; }
+    public double Width { get => _width; }
     public bool Bold { get => _bold; }
     public bool Italic { get => _italic; }
     public bool Strikethrough { get => _strikethrough; }
@@ -145,8 +165,10 @@ internal class FormatAccumulator
     public Brush TextColor { get => _textColor; }
 
     public bool HasText => _runs.Count > 0;
+    public double RemainingWidth => _width - _indent;
 
     public IndentMemento CreateIndentScope(double deltaIndent) => new(this, deltaIndent);
+    public WidthMemento CreateWidthScope(double width) => new(this, width);
     public BoldMemento CreateBoldScope() => new(this);
     public ItalicMemento CreateItalicScope() => new(this);
     public StrikethroughMemento CreateStrikethroughScope() => new(this);
@@ -159,12 +181,12 @@ internal class FormatAccumulator
         _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textColor));
     }
 
-    public FormattedText GetFormattedText()
+    public FormattedText GetFormattedText(double horizontalPadding = 0.0)
     {
         _runs[0].TrimStart();
         _runs[_runs.Count - 1].TrimEnd();
         string text = String.Concat(_runs.Select(r => r.Text));
-        FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, _indent, _view);
+        FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, _width - _indent - horizontalPadding, _view);
         int startIndex = 0;
         foreach (FormatRun run in _runs) {
             int length = run.Text?.Length ?? 0;

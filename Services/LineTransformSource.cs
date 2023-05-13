@@ -67,12 +67,12 @@ internal sealed class LineTransformSource : ILineTransformSource
             if (Xml.LastXmlException is not null) {
                 double columnWidth = _view.FormattedLineSource.ColumnWidth;
                 var origin = new Point(
-                    x: (commentWithXmlText.CommentLeftCharIndex + Xml.LastXmlException.LinePosition - 2) * columnWidth,
+                    x: (commentWithXmlText.CommentLeftCharIndex + Xml.LastXmlException.LinePosition + 3) * columnWidth,
                     y: Xml.LastXmlException.LineNumber * _view.FormattedLineSource.LineHeight - 3
                 );
                 var errorInfo = new RenderInfo(
-                    new List<Shape> {
-                        new RectangleShape(Brushes.Red, origin, width: columnWidth, height: 2, deltaY: 2)
+                    new List<Shape> { // Caret
+                        new RectangleShape(Brushes.Red, null, origin, width: columnWidth, height: 2, deltaY: 2)
                     },
                     calculatedHeight: (commentWithXmlText.LastLineNumber - commentWithXmlText.FirstLineNumber + 1) * _view.FormattedLineSource.LineHeight,
                     verticalScale: 1.0,

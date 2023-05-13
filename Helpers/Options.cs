@@ -18,6 +18,7 @@ internal static class Options
     public static readonly Pen CommentSeparator;
     public static readonly Pen BoldCommentSeparator;
     public static readonly Pen ErrorOutline;
+    public static readonly Pen FrameStroke;
 
     public static readonly int CommentWidthInColumns = 80;
 
@@ -50,6 +51,9 @@ internal static class Options
 
         ErrorOutline = new Pen(Brushes.Red, 2.0);
         ErrorOutline.Freeze();
+
+        FrameStroke = new Pen(Brushes.Black, 0.8);
+        FrameStroke.Freeze();
 
         BoldCommentSeparator = CommentOutline;
     }
