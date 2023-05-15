@@ -1,9 +1,11 @@
-﻿using System.Xml.Linq;
+﻿using System.Diagnostics;
+using System.Xml.Linq;
 using Microsoft.VisualStudio.Utilities;
 using PrettyDocComments.Helpers;
 
 namespace PrettyDocComments.Model;
 
+[DebuggerDisplay("Cell[TextBlocks = {TextBlocks?.Count}, _height = {_height}, Element = {Element}]")]
 internal class Cell
 {
     public XElement Element;

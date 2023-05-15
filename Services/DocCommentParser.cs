@@ -12,10 +12,11 @@ internal sealed class DocCommentParser
     private static readonly WidthEstimator _estimator = new();
 
     private readonly FormatAccumulator _accumulator;
-    private readonly List<TextBlock> _textBlocks = new();
     private readonly double _emSize;
-    private int _listLevel = -1;
     private readonly IWpfTextView _view; // TODO: remove when ParseTable is done.
+
+    private List<TextBlock> _textBlocks;
+    private int _listLevel = -1;
 
     public DocCommentParser(double indent, double width, IWpfTextView view)
     {
@@ -24,14 +25,14 @@ internal sealed class DocCommentParser
         _view = view;
     }
 
-    public IEnumerable<TextBlock> Parse(XElement node)
+    public List<TextBlock> Parse(XElement node)
     {
+        _textBlocks = new List<TextBlock>();
         ParseElement(node);
         CloseBlock();
-        foreach (TextBlock block in _textBlocks) {
-            yield return block;
-        }
-        _textBlocks.Clear();
+        var temp = _textBlocks;
+        _textBlocks = null;
+        return temp;
     }
 
     private TextBlock? CloseBlock(double height, BackgroundType backgroundType = BackgroundType.Default)
@@ -264,16 +265,15 @@ internal sealed class DocCommentParser
                     "".AsFormatted(Options.NormalTypeFace, columnWidth - Options.Padding.GetWidth(), _view),
                     left, -Options.Padding.Bottom, height: rowHeight, backgroundType));
                 double deltaY;
-                TextBlock tb;
                 if (row.Cells.Count > i) {
                     Cell cell = row.Cells[i];
                     _textBlocks.AddRange(cell.TextBlocks);
-                    tb = _textBlocks.Last();
-                    deltaY = tb.DeltaY - cell.Height - Options.Padding.Bottom; // Jump upwards for next column's cell.
+                    deltaY = -cell.Height; // Jump upwards for next column's cell.
                 } else {
-                    tb = _textBlocks.Last();
-                    deltaY = tb.DeltaY - Options.Padding.Bottom;
+                    deltaY = 0.0;
                 }
+                TextBlock tb = _textBlocks.Last();
+                deltaY += tb.DeltaY - Options.Padding.Bottom;
                 if (i == columnWidths.Length - 1) { // Jump down to next row.
                     deltaY += rowHeight + Options.Padding.GetHeight();
                 }
@@ -316,7 +316,7 @@ internal sealed class DocCommentParser
             using (_accumulator.CreateWidthScope(_accumulator.Indent + columnWidth - Options.Padding.GetWidth())) {
                 if (row.Cells.Count > i) {
                     Cell cell = row.Cells[i];
-                    cell.TextBlocks = Parse(cell.Element).ToList();
+                    cell.TextBlocks = Parse(cell.Element);
                 }
             }
             deltaIndent += columnWidth;

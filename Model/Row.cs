@@ -1,5 +1,8 @@
-﻿namespace PrettyDocComments.Model;
+﻿using System.Diagnostics;
 
+namespace PrettyDocComments.Model;
+
+[DebuggerDisplay("Row[IsHeader = {IsHeader}, Cells = {Cells.Count}]")]
 internal class Row
 {
     public bool IsHeader;
