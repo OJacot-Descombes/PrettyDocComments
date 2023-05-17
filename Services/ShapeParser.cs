@@ -141,15 +141,14 @@ internal sealed class ShapeParser
     private void AddMainTitle(string title)
     {
         FormattedText formattedText = CaptionText(title);
-        double deltaY = formattedText.Height;
-        _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y), deltaY));
-        _y += deltaY;
+        _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y)));
+        _y += formattedText.Height;
     }
 
     private void ParseBlockWithInlineHeading(XElement element, string caption)
     {
         FormattedText formattedCaption = CaptionText(caption);
-        _shapes.Add(new TextShape(formattedCaption, new Point(Options.Padding.Left, _y), deltaY: 0));
+        _shapes.Add(new TextShape(formattedCaption, new Point(Options.Padding.Left, _y)));
         double blockIndent = 4 * _emSize;
         int firstLineIndentChars = (int)(3.7 * Math.Max(formattedCaption.Width - blockIndent, 42) / _emSize) + 4;
         element.AddFirst(new string(NonBreakingSpace, firstLineIndentChars));
@@ -166,26 +165,24 @@ internal sealed class ShapeParser
     {
         var parser = new DocCommentParser(indent, _width, _view);
         foreach (TextBlock textBlock in parser.Parse(element)) {
-            double deltaY;
             if (textBlock.BackgroundType is BackgroundType.Default) {
-                deltaY = textBlock.DeltaY;
-                _shapes.Add(new TextShape(textBlock.Text, new Point(textBlock.Left, _y), deltaY));
+                _shapes.Add(new TextShape(textBlock.Text, new Point(textBlock.Left, _y)));
             } else {
-                deltaY = textBlock.DeltaY + Options.Padding.GetHeight();
+                bool hasText = textBlock.Text.Text is { Length: > 0 };
                 _shapes.Add(new RectangleShape(
                     textBlock.Fill, textBlock.Stroke,
-                    new Point(textBlock.Left, _y),
-                    textBlock.Text.MaxTextWidth + Options.Padding.GetWidth(),
-                    textBlock.Height + Options.Padding.GetHeight(),
-                    deltaY));
-                _shapes.Add(
-                    new TextShape(
-                        textBlock.Text,
-                        new Point(textBlock.Left + Options.Padding.Left, _y + Options.Padding.Top),
-                        deltaY: 0)
-                );
+                    origin: new Point(textBlock.Left, _y),
+                    width: textBlock.Text.MaxTextWidth + Options.Padding.GetWidth(),
+                    height: textBlock.Height));
+                if (hasText) {
+                    _shapes.Add(
+                        new TextShape(
+                            textBlock.Text,
+                            new Point(textBlock.Left + Options.Padding.Left, _y + Options.Padding.Top))
+                    );
+                }
             }
-            _y += deltaY;
+            _y += textBlock.DeltaY;
         }
     }
 
@@ -194,14 +191,11 @@ internal sealed class ShapeParser
         if (String.IsNullOrWhiteSpace(el.Value)) { // There is no text, just add the attribute values(s).
             string text = "● " + String.Join(" ", el.Attributes().Select(a => a.Value));
             FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, _width, _view);
-            _shapes.Add(new TextShape(
-                formattedText, new Point(Options.Padding.Left, _y),
-                formattedText.Height)
-            );
+            _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y)));
             _y += formattedText.Height;
         } else {
             FormattedText formattedText = "●".AsFormatted(Options.NormalTypeFace, _width, _view);
-            _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y), 0.0));
+            _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y)));
             ParseBlock(el, 1.3 * _emSize);
         }
     }

@@ -9,8 +9,8 @@ internal sealed class RectangleShape : Shape
     private readonly Pen _pen;
     private readonly double _width, _height;
 
-    public RectangleShape(Brush brush, Pen pen, Point origin, double width, double height, double deltaY)
-        : base(origin, deltaY)
+    public RectangleShape(Brush brush, Pen pen, Point origin, double width, double height)
+        : base(origin, height)
     {
         _brush = brush;
         _pen = pen;

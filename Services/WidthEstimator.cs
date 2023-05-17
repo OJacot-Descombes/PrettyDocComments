@@ -64,7 +64,7 @@ internal class WidthEstimator
                         case "code":
                             //TODO: Estimate code width better after removing unnecessary indent and taking longest line. The latter must be done in the DocCommentParser as well.
                             //    ParseElement(el, normalizeWS: false);
-                            //    CloseBlock(BackgroundType.Shaded);
+                            //    CloseBlock(BackgroundType.CodeBlock);
                             break;
                         case "remarks" or "example" or "para" or "seealso":
                             maxNumChars = Math.Max(maxNumChars, currentLineWidth);

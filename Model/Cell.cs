@@ -12,6 +12,5 @@ internal class Cell
     public List<TextBlock> TextBlocks;
 
     private double? _height;
-    public double Height => _height ??= TextBlocks.Sum(t => t.DeltaY) +
-        (TextBlocks.LastOrDefault().BackgroundType == BackgroundType.Shaded ? Options.Padding.GetHeight() : 0);
+    public double Height => _height ??= TextBlocks.Sum(t => t.DeltaY) + Options.Padding.GetHeight();
 }

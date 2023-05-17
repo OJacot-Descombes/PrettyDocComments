@@ -5,17 +5,15 @@ namespace PrettyDocComments.Model;
 
 internal abstract class Shape
 {
-    public Shape(Point origin, double deltaY)
+    public Shape(Point origin, double height)
     {
         _origin = origin;
-        DeltaY = deltaY;
+        Bottom = height + _origin.Y;
     }
 
     protected Point _origin;
 
-    public double DeltaY { get; }
-
-    public double Bottom => _origin.Y + DeltaY;
+    public double Bottom { get; }
 
     public abstract void Draw(DrawingContext dc);
 }

@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Windows.Media;
+using System.Xml.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using PrettyDocComments.Helpers;
@@ -39,8 +40,8 @@ internal sealed class DocCommentParser
     {
         if (_accumulator.HasText) {
             double padding = backgroundType is BackgroundType.Default ? 0.0 : Options.Padding.GetWidth();
-            var textBlock = new TextBlock(_accumulator.GetFormattedText(padding), _accumulator.Indent,
-                height, height, backgroundType);
+            FormattedText text = _accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
+            var textBlock = new TextBlock(text, _accumulator.Indent, height, height, backgroundType);
             _textBlocks.Add(textBlock);
             return textBlock;
         }
@@ -51,7 +52,8 @@ internal sealed class DocCommentParser
     {
         if (_accumulator.HasText) {
             double padding = backgroundType is BackgroundType.Default ? 0.0 : Options.Padding.GetWidth();
-            _textBlocks.Add(new TextBlock(_accumulator.GetFormattedText(padding), _accumulator.Indent, backgroundType));
+            FormattedText text = _accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
+            _textBlocks.Add(new TextBlock(text, _accumulator.Indent, backgroundType));
         }
     }
 
@@ -93,13 +95,13 @@ internal sealed class DocCommentParser
                                 ParseElement(el, normalizeWS: false);
                             }
                             break;
-                        case "code": //TODO: Remove unnecessary indent.
+                        case "code":
                             CloseBlock();
                             using (_accumulator.CreateCodeScope())
-                            using (_accumulator.CreateIndentScope(_emSize))
                             using (_accumulator.CreateWidthScope(_accumulator.Width - Options.Padding.Right)) {
+                                RemoveTagIndent(el);
                                 ParseElement(el, normalizeWS: false);
-                                CloseBlock(BackgroundType.Shaded);
+                                CloseBlock(BackgroundType.CodeBlock);
                             }
                             break;
                         case "remarks":
@@ -235,6 +237,55 @@ internal sealed class DocCommentParser
         _listLevel--;
     }
 
+    /// <summary>
+    /// This method removes the indentation of an XML element's value.
+    /// </summary>
+    /// <param name="el">Usually a &lt;code&gt; element</param>
+    private void RemoveTagIndent(XElement el)
+    {
+        string[] lines = el.Value.Split('\n');
+
+        // Find the first and last non-empty lines where the index 'last' points to the last such line + 1
+        int first = 0;
+        int last = lines.Length;
+        while (first < lines.Length && String.IsNullOrWhiteSpace(lines[first])) {
+            first++;
+        }
+        while (last > first && String.IsNullOrWhiteSpace(lines[last - 1])) {
+            last--;
+        }
+
+        if (last > first) {
+            // Calculate the minimum number of leading spaces in the non-empty lines
+            int minSpaces = Int32.MaxValue;
+            for (int i = first; i < last; i++) {
+                lines[i] = lines[i].TrimEnd();
+                string line = lines[i];
+                if (line.Length > 0) {
+                    minSpaces = Math.Min(minSpaces, line.TakeWhile(Char.IsWhiteSpace).Count());
+                }
+            }
+
+            if (minSpaces > 0) {
+                // Remove the leading spaces from each non-empty line
+                for (int i = first; i < last; i++) {
+                    string line = lines[i];
+                    if (line.Length > minSpaces) {
+                        lines[i] = line.Substring(minSpaces);
+                    }
+                }
+
+                //// Join the lines and set the value
+                el.Value = String.Join("\n", lines.Skip(first).Take(last - first));
+            } else if (first > 0 || last < lines.Length) {
+                el.Value = String.Join("\n", lines.Skip(first).Take(last - first));
+            }
+        } else {
+            // If all lines are empty, set the value to a single space to get a shaded rectangle.
+            el.Value = " ";
+        }
+    }
+
     private void ParseTable(XElement el)
     {
         double MinRowHeight = _view.FormattedLineSource.LineHeight / 2;
@@ -263,19 +314,19 @@ internal sealed class DocCommentParser
                 // Add single TextBlock as Frame.
                 _textBlocks.Add(new TextBlock(
                     "".AsFormatted(Options.NormalTypeFace, columnWidth - Options.Padding.GetWidth(), _view),
-                    left, -Options.Padding.Bottom, height: rowHeight, backgroundType));
+                    left, +Options.Padding.Top, height: rowHeight, backgroundType));
                 double deltaY;
                 if (row.Cells.Count > i) {
                     Cell cell = row.Cells[i];
                     _textBlocks.AddRange(cell.TextBlocks);
-                    deltaY = -cell.Height; // Jump upwards for next column's cell.
+                    deltaY = -(cell.Height - Options.Padding.Bottom); // Jump upwards for next column's cell.
                 } else {
-                    deltaY = 0.0;
+                    deltaY = -Options.Padding.Top;
                 }
                 TextBlock tb = _textBlocks.Last();
-                deltaY += tb.DeltaY - Options.Padding.Bottom;
+                deltaY += tb.DeltaY;
                 if (i == columnWidths.Length - 1) { // Jump down to next row.
-                    deltaY += rowHeight + Options.Padding.GetHeight();
+                    deltaY += rowHeight;
                 }
 
                 _textBlocks[_textBlocks.Count - 1] = new TextBlock(tb.Text, tb.Left, deltaY, tb.Height, tb.BackgroundType);

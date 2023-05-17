@@ -3,7 +3,7 @@
 enum BackgroundType
 {
 	Default,
-	Shaded,
+	CodeBlock,
 	Framed,
 	FramedShaded
 }

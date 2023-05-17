@@ -5,8 +5,8 @@ namespace PrettyDocComments.Model;
 
 internal sealed class TextShape : Shape
 {
-    public TextShape(FormattedText text, Point origin, double deltaY)
-        : base(origin, deltaY)
+    public TextShape(FormattedText text, Point origin)
+        : base(origin, text.Height)
     {
         _text = text;
     }

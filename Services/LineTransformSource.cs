@@ -72,7 +72,7 @@ internal sealed class LineTransformSource : ILineTransformSource
                 );
                 var errorInfo = new RenderInfo(
                     new List<Shape> { // Caret
-                        new RectangleShape(Brushes.Red, null, origin, width: columnWidth, height: 2, deltaY: 2)
+                        new RectangleShape(Brushes.Red, null, origin, width: columnWidth, height: 2)
                     },
                     calculatedHeight: (commentWithXmlText.LastLineNumber - commentWithXmlText.FirstLineNumber + 1) * _view.FormattedLineSource.LineHeight,
                     verticalScale: 1.0,

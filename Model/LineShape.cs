@@ -8,8 +8,8 @@ internal sealed class LineShape : Shape
     private readonly Pen _pen;
     private readonly Point _endpoint;
 
-    public LineShape(Pen pen, Point origin, Point endpoint, double deltaY)
-        : base(origin, deltaY)
+    public LineShape(Pen pen, Point origin, Point endpoint, double height)
+        : base(origin, height)
     {
         _endpoint = endpoint;
         _pen = pen;

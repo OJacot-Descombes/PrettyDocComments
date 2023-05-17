@@ -181,10 +181,12 @@ internal class FormatAccumulator
         _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textColor));
     }
 
-    public FormattedText GetFormattedText(double horizontalPadding = 0.0)
+    public FormattedText GetFormattedText(bool trimStartEnd, double horizontalPadding)
     {
-        _runs[0].TrimStart();
-        _runs[_runs.Count - 1].TrimEnd();
+        if (trimStartEnd) {
+            _runs[0].TrimStart();
+            _runs[_runs.Count - 1].TrimEnd();
+        }
         string text = String.Concat(_runs.Select(r => r.Text));
         FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, _width - _indent - horizontalPadding, _view);
         int startIndex = 0;

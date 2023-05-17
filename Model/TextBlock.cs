@@ -1,15 +1,18 @@
-﻿using System.Windows.Media;
+﻿using System.Diagnostics;
+using System.Windows.Media;
+using Microsoft.VisualStudio.Utilities;
 using PrettyDocComments.Helpers;
 
 namespace PrettyDocComments.Model;
 
+[DebuggerDisplay("{nameof(Text)}: \"{Text.Text}\", {nameof(Left)}: {Left}, {nameof(DeltaY)}: {DeltaY}, {nameof(Height)}: {Height}, {nameof(BackgroundType)}: {BackgroundType}")]
 internal readonly struct TextBlock
 {
     public TextBlock(FormattedText text, double left, BackgroundType backgroundType = BackgroundType.Default)
     {
         Text = text;
         Left = left;
-        DeltaY = Height = text.Height;
+        DeltaY = Height = text.Height + (backgroundType is BackgroundType.Default ? 0.0 : Options.Padding.GetHeight());
         BackgroundType = backgroundType;
     }
 
@@ -33,7 +36,7 @@ internal readonly struct TextBlock
     public readonly BackgroundType BackgroundType;
 
     public readonly Brush Fill => BackgroundType switch {
-        BackgroundType.Shaded or BackgroundType.FramedShaded => Options.CodeBackground,
+        BackgroundType.CodeBlock or BackgroundType.FramedShaded => Options.CodeBackground,
         _ => null,
     };
 
@@ -41,9 +44,4 @@ internal readonly struct TextBlock
         BackgroundType.Framed or BackgroundType.FramedShaded => Options.FrameStroke,
         _ => null,
     };
-
-    public override string ToString()
-    {
-        return $"{nameof(Text)}: \"{Text.Text}\", {nameof(Left)}: {Left}, {nameof(DeltaY)}: {DeltaY}, {nameof(Height)}: {Height}, {nameof(BackgroundType)}: {BackgroundType}";
-    }
 }
