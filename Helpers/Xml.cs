@@ -13,9 +13,15 @@ internal static class Xml
             nodes = doc.Root.Nodes();
             return true;
         } catch (XmlException ex) {
-            nodes = Enumerable.Empty<XNode>();
+            try { // If the XML contains a <!DOCTYPE html> it is probably rooted already and this may work:
+                var doc = XDocument.Parse(unrootedXml);
+                nodes = doc.Root.Nodes();
+                return true;
+            } catch {
+            }
             LastXmlException = ex;
-            return true;
+            nodes = Enumerable.Empty<XNode>();
+            return true; // Return true to have error rendered.
         } catch {
             nodes = null;
             return false;

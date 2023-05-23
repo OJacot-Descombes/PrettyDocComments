@@ -7,7 +7,7 @@ using PrettyDocComments.Model;
 
 namespace PrettyDocComments.Services;
 
-internal sealed class DocCommentParser
+internal sealed class FormatParser
 {
     private static readonly string[] _levelBullets = { "●", "■", "○" };
     private static readonly WidthEstimator _estimator = new();
@@ -19,7 +19,7 @@ internal sealed class DocCommentParser
     private List<TextBlock> _textBlocks;
     private int _listLevel = -1;
 
-    public DocCommentParser(double indent, double width, IWpfTextView view)
+    public FormatParser(double indent, double width, IWpfTextView view)
     {
         _accumulator = new FormatAccumulator(view, indent, width);
         _emSize = view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * Options.FontScaling;
@@ -59,10 +59,12 @@ internal sealed class DocCommentParser
 
     private void ParseElement(XElement node, bool normalizeWS = true)
     {
+        string previousTag = null;
         foreach (XNode child in node.Nodes()) {
             switch (child) {
                 case XText xText:
                     _accumulator.Add(xText.Value.NormalizeSpace(normalizeWS));
+                    previousTag = null;
                     break;
                 case XElement el:
                     string normalizedTag = el.Name.LocalName.ToLowerInvariant();
@@ -113,11 +115,20 @@ internal sealed class DocCommentParser
                         case "list" or "ul" or "ol" or "dl" or "menu":
                             ParseList(el, normalizedTag);
                             break;
-                        case "para":
+                        case "para" or "p":
+                            CloseBlock();
+
+                            // Don't add space twice between two param tags. Don't add space before first element.
+                            if (previousTag is not ("para" or "p") && el.PreviousNode is not null) {
+                                _accumulator.Add(" ");
+                                CloseBlock(height: _emSize / 2.5);
+                            }
                             ParseElement(el);
                             CloseBlock();
-                            _accumulator.Add(" ");
-                            CloseBlock(height: _emSize / 2.5);
+                            if (el.NextNode is not null) { // Don't add space after last element.
+                                _accumulator.Add(" ");
+                                CloseBlock(height: _emSize / 2.5);
+                            }
                             break;
                         case "term" or "dt" when _listLevel >= 0:
                             using (_accumulator.CreateBoldScope()) {
@@ -128,25 +139,39 @@ internal sealed class DocCommentParser
                         case "description" when _listLevel >= 0:
                             ParseElement(el);
                             break;
-                        case "paramref" or "typeparamref":
+                        case "paramref" or "typeparamref" or "permission" or "a":
                             Reference(el); // "name"
                             break;
                         case "see" or "seealso":
                             // Let's treat <seealso> like <see> if it is nested
                             // (according to Mahmoud Al-Qudsi: https://stackoverflow.com/a/69947292/880990)
+                            _accumulator.Add("See: ");
                             Reference(el); // "cref", "langword", "href"
                             break;
-                        case "include":
+                        case "include" or "inheritdoc":
                             using (_accumulator.CreateTextColorScope(Options.SpecialTextColor)) {
-                                _accumulator.Add("include(");
+                                _accumulator.Add(normalizedTag);
+                                _accumulator.Add("(");
                                 _accumulator.Add(String.Join(" ", el.Attributes().Select(a => $"{a.Name}='{a.Value}'")));
                                 _accumulator.Add(")");
                             }
                             break;
                         default:
-                            _accumulator.Add(el.ToString().NormalizeSpace(normalizeWS));
+                            using (_accumulator.CreateItalicScope()) {
+                                _accumulator.Add(normalizedTag.FirstCap() + ": ");
+                            }
+                            ParseElement(el);
+                            //_accumulator.Add(el.ToString().NormalizeSpace(normalizeWS));
                             break;
                     }
+                    previousTag = normalizedTag;
+                    break;
+                case XComment comment:
+                    CloseBlock();
+                    using (_accumulator.CreateTextColorScope(Options.CommentTextColor)) {
+                        _accumulator.Add(comment.Value);
+                    }
+                    CloseBlock();
                     break;
                 default:
                     _accumulator.Add(child.ToString().NormalizeSpace(normalizeWS));
@@ -210,11 +235,19 @@ internal sealed class DocCommentParser
                 CloseBlock();
                 using (_accumulator.CreateUnderlineScope()) {
                     foreach (var headerElement in listItem.Elements()) {
-                        ParseElement(headerElement);
-                        _accumulator.Add("\r\n");
+                        if (headerElement.Name.LocalName == "term") {
+                            using (_accumulator.CreateBoldScope()) {
+                                ParseElement(headerElement);
+                                _accumulator.Add(" – ");
+                            }
+
+                        } else {
+                            ParseElement(headerElement);
+                            _accumulator.Add("\r\n");
+                        }
                     }
                 }
-            } else { // textBlock
+            } else { // item
                 CloseBlock();
                 string actualBullet = numberType switch {
                     null => bullet ?? _levelBullets[_listLevel % _levelBullets.Length],
@@ -297,7 +330,7 @@ internal sealed class DocCommentParser
         }
         ScaleColumnWidths(columnWidths, _accumulator.RemainingWidth);
 
-        var parser = new DocCommentParser(_accumulator.Indent + Options.Padding.Left, 0, _view);
+        var parser = new FormatParser(_accumulator.Indent + Options.Padding.Left, 0, _view);
 
         CloseBlock();
         foreach (Row row in rows) {

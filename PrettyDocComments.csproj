@@ -53,7 +53,7 @@
     <Compile Include="Model\LineShape.cs" />
     <Compile Include="Services\FormatAccumulator.cs" />
     <Compile Include="Model\Row.cs" />
-    <Compile Include="Services\DocCommentParser.cs" />
+    <Compile Include="Services\FormatParser.cs" />
     <Compile Include="Model\FormatRun.cs" />
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="Helpers\Xml.cs" />

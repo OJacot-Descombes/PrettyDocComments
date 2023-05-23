@@ -13,6 +13,7 @@ internal static class Options
     public static readonly Brush CodeBackground = Brushes.Gainsboro;
     public static readonly Brush DefaultTextColor = Brushes.Black;
     public static readonly Brush SpecialTextColor = Brushes.DarkSlateBlue;
+    public static readonly Brush CommentTextColor = Brushes.ForestGreen;
 
     public static readonly Pen CommentOutline;
     public static readonly Pen CommentSeparator;

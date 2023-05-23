@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
 using Microsoft.VisualStudio.Text.Editor;
@@ -31,4 +32,11 @@ internal static class StringExtensions
     public static string NormalizeSpace(this string s, bool normalizeWS)
     => normalizeWS ? _normalizeWhiteSpacesRegex.Replace(s, " ") : s;
 
+    public static string FirstCap(this string s)
+    {
+        if (s is { Length: > 0 }) {
+            return s.Substring(0, 1).ToUpper() + s.Substring(1, s.Length - 1);
+        }
+        return s;
+    }
 }
