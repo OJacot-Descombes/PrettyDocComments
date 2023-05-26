@@ -1,4 +1,6 @@
-﻿using System.Windows.Media;
+﻿using System.Windows;
+using System.Windows.Media;
+using System.Xaml;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
@@ -7,21 +9,23 @@ using PrettyDocComments.Model;
 
 namespace PrettyDocComments.Services;
 
-internal sealed class FormatParser
+internal sealed partial class FormatParser
 {
     private static readonly string[] _levelBullets = { "●", "■", "○" };
     private static readonly WidthEstimator _estimator = new();
 
-    private readonly FormatAccumulator _accumulator;
     private readonly double _emSize;
     private readonly IWpfTextView _view; // TODO: remove when ParseTable is done.
 
     private List<TextBlock> _textBlocks;
     private int _listLevel = -1;
 
-    public FormatParser(double indent, double width, IWpfTextView view)
+    private readonly FormatAccumulator _accumulator;
+    public FormatAccumulator Accumulator => _accumulator;
+
+    public FormatParser(double indent, double width, double fontAspect, IWpfTextView view)
     {
-        _accumulator = new FormatAccumulator(view, indent, width);
+        _accumulator = new FormatAccumulator(view, indent, width, fontAspect);
         _emSize = view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * Options.FontScaling;
         _view = view;
     }
@@ -34,6 +38,195 @@ internal sealed class FormatParser
         var temp = _textBlocks;
         _textBlocks = null;
         return temp;
+    }
+
+    private void ParseElement(XElement node, bool normalizeWS = true)
+    {
+        string previousTag = null;
+        foreach (XNode child in node.Nodes()) {
+            switch (child) {
+                case XText xText:
+                    _accumulator.Add(xText.Value.NormalizeSpace(normalizeWS));
+                    previousTag = null;
+                    break;
+                case XElement el:
+                    string normalizedTag = el.Name.LocalName.ToLowerInvariant();
+                    switch (normalizedTag) {
+                        case "big":
+                            using (_accumulator.CreateFontAspect(_accumulator.FontAspect * 1.2)) {
+                                ParseElement(el);
+                            }
+                            break;
+                        case "button":
+                            _accumulator.Add(" [ "); ParseElement(el); _accumulator.Add(" ] ");
+                            break;
+                        case "blockquote":
+                            CloseBlock();
+                            using (_accumulator.CreateItalicScope())
+                            using (_accumulator.CreateIndentScope(_emSize)) {
+                                ParseElement(el);
+                                CloseBlock();
+                            }
+                            break;
+                        case "br":
+                            _accumulator.AddLineBreak();
+                            break;
+                        case "b" or "strong":
+                            using (_accumulator.CreateBoldScope()) {
+                                ParseElement(el);
+                            }
+                            break;
+                        case "i" or "cite" or "dfn" or "em":
+                            using (_accumulator.CreateItalicScope()) {
+                                ParseElement(el);
+                            }
+                            break;
+                        case "u" or "ins":
+                            using (_accumulator.CreateUnderlineScope()) {
+                                ParseElement(el);
+                            }
+                            break;
+                        case "s" or "strike" or "del":
+                            using (_accumulator.CreateStrikethroughScope()) {
+                                ParseElement(el);
+                            }
+                            break;
+                        case "center":
+                            CloseBlock();
+                            using (_accumulator.CreateAlignmentScope(TextAlignment.Center)) {
+                                ParseElement(el);
+                                CloseBlock();
+                            }
+                            break;
+                        case "c":
+                            using (_accumulator.CreateCodeScope()) {
+                                ParseElement(el, normalizeWS: false);
+                            }
+                            break;
+                        case "code":
+                            CloseBlock();
+                            using (_accumulator.CreateCodeScope())
+                            using (_accumulator.CreateWidthScope(_accumulator.Width - Options.Padding.Right)) {
+                                RemoveTagIndent(el);
+                                ParseElement(el, normalizeWS: false);
+                                CloseBlock(BackgroundType.CodeBlock);
+                            }
+                            break;
+                        case "details": // Display like an open disclosure widget. (non-functional)
+                            if (el.Element("summary") is { } summary) {
+                                summary.AddFirst("▼ ");
+                            }
+                            ParseElement(el);
+                            break;
+                        case "dialog" or "fieldset":
+                            CloseBlock();
+                            using (_accumulator.CreateWidthScope(_accumulator.Width - Options.Padding.Right)) {
+                                ParseElement(el);
+                                CloseBlock(BackgroundType.Framed);
+                            }
+                            break;
+                        case "div" or "figcaption" or "footer" or "form":
+                            // Insert line break before and after <div> as most browsers do. No processing of CSS styles so far.
+                            CloseBlock();
+                            ParseElement(el);
+                            CloseBlock();
+                            break;
+                        case "remarks":
+                            ParseWithTitle(el, "Remarks");
+                            break;
+                        case "example":
+                            ParseWithTitle(el, "Example: ", 1.7 * _emSize);
+                            break;
+                        case "list" or "ul" or "ol" or "dl" or "menu" or "table" or "dir":
+                            ParseList(el, normalizedTag);
+                            break;
+                        case "para" or "p":
+                            CloseBlock();
+
+                            // Don't add space twice between two param tags. Don't add space before first element.
+                            if (previousTag is not ("para" or "p") && el.PreviousNode is not null) {
+                                _accumulator.Add(" ");
+                                CloseBlock(height: _emSize / 2.5);
+                            }
+                            ParseElement(el);
+                            CloseBlock();
+                            if (el.NextNode is not null) { // Don't add space after last element.
+                                _accumulator.Add(" ");
+                                CloseBlock(height: _emSize / 2.5);
+                            }
+                            break;
+                        case "term" when _listLevel >= 0:
+                            using (_accumulator.CreateBoldScope()) {
+                                ParseElement(el);
+                                _accumulator.Add(" – ");
+                            }
+                            break;
+                        case "description" when _listLevel >= 0:
+                            ParseElement(el);
+                            break;
+                        case "paramref" or "typeparamref" or "permission" or "a" or "embed" or "img" or "frame":
+                            Reference(el); // "name"
+                            break;
+                        case "see" or "seealso":
+                            // Let's treat <seealso> like <see> if it is nested
+                            // (according to Mahmoud Al-Qudsi: https://stackoverflow.com/a/69947292/880990)
+                            _accumulator.Add("See: ");
+                            Reference(el); // "cref", "langword", "href"
+                            break;
+                        case "include" or "inheritdoc":
+                            using (_accumulator.CreateTextColorScope(Options.SpecialTextColor)) {
+                                _accumulator.Add(normalizedTag);
+                                _accumulator.Add("(");
+                                _accumulator.Add(String.Join(" ", el.Attributes().Select(a => $"{a.Name}='{a.Value}'")));
+                                _accumulator.Add(")");
+                            }
+                            break;
+                        case "h1":
+                            HtmlHeading(el, 1.8);
+                            break;
+                        case "h2":
+                            HtmlHeading(el, 1.53);
+                            break;
+                        case "h3":
+                            HtmlHeading(el, 1.3);
+                            break;
+                        case "h4":
+                            HtmlHeading(el, 1.11);
+                            break;
+                        case "h5":
+                            HtmlHeading(el, 0.94);
+                            break;
+                        case "h6":
+                            HtmlHeading(el, 0.8);
+                            break;
+                        case "input":
+                            HtmlInputField(el);
+                            break;
+                        case "summary" or "figure" or "label":
+                            // Render without special handling but do not display the tag name.
+                            ParseElement(el);
+                            break;
+                        default: // Unsupported tags. Display tag name as a label.
+                            using (_accumulator.CreateItalicScope()) {
+                                _accumulator.Add(normalizedTag.FirstCap() + ": ");
+                            }
+                            ParseElement(el);
+                            break;
+                    }
+                    previousTag = normalizedTag;
+                    break;
+                case XComment comment:
+                    CloseBlock();
+                    using (_accumulator.CreateTextColorScope(Options.CommentTextColor)) {
+                        _accumulator.Add(comment.Value);
+                    }
+                    CloseBlock();
+                    break;
+                default:
+                    _accumulator.Add(child.ToString().NormalizeSpace(normalizeWS));
+                    break;
+            }
+        }
     }
 
     private TextBlock? CloseBlock(double height, BackgroundType backgroundType = BackgroundType.Default)
@@ -54,129 +247,6 @@ internal sealed class FormatParser
             double padding = backgroundType is BackgroundType.Default ? 0.0 : Options.Padding.GetWidth();
             FormattedText text = _accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
             _textBlocks.Add(new TextBlock(text, _accumulator.Indent, backgroundType));
-        }
-    }
-
-    private void ParseElement(XElement node, bool normalizeWS = true)
-    {
-        string previousTag = null;
-        foreach (XNode child in node.Nodes()) {
-            switch (child) {
-                case XText xText:
-                    _accumulator.Add(xText.Value.NormalizeSpace(normalizeWS));
-                    previousTag = null;
-                    break;
-                case XElement el:
-                    string normalizedTag = el.Name.LocalName.ToLowerInvariant();
-                    switch (normalizedTag) {
-                        case "br":
-                            _accumulator.Add("\r\n");
-                            break;
-                        case "b" or "strong":
-                            using (_accumulator.CreateBoldScope()) {
-                                ParseElement(el);
-                            }
-                            break;
-                        case "i":
-                            using (_accumulator.CreateItalicScope()) {
-                                ParseElement(el);
-                            }
-                            break;
-                        case "u":
-                            using (_accumulator.CreateUnderlineScope()) {
-                                ParseElement(el);
-                            }
-                            break;
-                        case "s" or "strike":
-                            using (_accumulator.CreateStrikethroughScope()) {
-                                ParseElement(el);
-                            }
-                            break;
-                        case "c":
-                            using (_accumulator.CreateCodeScope()) {
-                                ParseElement(el, normalizeWS: false);
-                            }
-                            break;
-                        case "code":
-                            CloseBlock();
-                            using (_accumulator.CreateCodeScope())
-                            using (_accumulator.CreateWidthScope(_accumulator.Width - Options.Padding.Right)) {
-                                RemoveTagIndent(el);
-                                ParseElement(el, normalizeWS: false);
-                                CloseBlock(BackgroundType.CodeBlock);
-                            }
-                            break;
-                        case "remarks":
-                            ParseWithTitle(el, "Remarks");
-                            break;
-                        case "example":
-                            ParseWithTitle(el, "Example: ", 1.7 * _emSize);
-                            break;
-                        case "list" or "ul" or "ol" or "dl" or "menu":
-                            ParseList(el, normalizedTag);
-                            break;
-                        case "para" or "p":
-                            CloseBlock();
-
-                            // Don't add space twice between two param tags. Don't add space before first element.
-                            if (previousTag is not ("para" or "p") && el.PreviousNode is not null) {
-                                _accumulator.Add(" ");
-                                CloseBlock(height: _emSize / 2.5);
-                            }
-                            ParseElement(el);
-                            CloseBlock();
-                            if (el.NextNode is not null) { // Don't add space after last element.
-                                _accumulator.Add(" ");
-                                CloseBlock(height: _emSize / 2.5);
-                            }
-                            break;
-                        case "term" or "dt" when _listLevel >= 0:
-                            using (_accumulator.CreateBoldScope()) {
-                                ParseElement(el);
-                                _accumulator.Add(" – ");
-                            }
-                            break;
-                        case "description" when _listLevel >= 0:
-                            ParseElement(el);
-                            break;
-                        case "paramref" or "typeparamref" or "permission" or "a":
-                            Reference(el); // "name"
-                            break;
-                        case "see" or "seealso":
-                            // Let's treat <seealso> like <see> if it is nested
-                            // (according to Mahmoud Al-Qudsi: https://stackoverflow.com/a/69947292/880990)
-                            _accumulator.Add("See: ");
-                            Reference(el); // "cref", "langword", "href"
-                            break;
-                        case "include" or "inheritdoc":
-                            using (_accumulator.CreateTextColorScope(Options.SpecialTextColor)) {
-                                _accumulator.Add(normalizedTag);
-                                _accumulator.Add("(");
-                                _accumulator.Add(String.Join(" ", el.Attributes().Select(a => $"{a.Name}='{a.Value}'")));
-                                _accumulator.Add(")");
-                            }
-                            break;
-                        default:
-                            using (_accumulator.CreateItalicScope()) {
-                                _accumulator.Add(normalizedTag.FirstCap() + ": ");
-                            }
-                            ParseElement(el);
-                            //_accumulator.Add(el.ToString().NormalizeSpace(normalizeWS));
-                            break;
-                    }
-                    previousTag = normalizedTag;
-                    break;
-                case XComment comment:
-                    CloseBlock();
-                    using (_accumulator.CreateTextColorScope(Options.CommentTextColor)) {
-                        _accumulator.Add(comment.Value);
-                    }
-                    CloseBlock();
-                    break;
-                default:
-                    _accumulator.Add(child.ToString().NormalizeSpace(normalizeWS));
-                    break;
-            }
         }
     }
 
@@ -203,71 +273,6 @@ internal sealed class FormatParser
             ParseElement(el);
             CloseBlock();
         }
-    }
-
-    private void ParseList(XElement el, string listTag)
-    {
-        // The <list> tag denotes a doc-comment type list, other types (ul, ol, dl, menu) are HTML type lists.
-
-        const string Nul = null;
-
-        string type = el.Attributes("type").FirstOrDefault()?.Value;
-        if (type is "table") {
-            ParseTable(el);
-            return;
-        }
-
-        _listLevel++;
-        (string bullet, string numberType) = (listTag, type) switch {
-            ("list", "number") => (Nul, "1"),
-            ("list", "table") => ("", Nul),
-            ("list", "bullet") => ("●", Nul),
-            ("ul", "disk") => ("●", Nul),
-            ("ul", "square") => ("■", Nul),
-            ("ul", "circle") => ("○", Nul),
-            ("ol", null) => (Nul, "1"),
-            ("ol", _) => (Nul, type),
-            _ => (Nul, Nul)
-        };
-        int number = 1;
-        foreach (var listItem in el.Elements()) {
-            if (listItem.Name.LocalName == "listheader") {
-                CloseBlock();
-                using (_accumulator.CreateUnderlineScope()) {
-                    foreach (var headerElement in listItem.Elements()) {
-                        if (headerElement.Name.LocalName == "term") {
-                            using (_accumulator.CreateBoldScope()) {
-                                ParseElement(headerElement);
-                                _accumulator.Add(" – ");
-                            }
-
-                        } else {
-                            ParseElement(headerElement);
-                            _accumulator.Add("\r\n");
-                        }
-                    }
-                }
-            } else { // item
-                CloseBlock();
-                string actualBullet = numberType switch {
-                    null => bullet ?? _levelBullets[_listLevel % _levelBullets.Length],
-                    "A" => number.ToAlphabet() + ". ",
-                    "a" => number.ToAlphabet(lowerCase: true) + ". ",
-                    "I" => number.ToRoman() + ". ",
-                    "i" => number.ToRoman(lowerCase: true) + ". ",
-                    _ => number.ToString() + ". "
-                };
-                _accumulator.Add(actualBullet);
-                TextBlock? textBlock = CloseBlock(height: 0.0);
-                double itemIndent = type == "table" ? 0.0 : Math.Max(textBlock?.Text.Width ?? 0.0, _emSize) + 0.5 * _emSize;
-                using (_accumulator.CreateIndentScope(itemIndent)) {
-                    ParseElement(listItem);
-                    CloseBlock();
-                };
-                number++;
-            }
-        }
-        _listLevel--;
     }
 
     /// <summary>
@@ -319,91 +324,33 @@ internal sealed class FormatParser
         }
     }
 
-    private void ParseTable(XElement el)
+    private void HtmlInputField(XElement el)
     {
-        double MinRowHeight = _view.FormattedLineSource.LineHeight / 2;
-
-        List<Row> rows = GatherTableElements(el);
-        double[] columnWidths = _estimator.EstimateColumnWidths(rows);
-        if (columnWidths is null) {
-            return;
-        }
-        ScaleColumnWidths(columnWidths, _accumulator.RemainingWidth);
-
-        var parser = new FormatParser(_accumulator.Indent + Options.Padding.Left, 0, _view);
-
-        CloseBlock();
-        foreach (Row row in rows) {
-            parser.ParseCells(row, columnWidths);
-            double rowHeight = Math.Max(MinRowHeight, row.Cells
-                .Select(c => c.Height)
-                .DefaultIfEmpty(0)
-                .Max());
-            BackgroundType backgroundType = row.IsHeader ? BackgroundType.FramedShaded : BackgroundType.Framed;
-            double left = _accumulator.Indent;
-            for (int i = 0; i < columnWidths.Length; i++) {
-                double columnWidth = columnWidths[i];
-
-                // Add single TextBlock as Frame.
-                _textBlocks.Add(new TextBlock(
-                    "".AsFormatted(Options.NormalTypeFace, columnWidth - Options.Padding.GetWidth(), _view),
-                    left, +Options.Padding.Top, height: rowHeight, backgroundType));
-                double deltaY;
-                if (row.Cells.Count > i) {
-                    Cell cell = row.Cells[i];
-                    _textBlocks.AddRange(cell.TextBlocks);
-                    deltaY = -(cell.Height - Options.Padding.Bottom); // Jump upwards for next column's cell.
-                } else {
-                    deltaY = -Options.Padding.Top;
-                }
-                TextBlock tb = _textBlocks.Last();
-                deltaY += tb.DeltaY;
-                if (i == columnWidths.Length - 1) { // Jump down to next row.
-                    deltaY += rowHeight;
-                }
-
-                _textBlocks[_textBlocks.Count - 1] = new TextBlock(tb.Text, tb.Left, deltaY, tb.Height, tb.BackgroundType);
-
-                left += columnWidth;
-            }
-        }
-
-        static List<Row> GatherTableElements(XElement el)
-        {
-            var rows = new List<Row>();
-            foreach (var listItem in el.Elements()) {
-                var row = new Row { IsHeader = listItem.Name.LocalName == "listheader" };
-                rows.Add(row);
-                foreach (XElement term in listItem.Elements()) { // We assume it's a <term>-tag.
-                    row.Cells.Add(new Cell { Element = term });
-                }
-            }
-
-            return rows;
-        }
-
-        static void ScaleColumnWidths(double[] columnWidths, double remainingWidth)
-        {
-            double columnScaling = (remainingWidth - Options.Padding.Right) / columnWidths.Sum();
-            for (int i = 0; i < columnWidths.Length; i++) {
-                columnWidths[i] *= columnScaling;
-            }
-        }
+        string text = el.Attribute("type")?.Value switch {
+            "button" when el.Attribute("value")?.Value is var value => $"[ {value} ]",
+            "checkbox" => "[X] ",
+            "color" or "date" or "datetime-local" => "[____|▼]",
+            "file" => "[ Browse... ]",
+            "hidden" => "",
+            "image" when el.Attribute("src")?.Value is var src => $"[ {src} ]",
+            "number" => "[____|↕]",
+            "password" => "[••••__]",
+            "radio" => "◯ ",
+            "range" => "━━⬤━━━━",
+            "reset" => "[ Reset ]",
+            "submit" => "[ Submit ]",
+            _ => "[______]"
+        };
+        _accumulator.Add(text);
     }
 
-    public void ParseCells(Row row, double[] columnWidths)
+    private void HtmlHeading(XElement el, double aspectFactor)
     {
-        double deltaIndent = 0;
-        for (int i = 0; i < columnWidths.Length; i++) {
-            double columnWidth = columnWidths[i];
-            using (_accumulator.CreateIndentScope(deltaIndent))
-            using (_accumulator.CreateWidthScope(_accumulator.Indent + columnWidth - Options.Padding.GetWidth())) {
-                if (row.Cells.Count > i) {
-                    Cell cell = row.Cells[i];
-                    cell.TextBlocks = Parse(cell.Element);
-                }
-            }
-            deltaIndent += columnWidth;
+        CloseBlock();
+        using (_accumulator.CreateBoldScope())
+        using (_accumulator.CreateFontAspect(aspectFactor)) {
+            ParseElement(el);
+            CloseBlock();
         }
     }
 }

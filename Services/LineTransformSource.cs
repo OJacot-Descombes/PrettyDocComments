@@ -65,16 +65,10 @@ internal sealed class LineTransformSource : ILineTransformSource
             Xml.TryParseUnrootedNodes(commentWithXmlText.Data, out var nodes)) {
 
             if (Xml.LastXmlException is not null) {
-                double columnWidth = _view.FormattedLineSource.ColumnWidth;
-                var origin = new Point(
-                    x: (commentWithXmlText.CommentLeftCharIndex + Xml.LastXmlException.LinePosition + 3) * columnWidth,
-                    y: Xml.LastXmlException.LineNumber * _view.FormattedLineSource.LineHeight - 3
-                );
                 var errorInfo = new RenderInfo(
-                    new List<Shape> { // Caret
-                        new RectangleShape(Brushes.Red, null, origin, width: columnWidth, height: 2)
-                    },
-                    calculatedHeight: (commentWithXmlText.LastLineNumber - commentWithXmlText.FirstLineNumber + 1) * _view.FormattedLineSource.LineHeight,
+                    new List<Shape> { GetCaretRectangle(commentWithXmlText), GetErrorText(commentWithXmlText) },
+                    calculatedHeight: (commentWithXmlText.LastLineNumber - commentWithXmlText.FirstLineNumber + 1) * 
+                        _view.FormattedLineSource.LineHeight,
                     verticalScale: 1.0,
                     containsErrorHint: true
                 );
@@ -88,6 +82,28 @@ internal sealed class LineTransformSource : ILineTransformSource
         }
         commentWithRenderInfo = default;
         return false;
+
+        RectangleShape GetCaretRectangle(Comment<string> commentWithXmlText)
+        {
+            double columnWidth = _view.FormattedLineSource.ColumnWidth;
+            var caretOrigin = new Point(
+                x: (commentWithXmlText.CommentLeftCharIndex + Xml.LastXmlException.LinePosition + 3) * columnWidth,
+                y: Xml.LastXmlException.LineNumber * _view.FormattedLineSource.LineHeight - 3
+            );
+            var caretRectangle = new RectangleShape(Brushes.Red, null, caretOrigin, width: columnWidth, height: 2);
+            return caretRectangle;
+        }
+
+        TextShape GetErrorText(Comment<string> commentWithXmlText)
+        {
+            double columnWidth = _view.FormattedLineSource.ColumnWidth;
+            FormattedText errorText = Xml.LastXmlException.Message.AsFormatted(
+                Options.NormalTypeFace, 0.4 * Options.CommentWidthInColumns * columnWidth, _view);
+            errorText.SetForegroundBrush(Options.ErrorOutline.Brush);
+            var errorOrigin = new Point(2 * columnWidth + commentWithXmlText.Width, 0);
+            var errorTextShape = new TextShape(errorText, errorOrigin);
+            return errorTextShape;
+        }
     }
 
     private bool IsLineCollapsed(ITextViewLine line)

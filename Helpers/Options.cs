@@ -1,5 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.TextFormatting;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Formatting;
 
 namespace PrettyDocComments.Helpers;
 
@@ -29,6 +32,9 @@ internal static class Options
     public static readonly double FontScaling = 0.8;
 
     public static readonly Thickness Padding = new(left: 5.0, top: 3.0, right: 3.0, bottom: 3.0);
+
+    public static double GetNormalEmSize(IWpfTextView view) =>
+        view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * Options.FontScaling;
 
     static Options()
     {

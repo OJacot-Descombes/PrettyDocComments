@@ -14,6 +14,7 @@ internal class WidthEstimator
         // We only return the realtive column sizes. Later, these values will be scaled to make the total width of
         // the table fit the available space. Therefore we only estimate the number of characters per line. 
 
+        rows = rows.Where(r => !r.IsCaption).ToList();
 
         if (rows.Count == 0) {
             return null;

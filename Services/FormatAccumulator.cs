@@ -8,16 +8,33 @@ namespace PrettyDocComments.Services;
 
 internal class FormatAccumulator
 {
-    public FormatAccumulator(IWpfTextView view, double indent, double width)
+    public FormatAccumulator(IWpfTextView view, double indent, double width, double fontAspect)
     {
         _view = view;
         _indent = indent;
         _width = width;
+        _fontAspect = fontAspect;
     }
 
     private readonly IWpfTextView _view;
 
     private readonly List<FormatRun> _runs = new();
+
+    public readonly struct FontAspectMemento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+
+        private readonly double _fontAspect;
+
+        internal FontAspectMemento(FormatAccumulator originator, double fontAspect)
+        {
+            _originator = originator;
+            _fontAspect = originator._fontAspect;
+            originator._fontAspect = fontAspect;
+        }
+
+        void IDisposable.Dispose() => _originator._fontAspect = _fontAspect;
+    }
 
     public readonly struct IndentMemento : IDisposable
     {
@@ -146,27 +163,45 @@ internal class FormatAccumulator
         }
     }
 
+    public readonly struct AlignmentMemento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+        private readonly TextAlignment _alignment;
+
+        internal AlignmentMemento(FormatAccumulator originator, TextAlignment alignment)
+        {
+            _originator = originator;
+            _alignment = originator._alignment;
+            originator._alignment = alignment;
+        }
+
+        void IDisposable.Dispose()
+        {
+            _originator._alignment = _alignment;
+        }
+    }
+
     private double _indent;
     private double _width;
+    private double _fontAspect;
     private bool _bold;
     private bool _italic;
     private bool _strikethrough;
     private bool _underline;
     private bool _code;
     private Brush _textColor = Options.DefaultTextColor;
+    private TextAlignment _alignment;
+
+    private bool _trimNextStart;
 
     public double Indent { get => _indent; }
     public double Width { get => _width; }
-    public bool Bold { get => _bold; }
-    public bool Italic { get => _italic; }
-    public bool Strikethrough { get => _strikethrough; }
-    public bool Underline { get => _underline; }
-    public bool Code { get => _code; }
-    public Brush TextColor { get => _textColor; }
+    public double FontAspect { get => _fontAspect; }
 
     public bool HasText => _runs.Count > 0;
     public double RemainingWidth => _width - _indent;
 
+    public FontAspectMemento CreateFontAspect(double aspect) => new(this, aspect);
     public IndentMemento CreateIndentScope(double deltaIndent) => new(this, deltaIndent);
     public WidthMemento CreateWidthScope(double width) => new(this, width);
     public BoldMemento CreateBoldScope() => new(this);
@@ -175,10 +210,21 @@ internal class FormatAccumulator
     public UnderlineMemento CreateUnderlineScope() => new(this);
     public CodeMemento CreateCodeScope() => new(this);
     public TextColorMemento CreateTextColorScope(Brush textColor) => new(this, textColor);
+    public AlignmentMemento CreateAlignmentScope(TextAlignment alignment) => new(this, alignment);
 
     public void Add(string text)
     {
-        _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textColor));
+        if (_trimNextStart) {
+            _trimNextStart = false;
+            text = text.TrimStart();
+        }
+        _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textColor, _fontAspect));
+    }
+
+    public void AddLineBreak()
+    {
+        _runs.Add(new FormatRun("\r\n", _bold, _italic, _strikethrough, _underline, _code, _textColor, _fontAspect));
+        _trimNextStart = true;
     }
 
     public FormattedText GetFormattedText(bool trimStartEnd, double horizontalPadding)
@@ -189,6 +235,7 @@ internal class FormatAccumulator
         }
         string text = String.Concat(_runs.Select(r => r.Text));
         FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, _width - _indent - horizontalPadding, _view);
+        formattedText.TextAlignment = _alignment;
         int startIndex = 0;
         foreach (FormatRun run in _runs) {
             int length = run.Text?.Length ?? 0;
@@ -196,6 +243,9 @@ internal class FormatAccumulator
             formattedText.SetFontStyle(run.Italic ? FontStyles.Italic : FontStyles.Normal, startIndex, length);
             formattedText.SetFontWeight(run.Bold ? FontWeights.Bold : FontWeights.Normal, startIndex, length);
             formattedText.SetForegroundBrush(run.TextBrush, startIndex, length);
+            if (run.FontAspect != 1.0) {
+                formattedText.SetFontSize(Options.GetNormalEmSize(_view) * run.FontAspect, startIndex, length);
+            }
             var textDecorations = new TextDecorationCollection(2);
             if (run.Underline) {
                 textDecorations.Add(TextDecorations.Underline);

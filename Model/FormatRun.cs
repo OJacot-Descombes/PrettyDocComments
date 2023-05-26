@@ -11,8 +11,9 @@ internal sealed class FormatRun
     private readonly bool _underline;
     private readonly bool _code;
     private readonly Brush _textBrush;
+    private readonly double _fontAspect;
 
-    public FormatRun(string text, bool bold, bool italic, bool strikethrough, bool underline, bool code, Brush textBrush)
+    public FormatRun(string text, bool bold, bool italic, bool strikethrough, bool underline, bool code, Brush textBrush, double fontAspect)
     {
         _text = text;
         _bold = bold;
@@ -21,6 +22,7 @@ internal sealed class FormatRun
         _underline = underline;
         _code = code;
         _textBrush = textBrush;
+        _fontAspect = fontAspect;
     }
 
     public string Text => _text;
@@ -30,6 +32,7 @@ internal sealed class FormatRun
     public bool Underline => _underline;
     public bool Code => _code;
     public Brush TextBrush => _textBrush;
+    public double FontAspect => _fontAspect;
 
     public void TrimStart()
     {

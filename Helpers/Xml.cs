@@ -9,7 +9,7 @@ internal static class Xml
     {
         LastXmlException = null;
         try {
-            var doc = XDocument.Parse("<root>" + unrootedXml + "</root>");
+            var doc = XDocument.Parse("<root>" + unrootedXml + "</root>", LoadOptions.PreserveWhitespace);
             nodes = doc.Root.Nodes();
             return true;
         } catch (XmlException ex) {

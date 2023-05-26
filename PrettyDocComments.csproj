@@ -57,6 +57,8 @@
     <Compile Include="Model\FormatRun.cs" />
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="Helpers\Xml.cs" />
+    <Compile Include="Services\FormatParser.Lists.cs" />
+    <Compile Include="Services\FormatParser.Tables.cs" />
     <Compile Include="Services\LineTransformSource.cs" />
     <Compile Include="LineTransformSourceProvider.cs" />
     <Compile Include="Helpers\Options.cs" />

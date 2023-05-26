@@ -6,5 +6,6 @@ namespace PrettyDocComments.Model;
 internal class Row
 {
     public bool IsHeader;
+    public bool IsCaption;
     public List<Cell> Cells = new();
 }

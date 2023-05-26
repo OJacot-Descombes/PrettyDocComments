@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Windows;
 using System.Windows.Media;
+using System.Xml;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
@@ -97,7 +98,7 @@ internal sealed class ShapeParser
                     ParseSeealsoBlock(el);
                     break;
                 case "summary":
-                    ParseBlock(el, Options.Padding.Left);
+                    ParseBlock(el, Options.Padding.Left, 1.1);
                     break;
                 default:
                     ParseBlock(el, Options.Padding.Left);
@@ -117,19 +118,24 @@ internal sealed class ShapeParser
     private static IEnumerable<XElement> WrapTopLevelText(IEnumerable<XNode> nodes)
     {
         XElement topLevelText = null;
+        bool hasText = false;
         foreach (XNode node in nodes) {
             if (node is XElement el && _topLevelElements.Contains(el.Name.LocalName)) {
                 if (topLevelText is not null) {
-                    yield return topLevelText;
+                    if (hasText) {
+                        yield return topLevelText;
+                    }
                     topLevelText = null;
+                    hasText = false;
                 }
                 yield return el;
             } else {
                 topLevelText ??= new XElement("_text_");
                 topLevelText.Add(node);
+                hasText |= node is not XText txt || !String.IsNullOrWhiteSpace(txt.Value);
             }
         }
-        if (topLevelText is not null) {
+        if (hasText) {
             yield return topLevelText;
         }
     }
@@ -167,9 +173,9 @@ internal sealed class ShapeParser
         ParseBlock(element, Options.Padding.Left + blockIndent);
     }
 
-    private void ParseBlock(XElement element, double indent)
+    private void ParseBlock(XElement element, double indent, double fontAspect = 1.0)
     {
-        var parser = new FormatParser(indent, _width, _view);
+        var parser = new FormatParser(indent, _width, fontAspect, _view);
         foreach (TextBlock textBlock in parser.Parse(element)) {
             if (textBlock.BackgroundType is BackgroundType.Default) {
                 _shapes.Add(new TextShape(textBlock.Text, new Point(textBlock.Left, _y)));
