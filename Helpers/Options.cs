@@ -1,8 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.TextFormatting;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Formatting;
 
 namespace PrettyDocComments.Helpers;
 

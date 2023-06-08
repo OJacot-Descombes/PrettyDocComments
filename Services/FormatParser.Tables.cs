@@ -71,11 +71,29 @@ internal sealed partial class FormatParser
             var rows = new List<Row>();
             foreach (var listItem in el.Elements()) {
                 string localName = listItem.Name.LocalName;
-                if (localName == "colgroup") {
-                    continue; // Ignore HTML tag containing column formatting information (so far).
+                switch (localName) {
+                    case "colgroup":
+                        continue; // Ignore HTML tag containing column formatting information (so far).
+                    case "thead" or "tbody" or "tfoot": // Ignore and skip one tag-level .
+                        foreach (var item in listItem.Elements()) {
+                            GatherCells(rows, item, item.Name.LocalName);
+                        }
+                        break;
+                    default:
+                        GatherCells(rows, listItem, localName);
+                        break;
                 }
+            }
 
-                var row = new Row { IsHeader = localName is "listheader" || listItem.Elements("th").Any(), IsCaption = localName == "caption" };
+            return rows;
+
+            static void GatherCells(List<Row> rows, XElement listItem, string localName)
+            {
+                var row = new Row {
+                    IsHeader = localName is "listheader" || listItem.Elements("th").Any() ||
+                        listItem.Parent.Name.LocalName is "tfoot", // Format like header
+                    IsCaption = localName == "caption"
+                };
                 rows.Add(row);
                 if (row.IsCaption) {
                     row.Cells.Add(new Cell { Element = listItem });
@@ -85,8 +103,6 @@ internal sealed partial class FormatParser
                     }
                 }
             }
-
-            return rows;
         }
 
         static void ScaleColumnWidths(double[] columnWidths, double remainingWidth)

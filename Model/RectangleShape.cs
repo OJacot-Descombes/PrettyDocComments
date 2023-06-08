@@ -18,7 +18,7 @@ internal sealed class RectangleShape : Shape
         _height = height;
     }
 
-    public override void Draw(DrawingContext dc)
+    public override void Draw(DrawingContext dc, double commentWidth)
     {
         dc.DrawRectangle(_brush, _pen, new Rect(_origin.X, _origin.Y, _width, _height));
     }

@@ -50,7 +50,7 @@
     <Compile Include="Model\Cell.cs" />
     <Compile Include="Model\Comment.cs" />
     <Compile Include="Model\RenderInfo.cs" />
-    <Compile Include="Model\LineShape.cs" />
+    <Compile Include="Model\HorizontalLineShape.cs" />
     <Compile Include="Services\FormatAccumulator.cs" />
     <Compile Include="Model\Row.cs" />
     <Compile Include="Services\FormatParser.cs" />

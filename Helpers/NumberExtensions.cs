@@ -29,7 +29,6 @@ public static class NumberExtensions
         (      1, "I"   )
     };
 
-
     // Improved version of https://www.c-sharpcorner.com/article/convert-numbers-to-roman-characters-in-c-sharp/
     public static string ToRoman(this int n, bool lowerCase = false)
     {
@@ -57,5 +56,16 @@ public static class NumberExtensions
         } else {
             return ((char)('A' + num - 1)).ToString();
         }
+    }
+
+    public static double Clamp(this double value, double min, double max)
+    {
+        if (value < min) {
+            return min;
+        }
+        if (value > max) {
+            return max;
+        }
+        return value;
     }
 }

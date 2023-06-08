@@ -34,19 +34,20 @@ internal sealed class Renderer
                 double rectWidth = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
                 if (originalCommentWidth > rectWidth) {
                     var coverRect = new Rect(rectWidth, 0, originalCommentWidth - rectWidth, height);
-                    dc.DrawRectangle(Brushes.White, null, coverRect);
+                    dc.DrawRectangle(view.Background, null, coverRect);
                 }
 
                 var rect = new Rect(0, 0, rectWidth, height);
                 dc.PushClip(new RectangleGeometry(rect));
                 dc.DrawRectangle(Options.CommentBackground, Options.CommentOutline, rect);
-            }
-            if (topPadding != 0.0) {
-                dc.PushTransform(new TranslateTransform(0, topPadding));
-            }
 
-            foreach (var shape in comment.Data.Shapes) {
-                shape.Draw(dc);
+                if (topPadding != 0.0) {
+                    dc.PushTransform(new TranslateTransform(0, topPadding));
+                }
+
+                foreach (var shape in comment.Data.Shapes) {
+                    shape.Draw(dc, rectWidth);
+                }
             }
             dc.Close();
         }

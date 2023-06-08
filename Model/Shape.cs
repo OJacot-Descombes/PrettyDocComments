@@ -15,5 +15,5 @@ internal abstract class Shape
 
     public double Bottom { get; }
 
-    public abstract void Draw(DrawingContext dc);
+    public abstract void Draw(DrawingContext dc, double commentWidth);
 }

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Windows;
 using System.Windows.Media;
-using System.Xml;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
@@ -146,7 +145,7 @@ internal sealed class ShapeParser
             ? Options.BoldCommentSeparator
             : Options.CommentSeparator;
         _y += 4.0;
-        _shapes.Add(new LineShape(commentSeparator, new(0, _y), new(_width, _y), 4.0));
+        _shapes.Add(new HorizontalLineShape(commentSeparator, new(0, _y), 4.0));
         _y += 2.0;
     }
 

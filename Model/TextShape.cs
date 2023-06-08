@@ -13,7 +13,7 @@ internal sealed class TextShape : Shape
 
     private readonly FormattedText _text;
 
-    public override void Draw(DrawingContext dc)
+    public override void Draw(DrawingContext dc, double commentWidth)
     {
         dc.DrawText(_text, _origin);
     }

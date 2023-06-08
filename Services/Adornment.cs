@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
+using PrettyDocComments.Helpers;
 using PrettyDocComments.Model;
 
 namespace PrettyDocComments.Services;
@@ -120,13 +121,19 @@ internal sealed class Adornment
                     height = Math.Max(comment.Data.CalculatedHeight, viewLines.LastVisibleLine.Bottom - top);
                     topPadding = 0.0;
                 } else if (isLastCommentLineVisible) {
-                    height = Math.Max(comment.Data.CalculatedHeight,
-                        SafeGetCharacterBounds(comment.Span.End).Bottom - viewLines.FirstVisibleLine.Top + 1);
-                    top = SafeGetCharacterBounds(comment.Span.End).Bottom - height;
+                    double bottom = SafeGetCharacterBounds(comment.Span.End).Bottom;
+                    height = Math.Max(comment.Data.CalculatedHeight, bottom - viewLines.FirstVisibleLine.Top + 1);
+                    top = bottom - height;
                     topPadding = Math.Max(0, height - comment.Data.CalculatedHeight);
-                } else { // Neither first or last line of comment are visible, use heuristics (not very precise).
-                    top = _view.ViewportTop - _view.LineHeight * (firstVisibleLineNumber - comment.FirstLineNumber);
-                    height = comment.Data.CalculatedHeight;
+                } else { // Neither first or last line of comment are visible, use heuristics.
+                    // We anchor the adorner relative to the middle of the view port vertically.
+                    double midViewport = 0.5 * (_view.ViewportTop + _view.ViewportBottom);
+                    ITextViewLine textLine = _view.TextViewLines.GetTextViewLineContainingYCoordinate(midViewport);
+                    double middleLineNumber = textLine.Start.GetContainingLineNumber() +
+                        (midViewport - textLine.Top) / textLine.Height; // Add fraction of line for smoother scrolling.
+                    height = Math.Max(_view.ViewportHeight, comment.Data.CalculatedHeight);
+                    top = (midViewport - height * (middleLineNumber - comment.FirstLineNumber) / comment.NumberOfLines)
+                        .Clamp(_view.ViewportBottom - height, _view.ViewportTop);
                     topPadding = 0.0;
                 }
 
