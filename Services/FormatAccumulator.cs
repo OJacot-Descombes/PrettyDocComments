@@ -153,13 +153,13 @@ internal class FormatAccumulator
         internal TextColorMemento(FormatAccumulator originator, Brush textColor)
         {
             _originator = originator;
-            _textColor = originator._textColor;
-            originator._textColor = textColor;
+            _textColor = originator._textBrush;
+            originator._textBrush = textColor;
         }
 
         void IDisposable.Dispose()
         {
-            _originator._textColor = _textColor;
+            _originator._textBrush = _textColor;
         }
     }
 
@@ -189,7 +189,7 @@ internal class FormatAccumulator
     private bool _strikethrough;
     private bool _underline;
     private bool _code;
-    private Brush _textColor = Options.DefaultTextColor;
+    private Brush _textBrush = Options.DefaultTextBrush;
     private TextAlignment _alignment;
 
     private bool _trimNextStart;
@@ -218,12 +218,12 @@ internal class FormatAccumulator
             _trimNextStart = false;
             text = text.TrimStart();
         }
-        _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textColor, _fontAspect));
+        _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textBrush, _fontAspect));
     }
 
     public void AddLineBreak()
     {
-        _runs.Add(new FormatRun("\r\n", _bold, _italic, _strikethrough, _underline, _code, _textColor, _fontAspect));
+        _runs.Add(new FormatRun("\r\n", _bold, _italic, _strikethrough, _underline, _code, _textBrush, _fontAspect));
         _trimNextStart = true;
     }
 

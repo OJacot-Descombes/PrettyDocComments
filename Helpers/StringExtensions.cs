@@ -15,7 +15,7 @@ internal static class StringExtensions
             flowDirection: view.VisualElement.FlowDirection,
             typeface: typeface,
             emSize: emSize,
-            foreground: Options.DefaultTextColor,
+            foreground: Options.DefaultTextBrush,
             pixelsPerDip: VisualTreeHelper.GetDpi(view.VisualElement).PixelsPerDip
         ) {
             MaxTextWidth = Math.Max(width, emSize)

@@ -8,7 +8,6 @@ namespace PrettyDocComments.Services;
 
 internal sealed partial class FormatParser
 {
-
     private void ParseTable(XElement el)
     {
         double MinRowHeight = _view.FormattedLineSource.LineHeight / 2;
@@ -20,7 +19,7 @@ internal sealed partial class FormatParser
         }
         ScaleColumnWidths(columnWidths, _accumulator.RemainingWidth);
 
-        var parser = new FormatParser(_accumulator.Indent + Options.Padding.Left, 0, _accumulator.FontAspect, _view);
+        var parser = new FormatParser(_accumulator.Indent + Options.Padding.Left, _emSize, 0, _accumulator.FontAspect, _view);
 
         CloseBlock();
         foreach (Row row in rows) {

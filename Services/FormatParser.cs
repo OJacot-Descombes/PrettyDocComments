@@ -23,10 +23,10 @@ internal sealed partial class FormatParser
     private readonly FormatAccumulator _accumulator;
     public FormatAccumulator Accumulator => _accumulator;
 
-    public FormatParser(double indent, double width, double fontAspect, IWpfTextView view)
+    public FormatParser(double indent, double emSize, double width, double fontAspect, IWpfTextView view)
     {
         _accumulator = new FormatAccumulator(view, indent, width, fontAspect);
-        _emSize = view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * Options.FontScaling;
+        _emSize = emSize;
         _view = view;
     }
 
@@ -173,7 +173,7 @@ internal sealed partial class FormatParser
                             CloseBlock();
                             break;
                         case "include" or "inheritdoc":
-                            using (_accumulator.CreateTextColorScope(Options.SpecialTextColor)) {
+                            using (_accumulator.CreateTextColorScope(Options.SpecialTextBrush)) {
                                 _accumulator.Add(normalizedTag);
                                 _accumulator.Add("(");
                                 _accumulator.Add(String.Join(" ", el.Attributes().Select(a => $"{a.Name}='{a.Value}'")));
@@ -255,7 +255,6 @@ internal sealed partial class FormatParser
                         case "see" or "seealso":
                             // Let's treat <seealso> like <see> if it is nested
                             // (according to Mahmoud Al-Qudsi: https://stackoverflow.com/a/69947292/880990)
-                            _accumulator.Add("See: ");
                             Reference(el); // "cref", "langword", "href"
                             break;
                         case "select":
@@ -306,7 +305,7 @@ internal sealed partial class FormatParser
                     break;
                 case XComment comment:
                     CloseBlock();
-                    using (_accumulator.CreateTextColorScope(Options.CommentTextColor)) {
+                    using (_accumulator.CreateTextColorScope(Options.CommentTextBrush)) {
                         _accumulator.Add(comment.Value);
                     }
                     CloseBlock();
@@ -341,13 +340,13 @@ internal sealed partial class FormatParser
 
     private void Reference(XElement el)
     {
-        using (_accumulator.CreateTextColorScope(Options.SpecialTextColor)) {
+        using (_accumulator.CreateTextColorScope(Options.SpecialTextBrush)) {
             if (el.Value is { Length: > 0 }) {
                 ParseElement(el);
             } else {
                 string text =
                      (el.Attribute("src") ?? el.Attributes().FirstOrDefault())?.Value is { Length: > 0 } attributeValue
-                          ? "[" + attributeValue + "]"
+                          ? attributeValue
                           : el.Name.LocalName;
                 _accumulator.Add(text);
             }

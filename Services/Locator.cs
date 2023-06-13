@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
 using PrettyDocComments.Model;
 
@@ -9,12 +10,12 @@ namespace PrettyDocComments.Services;
 internal sealed class Locator
 {
     private readonly Regex _docCommentRegex;
-    private readonly double _charWidth;
+    private readonly IWpfTextView _view;
 
-    public Locator(Regex docCommentRegex, double charWidth)
+    public Locator(Regex docCommentRegex, IWpfTextView view)
     {
+        _view = view;
         _docCommentRegex = docCommentRegex;
-        _charWidth = charWidth;
     }
 
     public bool TryGetComment(ITextSnapshot textSnapshot, ITextViewLine line, out Comment<string> comment)
@@ -51,7 +52,7 @@ internal sealed class Locator
             }
             SnapshotPoint endPoint = textSnapshot.GetLineFromLineNumber(lastLineNumber).Start;
             comment = new Comment<string>(new SnapshotSpan(startPoint, endPoint), commentLeftCharIndex,
-                firstLineNumber, lastLineNumber, _charWidth * (maxTextLength + 3),
+                firstLineNumber, lastLineNumber, _view.FormattedLineSource.ColumnWidth * (maxTextLength + 3),
                 sb.Replace("&nbsp;", "\u00A0").ToString());
             return true;
         }

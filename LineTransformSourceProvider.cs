@@ -3,10 +3,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Outlining;
+using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 using PrettyDocComments.Services;
 
@@ -23,6 +25,15 @@ internal sealed class LineTransformSourceProvider : ILineTransformSourceProvider
 {
     private static readonly Regex _cSharpDocCommentRecoginzer = new(@"^\s*(///)([^/]|$)", RegexOptions.Compiled);
     private static readonly Regex _visualBasicDocCommentRecoginzer = new(@"^\s*(''')([^/]|$)", RegexOptions.Compiled);
+
+    [SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "<Pending>")]
+    public LineTransformSourceProvider()
+    {
+        var textManager = (IConnectionPointContainer)ServiceProvider.GlobalProvider.GetService(typeof(SVsTextManager));
+        Guid interfaceGuid = typeof(IVsTextManagerEvents).GUID;
+        textManager.FindConnectionPoint(ref interfaceGuid, out var tmConnectionPoint);
+        tmConnectionPoint.Advise(new TextManagerEvents(), out _);
+    }
 
 #pragma warning disable IDE0044, IDE0051, CS0649, CS0169 // Add readonly modifier, Remove unused private members.
 

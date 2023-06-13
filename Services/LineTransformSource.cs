@@ -4,6 +4,7 @@ using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Outlining;
+using Microsoft.VisualStudio.TextManager.Interop;
 using PrettyDocComments.Helpers;
 using PrettyDocComments.Model;
 
@@ -30,7 +31,7 @@ internal sealed class LineTransformSource : ILineTransformSource
         _view = view;
         _adornment = new Adornment(view, _renderer);
 
-        _locator = new Locator(docCommentRegex, view.FormattedLineSource.ColumnWidth);
+        _locator = new Locator(docCommentRegex, view);
         _shapeParser = new ShapeParser(view);
     }
 
@@ -67,7 +68,7 @@ internal sealed class LineTransformSource : ILineTransformSource
             if (Xml.LastXmlException is not null) {
                 var errorInfo = new RenderInfo(
                     new List<Shape> { GetCaretRectangle(commentWithXmlText), GetErrorText(commentWithXmlText) },
-                    calculatedHeight: (commentWithXmlText.LastLineNumber - commentWithXmlText.FirstLineNumber + 1) * 
+                    calculatedHeight: (commentWithXmlText.LastLineNumber - commentWithXmlText.FirstLineNumber + 1) *
                         _view.FormattedLineSource.LineHeight,
                     verticalScale: 1.0,
                     containsErrorHint: true
@@ -86,9 +87,13 @@ internal sealed class LineTransformSource : ILineTransformSource
         RectangleShape GetCaretRectangle(Comment<string> commentWithXmlText)
         {
             double columnWidth = _view.FormattedLineSource.ColumnWidth;
-            var caretOrigin = new Point(
-                x: (commentWithXmlText.CommentLeftCharIndex + Xml.LastXmlException.LinePosition + 3) * columnWidth,
-                y: Xml.LastXmlException.LineNumber * _view.FormattedLineSource.LineHeight - 3
+            var caretOrigin = Xml.LastXmlException.LineNumber > commentWithXmlText.NumberOfLines
+                ? new Point(
+                    x: commentWithXmlText.Width,
+                    y: commentWithXmlText.NumberOfLines * _view.FormattedLineSource.LineHeight - 3)
+                : new Point(
+                    x: Math.Min((Xml.LastXmlException.LinePosition + 3) * columnWidth, commentWithXmlText.Width),
+                    y: Xml.LastXmlException.LineNumber * _view.FormattedLineSource.LineHeight - 3
             );
             var caretRectangle = new RectangleShape(Brushes.Red, null, caretOrigin, width: columnWidth, height: 2);
             return caretRectangle;
@@ -98,7 +103,7 @@ internal sealed class LineTransformSource : ILineTransformSource
         {
             double columnWidth = _view.FormattedLineSource.ColumnWidth;
             FormattedText errorText = Xml.LastXmlException.Message.AsFormatted(
-                Options.NormalTypeFace, 0.4 * Options.CommentWidthInColumns * columnWidth, _view);
+                Options.NormalTypeFace, 0.5 * Options.CommentWidthInColumns * columnWidth, _view);
             errorText.SetForegroundBrush(Options.ErrorOutline.Brush);
             var errorOrigin = new Point(2 * columnWidth + commentWithXmlText.Width, 0);
             var errorTextShape = new TextShape(errorText, errorOrigin);

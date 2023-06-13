@@ -1,6 +1,12 @@
 ﻿using System.Runtime.InteropServices;
 using System.Threading;
+using EnvDTE;
+using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Shell.Settings;
+using PrettyDocComments.CustomOptions;
+using PrettyDocComments.Helpers;
 using Task = System.Threading.Tasks.Task;
 
 namespace PrettyDocComments;
@@ -24,8 +30,17 @@ namespace PrettyDocComments;
 /// </remarks>
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 [Guid(PrettyDocCommentsPackage.PackageGuidString)]
+[ProvideOptionPage(typeof(OptionPageGrid), "Pretty Doc Comments", "General",  0, 0, true)]
 public sealed class PrettyDocCommentsPackage : AsyncPackage
 {
+    public static PrettyDocCommentsPackage Instance { get; private set; }
+
+    public PrettyDocCommentsPackage()
+    {
+        Instance = this;
+        Options.Refresh();
+    }
+
     /// <summary>
     /// PrettyDocCommentsPackage GUID string.
     /// </summary>
@@ -49,4 +64,6 @@ public sealed class PrettyDocCommentsPackage : AsyncPackage
     }
 
     #endregion
+
+    public OptionPageGrid GetOptionPage()=> (OptionPageGrid)GetDialogPage(typeof(OptionPageGrid));
 }

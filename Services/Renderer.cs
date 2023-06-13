@@ -26,12 +26,13 @@ internal sealed class Renderer
 
         var drawingGroup = new DrawingGroup();
         using (DrawingContext dc = drawingGroup.Open()) {
+            double rectWidth;
             if (comment.Data.ContainsErrorHint) {
-                double width = comment.Width + view.FormattedLineSource.ColumnWidth;
-                dc.DrawRectangle(null, Options.ErrorOutline, new Rect(0, 0, width, height));
+                rectWidth = comment.Width + view.FormattedLineSource.ColumnWidth;
+                dc.DrawRectangle(null, Options.ErrorOutline, new Rect(0, 0, rectWidth, height));
             } else {
                 double originalCommentWidth = comment.Width + CollpasedTextSurplusLength * view.FormattedLineSource.ColumnWidth;
-                double rectWidth = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
+                rectWidth = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
                 if (originalCommentWidth > rectWidth) {
                     var coverRect = new Rect(rectWidth, 0, originalCommentWidth - rectWidth, height);
                     dc.DrawRectangle(view.Background, null, coverRect);
@@ -44,10 +45,9 @@ internal sealed class Renderer
                 if (topPadding != 0.0) {
                     dc.PushTransform(new TranslateTransform(0, topPadding));
                 }
-
-                foreach (var shape in comment.Data.Shapes) {
-                    shape.Draw(dc, rectWidth);
-                }
+            }
+            foreach (var shape in comment.Data.Shapes) {
+                shape.Draw(dc, rectWidth);
             }
             dc.Close();
         }

@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Editor;
+using PrettyDocComments.CustomOptions;
 
 namespace PrettyDocComments.Helpers;
 
@@ -10,29 +11,61 @@ internal static class Options
     public static readonly Typeface CaptionsTypeFace;
     public static readonly Typeface CodeTypeFace;
 
-    public static readonly Brush CommentBackground = Brushes.LightGoldenrodYellow;
-    public static readonly Brush CodeBackground = Brushes.Gainsboro;
-    public static readonly Brush DefaultTextColor = Brushes.Black;
-    public static readonly Brush SpecialTextColor = Brushes.DarkSlateBlue;
-    public static readonly Brush CommentTextColor = Brushes.ForestGreen;
+    private static Brush _commentBackground;
+    public static Brush CommentBackground =>
+        CreateBrush(ref _commentBackground, OptionsPage?.CommentBackColor) ?? Brushes.LightGoldenrodYellow;
 
-    public static readonly Pen CommentOutline;
-    public static readonly Pen CommentSeparator;
-    public static readonly Pen BoldCommentSeparator;
-    public static readonly Pen ErrorOutline;
-    public static readonly Pen FrameStroke;
+    private static Brush _codeBackground;
+    public static Brush CodeBackground =>
+        CreateBrush(ref _codeBackground, OptionsPage?.CodeBlockBackColor) ?? Brushes.Gainsboro;
 
-    public static readonly int CommentWidthInColumns = 80;
+    private static Brush _defaultTextBrush;
+    public static Brush DefaultTextBrush =>
+        CreateBrush(ref _defaultTextBrush, OptionsPage?.TextColor) ?? Brushes.Black;
 
+    private static Brush _specialTextBrush;
+    public static Brush SpecialTextBrush =>
+        CreateBrush(ref _specialTextBrush, OptionsPage?.SpecialTextColor) ?? Brushes.DarkSlateBlue;
+
+    private static Brush _commentTextBrush;
+    public static Brush CommentTextBrush =>
+        CreateBrush(ref _commentTextBrush, OptionsPage?.HtmlCommentTextColor) ?? Brushes.ForestGreen;
+
+    private static Pen _commentOutline;
+    public static Pen CommentOutline =>
+        CreatePen(ref _commentOutline, OptionsPage?.CommentLineColor, 2.0, Brushes.DarkKhaki);
+
+    private static Pen _commentSeparator;
+    public static Pen CommentSeparator =>
+        CreatePen(ref _commentSeparator, OptionsPage?.CommentLineColor, 0.5, Brushes.DarkKhaki);
+
+    public static Pen BoldCommentSeparator => CommentOutline;
+
+    private static Pen _errorOutline;
+    public static Pen ErrorOutline =>
+        CreatePen(ref _errorOutline, OptionsPage?.ErrorTextColor, 2.0, Brushes.Red);
+
+    private static Pen _frameStroke;
+    public static Pen FrameStroke =>
+        CreatePen(ref _frameStroke, OptionsPage?.TextColor, 0.8, Brushes.Black);
+
+    private static int? _commentWidthInColumns;
+    public static int CommentWidthInColumns =>
+        CreateValue(ref _commentWidthInColumns, OptionsPage?.CommentWidthInColumns, 80);
+
+    private static double? _fontScaling;
     /// <summary>
     /// By how much we multiply the editor font size to get the comment font size.
     /// </summary>
-    public static readonly double FontScaling = 0.8;
+    public static double FontScaling => CreateValue(ref _fontScaling, OptionsPage?.FontScaling, 0.8);
 
     public static readonly Thickness Padding = new(left: 5.0, top: 3.0, right: 3.0, bottom: 3.0);
 
     public static double GetNormalEmSize(IWpfTextView view) =>
-        view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * Options.FontScaling;
+        view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * FontScaling;
+
+    private static OptionPageGrid _optionsPage;
+    private static OptionPageGrid OptionsPage => _optionsPage ??= PrettyDocCommentsPackage.Instance?.GetOptionPage();
 
     static Options()
     {
@@ -47,19 +80,48 @@ internal static class Options
 
         CodeTypeFace = new Typeface(new FontFamily("Cascadia Mono"),
             FontStyles.Normal, FontWeights.Normal, FontStretches.Normal, new FontFamily("Consolas"));
+    }
 
-        CommentOutline = new Pen(Brushes.DarkKhaki, 2.0);
-        CommentOutline.Freeze();
+    public static void Refresh()
+    {
+        _optionsPage = null;
+        _commentBackground = null;
+        _codeBackground = null;
+        _defaultTextBrush = null;
+        _specialTextBrush = null;
+        _commentTextBrush = null;
+        _commentOutline = null;
+        _commentSeparator = null;
+        _errorOutline = null;
+        _frameStroke = null;
+        _commentWidthInColumns = null;
+        _fontScaling = null;
+    }
 
-        CommentSeparator = new Pen(Brushes.DarkKhaki, 0.5);
-        CommentSeparator.Freeze();
+    private static Brush CreateBrush(ref Brush backingField, DrawingColor? brushColor)
+    {
+        if (backingField is null && brushColor is { } color) {
+            backingField = new SolidColorBrush(color.ToMediaColor());
+            backingField.Freeze();
+        }
+        return backingField;
+    }
 
-        ErrorOutline = new Pen(Brushes.Red, 2.0);
-        ErrorOutline.Freeze();
+    private static Pen CreatePen(ref Pen backingField, DrawingColor? penColor, double thickness, SolidColorBrush defaultBrush)
+    {
+        if (backingField is null && penColor is { } color) {
+            backingField = new Pen(new SolidColorBrush(color.ToMediaColor()), thickness);
+            backingField.Freeze();
+        }
+        return backingField ?? new Pen(defaultBrush, thickness);
+    }
 
-        FrameStroke = new Pen(Brushes.Black, 0.8);
-        FrameStroke.Freeze();
-
-        BoldCommentSeparator = CommentOutline;
+    private static T CreateValue<T>(ref T? backingField, T? value, T defaultValue)
+        where T : struct
+    {
+        if (backingField is null && value is { } v) {
+            backingField = v;
+        }
+        return backingField ?? defaultValue;
     }
 }

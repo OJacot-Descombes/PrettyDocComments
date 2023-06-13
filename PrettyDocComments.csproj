@@ -46,11 +46,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Helpers\ColorExtensions.cs" />
     <Compile Include="Helpers\StringExtensions.cs" />
     <Compile Include="Model\Cell.cs" />
     <Compile Include="Model\Comment.cs" />
     <Compile Include="Model\RenderInfo.cs" />
     <Compile Include="Model\HorizontalLineShape.cs" />
+    <Compile Include="CustomOptions\OptionPageGrid.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Services\FormatAccumulator.cs" />
     <Compile Include="Model\Row.cs" />
     <Compile Include="Services\FormatParser.cs" />
@@ -74,6 +78,7 @@
     <Compile Include="Services\ShapeParser.cs" />
     <Compile Include="Model\TextBlock.cs" />
     <Compile Include="Services\WidthEstimator.cs" />
+    <Compile Include="TextManagerEvents.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Documentation\Workflow.mmd" />

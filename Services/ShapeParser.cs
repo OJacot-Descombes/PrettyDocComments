@@ -20,9 +20,9 @@ internal sealed class ShapeParser
     }.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
 
     private readonly IWpfTextView _view;
-    private readonly double _emSize;
-    private readonly double _initialY;
-    private readonly double _width;
+    private double _emSize;
+    private double _initialY;
+    private double _width;
 
     private double _y;
     private List<Shape> _shapes;
@@ -30,9 +30,13 @@ internal sealed class ShapeParser
     public ShapeParser(IWpfTextView view)
     {
         _view = view;
+    }
+
+    private void Initialize()
+    {
         _initialY = Options.Padding.Top;
-        _emSize = view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * Options.FontScaling;
-        _width = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
+        _emSize = Options.GetNormalEmSize(_view);
+        _width = Options.CommentWidthInColumns * _view.FormattedLineSource.ColumnWidth;
     }
 
     /// <summary>
@@ -43,6 +47,7 @@ internal sealed class ShapeParser
     /// <remarks>The background rectangle of the adorner is not returned.</remarks>
     public Comment<List<Shape>> Parse(Comment<IEnumerable<XNode>> comment)
     {
+        Initialize();
         _shapes = new List<Shape>();
         _y = _initialY;
         int blockNo = 0;
@@ -174,7 +179,7 @@ internal sealed class ShapeParser
 
     private void ParseBlock(XElement element, double indent, double fontAspect = 1.0)
     {
-        var parser = new FormatParser(indent, _width, fontAspect, _view);
+        var parser = new FormatParser(indent, _emSize, _width, fontAspect, _view);
         foreach (TextBlock textBlock in parser.Parse(element)) {
             if (textBlock.BackgroundType is BackgroundType.Default) {
                 _shapes.Add(new TextShape(textBlock.Text, new Point(textBlock.Left, _y)));
@@ -199,14 +204,16 @@ internal sealed class ShapeParser
 
     private void ParseSeealsoBlock(XElement el)
     {
+        double indent = Options.Padding.Left + 1.7 * _emSize;
+        double width = _width - indent - Options.Padding.Right;
         if (String.IsNullOrWhiteSpace(el.Value)) { // There is no text, just add the attribute values(s).
             string text = "● " + String.Join(" ", el.Attributes().Select(a => a.Value));
-            FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, _width, _view);
-            _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y)));
+            FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, width, _view);
+            _shapes.Add(new TextShape(formattedText, new Point(indent, _y)));
             _y += formattedText.Height;
         } else {
-            FormattedText formattedText = "●".AsFormatted(Options.NormalTypeFace, _width, _view);
-            _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y)));
+            FormattedText formattedText = "●".AsFormatted(Options.NormalTypeFace, width, _view);
+            _shapes.Add(new TextShape(formattedText, new Point(indent, _y)));
             ParseBlock(el, 1.3 * _emSize);
         }
     }
