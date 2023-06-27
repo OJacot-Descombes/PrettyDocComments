@@ -4,7 +4,6 @@ using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Outlining;
-using Microsoft.VisualStudio.TextManager.Interop;
 using PrettyDocComments.Helpers;
 using PrettyDocComments.Model;
 
@@ -33,6 +32,23 @@ internal sealed class LineTransformSource : ILineTransformSource
 
         _locator = new Locator(docCommentRegex, view);
         _shapeParser = new ShapeParser(view);
+
+        Options.OptionsChanged += OnOptionChanged;
+        _view.Closed += OnClosed;
+    }
+
+    private void OnOptionChanged()
+    {
+        if (_view is { IsClosed: false, InLayout: false }) {
+            var firstLine = _view.TextViewLines.FirstVisibleLine;
+            _view.DisplayTextLineContainingBufferPosition(firstLine.Start, firstLine.Top - _view.ViewportTop, ViewRelativePosition.Top);
+        }
+    }
+
+    private void OnClosed(object sender, System.EventArgs e)
+    {
+        Options.OptionsChanged -= OnOptionChanged;
+        _view.Closed -= OnClosed;
     }
 
     public LineTransform GetLineTransform(ITextViewLine line, double yPosition, ViewRelativePosition placement)

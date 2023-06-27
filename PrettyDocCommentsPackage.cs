@@ -1,10 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Threading;
-using EnvDTE;
-using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Shell.Settings;
 using PrettyDocComments.CustomOptions;
 using PrettyDocComments.Helpers;
 using Task = System.Threading.Tasks.Task;

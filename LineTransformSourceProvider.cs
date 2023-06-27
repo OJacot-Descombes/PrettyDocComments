@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Outlining;
@@ -52,6 +53,15 @@ internal sealed class LineTransformSourceProvider : ILineTransformSourceProvider
 
     public ILineTransformSource Create(IWpfTextView view)
     {
+        // From https://github.com/microsoft/VS-PPT/blob/master/src/SyntacticFisheye/SyntacticFisheyeLineTransformSourceProvider.cs
+        if (view.Roles.Contains(DifferenceViewerRoles.LeftViewTextViewRole) ||
+            view.Roles.Contains(DifferenceViewerRoles.RightViewTextViewRole) ||
+            view.Roles.Contains("VSMERGEDEFAULT" /*MergeViewerRoles.VSMergeDefaultRole from TFS*/)) {
+            // Don't use line transforms for diff views since it will cause them to become misaligned.
+            // Also, we don't want to prettyfy doc comments in diff views.
+            return null;
+        }
+
         Regex docCommentRegex = view.TextBuffer.ContentType.TypeName switch {
             "CSharp" or "F#" or "C/C++" => _cSharpDocCommentRecoginzer,
             "Basic" => _visualBasicDocCommentRecoginzer,

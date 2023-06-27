@@ -7,6 +7,8 @@ namespace PrettyDocComments.Helpers;
 
 internal static class Options
 {
+    public static event Action OptionsChanged;
+
     public static readonly Typeface NormalTypeFace;
     public static readonly Typeface CaptionsTypeFace;
     public static readonly Typeface CodeTypeFace;
@@ -96,6 +98,8 @@ internal static class Options
         _frameStroke = null;
         _commentWidthInColumns = null;
         _fontScaling = null;
+
+        OptionsChanged?.Invoke();
     }
 
     private static Brush CreateBrush(ref Brush backingField, DrawingColor? brushColor)
