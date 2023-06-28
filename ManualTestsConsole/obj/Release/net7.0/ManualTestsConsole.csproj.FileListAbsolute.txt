@@ -1,0 +1,15 @@
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\bin\Release\net7.0\ManualTestsConsole.exe
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\bin\Release\net7.0\ManualTestsConsole.deps.json
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\bin\Release\net7.0\ManualTestsConsole.runtimeconfig.json
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\bin\Release\net7.0\ManualTestsConsole.dll
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\bin\Release\net7.0\ManualTestsConsole.pdb
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\obj\Release\net7.0\ManualTestsConsole.csproj.AssemblyReference.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\obj\Release\net7.0\ManualTestsConsole.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\obj\Release\net7.0\ManualTestsConsole.AssemblyInfoInputs.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\obj\Release\net7.0\ManualTestsConsole.AssemblyInfo.cs
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\obj\Release\net7.0\ManualTestsConsole.csproj.CoreCompileInputs.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\obj\Release\net7.0\ManualTestsConsole.dll
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\obj\Release\net7.0\refint\ManualTestsConsole.dll
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\obj\Release\net7.0\ManualTestsConsole.pdb
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\obj\Release\net7.0\ManualTestsConsole.genruntimeconfig.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ManualTestsConsole\obj\Release\net7.0\ref\ManualTestsConsole.dll

@@ -1,0 +1,12 @@
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\bin\Release\net7.0\ExamplesVisualBasic.deps.json
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\bin\Release\net7.0\ExamplesVisualBasic.dll
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\bin\Release\net7.0\ExamplesVisualBasic.pdb
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\obj\Release\net7.0\ExamplesVisualBasic.vbproj.AssemblyReference.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\obj\Release\net7.0\ExamplesVisualBasic.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\obj\Release\net7.0\ExamplesVisualBasic.AssemblyInfoInputs.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\obj\Release\net7.0\ExamplesVisualBasic.AssemblyInfo.vb
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\obj\Release\net7.0\ExamplesVisualBasic.vbproj.CoreCompileInputs.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\obj\Release\net7.0\ExamplesVisualBasic.dll
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\obj\Release\net7.0\refint\ExamplesVisualBasic.dll
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\obj\Release\net7.0\ExamplesVisualBasic.pdb
+C:\Users\Oli\source\repos\PrettyDocComments\ExamplesVisualBasic\obj\Release\net7.0\ref\ExamplesVisualBasic.dll

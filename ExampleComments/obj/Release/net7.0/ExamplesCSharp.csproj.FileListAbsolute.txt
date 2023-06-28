@@ -1,0 +1,15 @@
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\bin\Release\net7.0\ExamplesCSharp.exe
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\bin\Release\net7.0\ExamplesCSharp.deps.json
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\bin\Release\net7.0\ExamplesCSharp.runtimeconfig.json
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\bin\Release\net7.0\ExamplesCSharp.dll
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\bin\Release\net7.0\ExamplesCSharp.pdb
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\obj\Release\net7.0\ExamplesCSharp.csproj.AssemblyReference.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\obj\Release\net7.0\ExamplesCSharp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\obj\Release\net7.0\ExamplesCSharp.AssemblyInfoInputs.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\obj\Release\net7.0\ExamplesCSharp.AssemblyInfo.cs
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\obj\Release\net7.0\ExamplesCSharp.csproj.CoreCompileInputs.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\obj\Release\net7.0\ExamplesCSharp.dll
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\obj\Release\net7.0\refint\ExamplesCSharp.dll
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\obj\Release\net7.0\ExamplesCSharp.pdb
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\obj\Release\net7.0\ExamplesCSharp.genruntimeconfig.cache
+C:\Users\Oli\source\repos\PrettyDocComments\ExampleComments\obj\Release\net7.0\ref\ExamplesCSharp.dll
