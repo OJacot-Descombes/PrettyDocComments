@@ -16,10 +16,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E2968F2C-3FAD-471E-BCC3-75986059C50E}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
 		options.png = options.png
 		original.png = original.png
 		prettyfied.png = prettyfied.png
-		..\..\..\Desktop\README.md = ..\..\..\Desktop\README.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
