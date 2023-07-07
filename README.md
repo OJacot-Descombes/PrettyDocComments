@@ -8,7 +8,7 @@ It works with single line comments in **C#**, **C++**, **F#** (`///`) and **VB**
 
 | original | prettyfied |
 | --- | --- |
-| <img src="original.png" /> | <img src="prettyfied.png" /> |
+| <img src="https://github.com/OJacot-Descombes/PrettyDocComments/original.png" /> | <img src="https://github.com/OJacot-Descombes/PrettyDocComments/prettyfied.png" /> |
 
 ## Getting Started
 [Download](https://marketplace.visualstudio.com/items?itemName=OlivierJacot-Descombes.PrettyDocComments) and run the extension (VSIX) for Visual Studio 2022 or later from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=OlivierJacot-Descombes.PrettyDocComments) or, from within Visual Studio, search for "PrettyDocComments" in the "Extensions and Updates" UI.
@@ -20,4 +20,4 @@ When the text cursor is on a doc comment line the pretty image is hidden and the
 
 You can configure the appearance of the prettyfied comments in menu ***Tools / Options...***, section ***Pretty Doc Comments***
 
-<img src="options.png" />
+<img src="https://github.com/OJacot-Descombes/PrettyDocComments/options.png" />
