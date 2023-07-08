@@ -1,30 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-  <Metadata>
-    <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.2.2" Language="en-US" Publisher="Olivier Jacot-Descombes" />
-    <DisplayName>Pretty Doc Comments</DisplayName>
-    <Description xml:space="preserve">Displays XML doc comments in a nice way and reduces the visual noise in the editor. C#, VB, F# and C++ supported.
+    <Metadata>
+        <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.2.3" Language="en-US" Publisher="Olivier Jacot-Descombes" />
+        <DisplayName>Pretty Doc Comments</DisplayName>
+        <Description xml:space="preserve">Displays XML doc comments in a nice way and reduces the visual noise in the editor. C#, VB, F# and C++ supported.
 
 When you place the caret on a comment, the original comment is displayed and can be edited in the usual way.</Description>
-    <MoreInfo>https://github.com/OJacot-Descombes/PrettyDocComments</MoreInfo>
-    <ReleaseNotes>This extension is in preview</ReleaseNotes>
-    <Icon>PrettyDocComments.png</Icon>
-    <PreviewImage>PrettyDocComments_128x128.png</PreviewImage>
-    <Tags>XML, doc, comments, doc comments, XML doc comments, C#, csharp, VB, Visual Basic, F#, fsharp, C++, WYSIWYG, prettify</Tags>
-  </Metadata>
-  <Installation>
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
-      <ProductArchitecture>amd64</ProductArchitecture>
-    </InstallationTarget>
-  </Installation>
-  <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-  </Dependencies>
-  <Prerequisites>
-    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
-  </Prerequisites>
-  <Assets>
-    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
-  </Assets>
+        <MoreInfo>https://github.com/OJacot-Descombes/PrettyDocComments</MoreInfo>
+        <ReleaseNotes>This extension is in preview</ReleaseNotes>
+        <Icon>PrettyDocComments.png</Icon>
+        <PreviewImage>PrettyDocComments_128x128.png</PreviewImage>
+        <Tags>XML, doc, comments, doc comments, XML doc comments, C#, csharp, VB, Visual Basic, F#, fsharp, C++, WYSIWYG, prettify</Tags>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+    </Dependencies>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
+    </Assets>
 </PackageManifest>
