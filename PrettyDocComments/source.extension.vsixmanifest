@@ -5,7 +5,7 @@
         <DisplayName>Pretty Doc Comments</DisplayName>
         <Description xml:space="preserve">Displays XML doc comments in a nice way and reduces the visual noise in the editor. C#, VB, F# and C++ supported.
 
-When you place the caret on a comment, the original comment is displayed and can be edited in the usual way.</Description>
+Place the caret on a comment to display and edit the original comment in the usual way.</Description>
         <MoreInfo>https://github.com/OJacot-Descombes/PrettyDocComments</MoreInfo>
         <ReleaseNotes>This extension is in preview</ReleaseNotes>
         <Icon>PrettyDocComments.png</Icon>
