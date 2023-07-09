@@ -289,13 +289,23 @@ internal sealed partial class FormatParser
                         case "wbr":
                             _accumulator.Add("\u200B"); // Zero-length space.
                             break;
-                        default: // UNSUPPORTED tags. Display tag name as a label plus the first Attribute if available.
-                            using (_accumulator.CreateItalicScope()) {
-                                string tagCapitalized = normalizedTag.FirstCap();
-                                if (el.Attributes().FirstOrDefault()?.Value is { Length: > 0 } attributeValue) {
-                                    _accumulator.Add($"""{tagCapitalized} "{attributeValue}": """);
-                                } else {
-                                    _accumulator.Add(tagCapitalized + ": ");
+                        default: // UNSUPPORTED including some HTML tags as well as custom tags.
+                            string formattedTag = el.Name.LocalName.SplitCamelCase().FirstCap();
+                            if (el.Attributes().Any()) {
+                                using (_accumulator.CreateBoldScope()) {
+                                    _accumulator.Add(formattedTag);
+                                }
+                                using (_accumulator.CreateItalicScope()) {
+                                    foreach (var attribute in el.Attributes()) {
+                                        _accumulator.Add($" \"{attribute.Value}\"");
+                                    }
+                                }
+                                using (_accumulator.CreateBoldScope()) {
+                                    _accumulator.Add(": ");
+                                }
+                            } else {
+                                using (_accumulator.CreateBoldScope()) {
+                                    _accumulator.Add(formattedTag + ": ");
                                 }
                             }
                             ParseElement(el);

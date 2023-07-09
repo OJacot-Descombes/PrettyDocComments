@@ -8,11 +8,11 @@ public class OptionPageGrid : DialogPage
 {
     private static readonly TypeConverter _colorConverter = new System.Drawing.ColorConverter();
 
-    [Category("General")]
-    [DisplayName("Enabled")]
-    [Description("Indicates whether this extension is enabled.")]
-    [DefaultValue(true)]
-    public bool Enabled { get; set; } = true;
+    //[Category("General")]
+    //[DisplayName("Enabled")]
+    //[Description("Indicates whether this extension is enabled.")]
+    //[DefaultValue(true)]
+    //public bool Enabled { get; set; } = true;
 
     [Category("Sizing")]
     [DisplayName("Font scaling")]

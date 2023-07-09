@@ -34,4 +34,15 @@ internal static class StringExtensions
         }
         return s;
     }
+
+    // See: comment of Aviad P. in: https://stackoverflow.com/a/5796427/880990
+    private static readonly Regex _splitCamelCaseRegex = new(@"(\B[A-Z]+?(?=[A-Z][^A-Z])|\B[A-Z]+?(?=[^A-Z]))", RegexOptions.Compiled);
+
+    public static string SplitCamelCase(this string s)
+    {
+        if (s is { Length: > 1 }) {
+            return _splitCamelCaseRegex.Replace(s, " $1");
+        }
+        return s;
+    }
 }
