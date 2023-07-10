@@ -257,7 +257,9 @@ internal sealed partial class FormatParser
                             Reference(el); // "cref", "langword", "href"
                             break;
                         case "select":
-                            _accumulator.Add("[_____|v]");
+                            using (_accumulator.CreateHighlightScope(Brushes.White)) {
+                                _accumulator.Add("[_____|v]");
+                            }
                             break;
                         case "small":
                             using (_accumulator.CreateFontAspect(_accumulator.FontAspect / 1.2)) {

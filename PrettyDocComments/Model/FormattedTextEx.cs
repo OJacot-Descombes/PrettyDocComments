@@ -12,7 +12,6 @@ internal class FormattedTextEx : FormattedText
     }
 
     private List<HighlightRun> _highlightRuns;
-    public List<HighlightRun> HighlightRuns => _highlightRuns;
 
     public void SetHighlightBrush(Brush highlightBrush, int startIndex, int count)
     {
@@ -23,7 +22,18 @@ internal class FormattedTextEx : FormattedText
         _highlightRuns.Add(new HighlightRun(highlightBrush, startIndex, count));
     }
 
-    public readonly struct HighlightRun
+    public void Draw(DrawingContext dc, Point origin)
+    {
+        if (_highlightRuns != null) {
+            foreach (var run in _highlightRuns) {
+                var gemometry = BuildHighlightGeometry(origin, run.StartIndex, run.Count);
+                dc.DrawGeometry(run.HighlightBrush, null, gemometry);
+            }
+        }
+        dc.DrawText(this, origin);
+    }
+
+    private readonly struct HighlightRun
     {
         public HighlightRun(Brush highlightBrush, int startIndex, int count)
         {

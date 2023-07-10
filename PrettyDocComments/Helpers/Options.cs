@@ -33,13 +33,13 @@ internal static class Options
     public static Brush CommentTextBrush =>
         CreateBrush(ref _commentTextBrush, GeneralOptions.Instance.HtmlCommentTextColor) ?? Brushes.ForestGreen;
 
-    private static Pen _commentOutline;
-    public static Pen CommentOutline =>
-        CreatePen(ref _commentOutline, GeneralOptions.Instance.CommentLineColor, 2.0, Brushes.DarkKhaki);
-
     private static Brush _highlightBrush;
     public static Brush HighlightBrush =>
         CreateBrush(ref _highlightBrush, GeneralOptions.Instance.HighlightColor) ?? Brushes.Yellow;
+
+    private static Pen _commentOutline;
+    public static Pen CommentOutline =>
+        CreatePen(ref _commentOutline, GeneralOptions.Instance.CommentLineColor, 2.0, Brushes.DarkKhaki);
 
     private static Pen _commentSeparator;
     public static Pen CommentSeparator =>
@@ -92,6 +92,7 @@ internal static class Options
         _defaultTextBrush = null;
         _specialTextBrush = null;
         _commentTextBrush = null;
+        _highlightBrush = null;
         _commentOutline = null;
         _commentSeparator = null;
         _errorOutline = null;

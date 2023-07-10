@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.2.8" Language="en-US" Publisher="Olivier Jacot-Descombes" />
+        <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.3.0" Language="en-US" Publisher="Olivier Jacot-Descombes" />
         <DisplayName>Pretty Doc Comments</DisplayName>
         <Description xml:space="preserve">Displays XML doc comments in a nice way and reduces the visual noise in the editor. C#, VB, F# and C++ supported.
 
 Place the caret on a comment to display and edit the original comment in the usual way.</Description>
         <MoreInfo>https://marketplace.visualstudio.com/items?itemName=OlivierJacot-Descombes.PrettyDocComments</MoreInfo>
-        <ReleaseNotes>Fixed persistence propblem of options page.</ReleaseNotes>
+        <ReleaseNotes>Added support for mark-tags, i.e., support for basic highlighting of text.</ReleaseNotes>
         <Icon>PrettyDocComments.png</Icon>
         <PreviewImage>PrettyDocComments_128x128.png</PreviewImage>
         <Tags>XML, doc, comments, doc comments, XML doc comments, C#, csharp, VB, Visual Basic, F#, fsharp, C++, WYSIWYG, prettify</Tags>
