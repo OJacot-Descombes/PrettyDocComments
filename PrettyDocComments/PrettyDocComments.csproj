@@ -46,15 +46,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CustomOptions\BaseOptionModel`1.cs" />
+    <Compile Include="CustomOptions\BaseOptionPage`1.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomOptions\DialogPageProvider.cs" />
     <Compile Include="Helpers\ColorExtensions.cs" />
     <Compile Include="Helpers\StringExtensions.cs" />
     <Compile Include="Model\Cell.cs" />
     <Compile Include="Model\Comment.cs" />
     <Compile Include="Model\RenderInfo.cs" />
     <Compile Include="Model\HorizontalLineShape.cs" />
-    <Compile Include="CustomOptions\OptionPageGrid.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="CustomOptions\GeneralOptions.cs" />
     <Compile Include="Services\FormatAccumulator.cs" />
     <Compile Include="Model\Row.cs" />
     <Compile Include="Services\FormatParser.cs" />

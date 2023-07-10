@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel;
-using Microsoft.VisualStudio.Shell;
-using PrettyDocComments.Helpers;
 
 namespace PrettyDocComments.CustomOptions;
 
-public class OptionPageGrid : DialogPage
+internal class GeneralOptions : BaseOptionModel<GeneralOptions>
 {
     [Category("Sizing")]
     [DisplayName("Font scaling")]
@@ -59,10 +57,4 @@ public class OptionPageGrid : DialogPage
     [Description("Color used to display XML parsing errors (default is Red).")]
     [TypeConverter(typeof(System.Drawing.ColorConverter))]
     public System.Drawing.Color ErrorTextColor { get; set; } = System.Drawing.Color.Red;
-
-    public override void SaveSettingsToStorage()
-    {
-        base.SaveSettingsToStorage();
-        Options.Refresh();
-    }
 }

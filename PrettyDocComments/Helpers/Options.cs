@@ -15,59 +15,56 @@ internal static class Options
 
     private static Brush _commentBackground;
     public static Brush CommentBackground =>
-        CreateBrush(ref _commentBackground, OptionsPage?.CommentBackColor) ?? Brushes.LightGoldenrodYellow;
+        CreateBrush(ref _commentBackground, GeneralOptions.Instance.CommentBackColor) ?? Brushes.LightGoldenrodYellow;
 
     private static Brush _codeBackground;
     public static Brush CodeBackground =>
-        CreateBrush(ref _codeBackground, OptionsPage?.CodeBlockBackColor) ?? Brushes.Gainsboro;
+        CreateBrush(ref _codeBackground, GeneralOptions.Instance.CodeBlockBackColor) ?? Brushes.Gainsboro;
 
     private static Brush _defaultTextBrush;
     public static Brush DefaultTextBrush =>
-        CreateBrush(ref _defaultTextBrush, OptionsPage?.TextColor) ?? Brushes.Black;
+        CreateBrush(ref _defaultTextBrush, GeneralOptions.Instance.TextColor) ?? Brushes.Black;
 
     private static Brush _specialTextBrush;
     public static Brush SpecialTextBrush =>
-        CreateBrush(ref _specialTextBrush, OptionsPage?.SpecialTextColor) ?? Brushes.DarkSlateBlue;
+        CreateBrush(ref _specialTextBrush, GeneralOptions.Instance.SpecialTextColor) ?? Brushes.DarkSlateBlue;
 
     private static Brush _commentTextBrush;
     public static Brush CommentTextBrush =>
-        CreateBrush(ref _commentTextBrush, OptionsPage?.HtmlCommentTextColor) ?? Brushes.ForestGreen;
+        CreateBrush(ref _commentTextBrush, GeneralOptions.Instance.HtmlCommentTextColor) ?? Brushes.ForestGreen;
 
     private static Pen _commentOutline;
     public static Pen CommentOutline =>
-        CreatePen(ref _commentOutline, OptionsPage?.CommentLineColor, 2.0, Brushes.DarkKhaki);
+        CreatePen(ref _commentOutline, GeneralOptions.Instance.CommentLineColor, 2.0, Brushes.DarkKhaki);
 
     private static Pen _commentSeparator;
     public static Pen CommentSeparator =>
-        CreatePen(ref _commentSeparator, OptionsPage?.CommentLineColor, 0.5, Brushes.DarkKhaki);
+        CreatePen(ref _commentSeparator, GeneralOptions.Instance.CommentLineColor, 0.5, Brushes.DarkKhaki);
 
     public static Pen BoldCommentSeparator => CommentOutline;
 
     private static Pen _errorOutline;
     public static Pen ErrorOutline =>
-        CreatePen(ref _errorOutline, OptionsPage?.ErrorTextColor, 2.0, Brushes.Red);
+        CreatePen(ref _errorOutline, GeneralOptions.Instance.ErrorTextColor, 2.0, Brushes.Red);
 
     private static Pen _frameStroke;
     public static Pen FrameStroke =>
-        CreatePen(ref _frameStroke, OptionsPage?.TextColor, 0.8, Brushes.Black);
+        CreatePen(ref _frameStroke, GeneralOptions.Instance.TextColor, 0.8, Brushes.Black);
 
     private static int? _commentWidthInColumns;
     public static int CommentWidthInColumns =>
-        CreateValue(ref _commentWidthInColumns, OptionsPage?.CommentWidthInColumns, 80);
+        CreateValue(ref _commentWidthInColumns, GeneralOptions.Instance.CommentWidthInColumns, 80);
 
     private static double? _fontScaling;
     /// <summary>
     /// By how much we multiply the editor font size to get the comment font size.
     /// </summary>
-    public static double FontScaling => CreateValue(ref _fontScaling, OptionsPage?.FontScaling, 0.8);
+    public static double FontScaling => CreateValue(ref _fontScaling, GeneralOptions.Instance.FontScaling, 0.8);
 
     public static readonly Thickness Padding = new(left: 5.0, top: 3.0, right: 3.0, bottom: 3.0);
 
     public static double GetNormalEmSize(IWpfTextView view) =>
         view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * FontScaling;
-
-    private static OptionPageGrid _optionsPage;
-    private static OptionPageGrid OptionsPage => _optionsPage ??= PrettyDocCommentsPackage.Instance?.GetOptionPage();
 
     static Options()
     {
@@ -86,7 +83,6 @@ internal static class Options
 
     public static void Refresh()
     {
-        _optionsPage = null;
         _commentBackground = null;
         _codeBackground = null;
         _defaultTextBrush = null;

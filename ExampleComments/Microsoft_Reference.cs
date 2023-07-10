@@ -183,7 +183,9 @@ public class Point_see
 }
 
 // D.3.15 <seealso>
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 public class Point_also
+#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 {
     /// <summary>
     /// This method determines whether two Points have the same location.
@@ -320,7 +322,9 @@ public class Graphics_Point
     /// </returns>
     /// <seealso cref="operator=="/>
     /// <seealso cref="operator!="/>
+#pragma warning disable CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
     public override bool Equals(object o)
+#pragma warning restore CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
     {
         if (o == null) {
             return false;
