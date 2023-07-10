@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.2.6" Language="en-US" Publisher="Olivier Jacot-Descombes" />
+        <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.2.7" Language="en-US" Publisher="Olivier Jacot-Descombes" />
         <DisplayName>Pretty Doc Comments</DisplayName>
         <Description xml:space="preserve">Displays XML doc comments in a nice way and reduces the visual noise in the editor. C#, VB, F# and C++ supported.
 
