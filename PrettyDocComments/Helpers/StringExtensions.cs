@@ -1,15 +1,16 @@
 ﻿using System.Text.RegularExpressions;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Editor;
+using PrettyDocComments.Model;
 
 namespace PrettyDocComments.Helpers;
 
 internal static class StringExtensions
 {
-    public static FormattedText AsFormatted(this string text, Typeface typeface, double width, IWpfTextView view)
+    public static FormattedTextEx AsFormatted(this string text, Typeface typeface, double width, IWpfTextView view)
     {
         double emSize = Options.GetNormalEmSize(view);
-        return new FormattedText(
+        return new FormattedTextEx(
             textToFormat: text,
             culture: view.FormattedLineSource.DefaultTextProperties.CultureInfo,
             flowDirection: view.VisualElement.FlowDirection,

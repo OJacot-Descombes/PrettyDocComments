@@ -118,7 +118,7 @@ internal sealed class LineTransformSource : ILineTransformSource
         TextShape GetErrorText(Comment<string> commentWithXmlText)
         {
             double columnWidth = _view.FormattedLineSource.ColumnWidth;
-            FormattedText errorText = Xml.LastXmlException.Message.AsFormatted(
+            FormattedTextEx errorText = Xml.LastXmlException.Message.AsFormatted(
                 Options.NormalTypeFace, 0.5 * Options.CommentWidthInColumns * columnWidth, _view);
             errorText.SetForegroundBrush(Options.ErrorOutline.Brush);
             var errorOrigin = new Point(2 * columnWidth + commentWithXmlText.Width, 0);

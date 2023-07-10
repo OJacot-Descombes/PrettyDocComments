@@ -156,14 +156,14 @@ internal sealed class ShapeParser
 
     private void AddMainTitle(string title)
     {
-        FormattedText formattedText = CaptionText(title);
+        FormattedTextEx formattedText = CaptionText(title);
         _shapes.Add(new TextShape(formattedText, new Point(Options.Padding.Left, _y)));
         _y += formattedText.Height;
     }
 
     private void ParseBlockWithInlineHeading(XElement element, string caption, int indent = 4, double minSpace = 42.0)
     {
-        FormattedText formattedCaption = CaptionText(caption);
+        FormattedTextEx formattedCaption = CaptionText(caption);
         _shapes.Add(new TextShape(formattedCaption, new Point(Options.Padding.Left, _y)));
         double blockIndent = indent * _emSize;
         int firstLineIndentChars = (int)(3.7 * Math.Max(formattedCaption.Width - blockIndent, minSpace) / _emSize) + 4;
@@ -208,15 +208,15 @@ internal sealed class ShapeParser
         double width = _width - indent - Options.Padding.Right;
         if (String.IsNullOrWhiteSpace(el.Value)) { // There is no text, just add the attribute values(s).
             string text = "● " + String.Join(" ", el.Attributes().Select(a => a.Value));
-            FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, width, _view);
+            FormattedTextEx formattedText = text.AsFormatted(Options.NormalTypeFace, width, _view);
             _shapes.Add(new TextShape(formattedText, new Point(indent, _y)));
             _y += formattedText.Height;
         } else {
-            FormattedText formattedText = "●".AsFormatted(Options.NormalTypeFace, width, _view);
+            FormattedTextEx formattedText = "●".AsFormatted(Options.NormalTypeFace, width, _view);
             _shapes.Add(new TextShape(formattedText, new Point(indent, _y)));
             ParseBlock(el, 1.3 * _emSize);
         }
     }
 
-    private FormattedText CaptionText(string text) => text.AsFormatted(Options.CaptionsTypeFace, _width, _view);
+    private FormattedTextEx CaptionText(string text) => text.AsFormatted(Options.CaptionsTypeFace, _width, _view);
 }

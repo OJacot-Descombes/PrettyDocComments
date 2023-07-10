@@ -163,6 +163,24 @@ internal class FormatAccumulator
         }
     }
 
+    public readonly struct HighlightMemento : IDisposable
+    {
+        private readonly FormatAccumulator _originator;
+        private readonly Brush _highlight;
+
+        internal HighlightMemento(FormatAccumulator originator, Brush highlight)
+        {
+            _originator = originator;
+            _highlight = originator._highlight;
+            originator._highlight = highlight;
+        }
+
+        void IDisposable.Dispose()
+        {
+            _originator._highlight = _highlight;
+        }
+    }
+
     public readonly struct AlignmentMemento : IDisposable
     {
         private readonly FormatAccumulator _originator;
@@ -190,6 +208,7 @@ internal class FormatAccumulator
     private bool _underline;
     private bool _code;
     private Brush _textBrush = Options.DefaultTextBrush;
+    private Brush _highlight;
     private TextAlignment _alignment;
 
     private bool _trimNextStart;
@@ -210,6 +229,7 @@ internal class FormatAccumulator
     public UnderlineMemento CreateUnderlineScope() => new(this);
     public CodeMemento CreateCodeScope() => new(this);
     public TextColorMemento CreateTextColorScope(Brush textColor) => new(this, textColor);
+    public HighlightMemento CreateHighlightScope(Brush highlight) => new(this, highlight);
     public AlignmentMemento CreateAlignmentScope(TextAlignment alignment) => new(this, alignment);
 
     public void Add(string text)
@@ -218,23 +238,23 @@ internal class FormatAccumulator
             _trimNextStart = false;
             text = text.TrimStart();
         }
-        _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textBrush, _fontAspect));
+        _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textBrush, _highlight, _fontAspect));
     }
 
     public void AddLineBreak()
     {
-        _runs.Add(new FormatRun("\r\n", _bold, _italic, _strikethrough, _underline, _code, _textBrush, _fontAspect));
+        _runs.Add(new FormatRun("\r\n", _bold, _italic, _strikethrough, _underline, _code, _textBrush, _highlight, _fontAspect));
         _trimNextStart = true;
     }
 
-    public FormattedText GetFormattedText(bool trimStartEnd, double horizontalPadding)
+    public FormattedTextEx GetFormattedText(bool trimStartEnd, double horizontalPadding)
     {
         if (trimStartEnd) {
             _runs[0].TrimStart();
             _runs[_runs.Count - 1].TrimEnd();
         }
         string text = String.Concat(_runs.Select(r => r.Text));
-        FormattedText formattedText = text.AsFormatted(Options.NormalTypeFace, _width - _indent - horizontalPadding, _view);
+        FormattedTextEx formattedText = text.AsFormatted(Options.NormalTypeFace, _width - _indent - horizontalPadding, _view);
         formattedText.TextAlignment = _alignment;
         int startIndex = 0;
         foreach (FormatRun run in _runs) {
@@ -243,6 +263,7 @@ internal class FormatAccumulator
             formattedText.SetFontStyle(run.Italic ? FontStyles.Italic : FontStyles.Normal, startIndex, length);
             formattedText.SetFontWeight(run.Bold ? FontWeights.Bold : FontWeights.Normal, startIndex, length);
             formattedText.SetForegroundBrush(run.TextBrush, startIndex, length);
+            formattedText.SetHighlightBrush(run.HighlightBrush, startIndex, length);
             if (run.FontAspect != 1.0) {
                 formattedText.SetFontSize(Options.GetNormalEmSize(_view) * run.FontAspect, startIndex, length);
             }

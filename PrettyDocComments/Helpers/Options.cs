@@ -37,6 +37,10 @@ internal static class Options
     public static Pen CommentOutline =>
         CreatePen(ref _commentOutline, GeneralOptions.Instance.CommentLineColor, 2.0, Brushes.DarkKhaki);
 
+    private static Brush _highlightBrush;
+    public static Brush HighlightBrush =>
+        CreateBrush(ref _highlightBrush, GeneralOptions.Instance.HighlightColor) ?? Brushes.Yellow;
+
     private static Pen _commentSeparator;
     public static Pen CommentSeparator =>
         CreatePen(ref _commentSeparator, GeneralOptions.Instance.CommentLineColor, 0.5, Brushes.DarkKhaki);

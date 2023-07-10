@@ -193,9 +193,8 @@ internal sealed partial class FormatParser
                             ParseElement(el);
                             CloseBlock(BackgroundType.Framed);
                             break;
-                        case "mark": // We cannot set the background color in FormattedText. Let's do something else:
-                            using (_accumulator.CreateBoldScope())
-                            using (_accumulator.CreateItalicScope()) {
+                        case "mark":
+                            using (_accumulator.CreateHighlightScope(Options.HighlightBrush)) {
                                 ParseElement(el);
                             }
                             break;
@@ -331,7 +330,7 @@ internal sealed partial class FormatParser
     {
         if (_accumulator.HasText) {
             double padding = backgroundType is BackgroundType.Default ? 0.0 : Options.Padding.GetWidth();
-            FormattedText text = _accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
+            FormattedTextEx text = _accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
             var textBlock = new TextBlock(text, _accumulator.Indent, height, height, backgroundType);
             _textBlocks.Add(textBlock);
             return textBlock;
@@ -343,7 +342,7 @@ internal sealed partial class FormatParser
     {
         if (_accumulator.HasText) {
             double padding = backgroundType is BackgroundType.Default ? 0.0 : Options.Padding.GetWidth();
-            FormattedText text = _accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
+            FormattedTextEx text = _accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
             _textBlocks.Add(new TextBlock(text, _accumulator.Indent, backgroundType));
         }
     }
@@ -490,22 +489,29 @@ internal sealed partial class FormatParser
 
     private void HtmlInputField(XElement el)
     {
-        string text = el.Attribute("type")?.Value switch {
-            "button" when el.Attribute("value")?.Value is var value => $"[ {value} ]",
-            "checkbox" => "[X] ",
-            "color" or "date" or "datetime-local" => "[_____|v]",
-            "file" => "[ Browse... ]",
-            "hidden" => "",
-            "image" => el.Attribute("src")?.Value is { Length: > 0 } src ? $"[ {src} ]" : "[ ☺ ]",
-            "number" => "[_____|↕]",
-            "password" => "[••••___]",
-            "radio" => "○ ",
-            "range" => "═══○═════",
-            "reset" => "[ Reset ]",
-            "submit" => "[ Submit ]",
-            _ => "[_______]"
+        string inputType = el.Attribute("type")?.Value;
+        (string text, bool whiteBox) = inputType switch {
+            "button" when el.Attribute("value")?.Value is var value => ($"[ {value} ]", false),
+            "checkbox" => ("[X] ", true),
+            "color" or "date" or "datetime-local" => ("[_____|v]", true),
+            "file" => ("[ Browse... ]", false),
+            "hidden" => ("", false),
+            "image" => (el.Attribute("src")?.Value is { Length: > 0 } src ? $"[ {src} ]" : "[ ☺ ]", false),
+            "number" => ("[_____|↕]", true),
+            "password" => ("[••••___]", true),
+            "radio" => ("○ ", false),
+            "range" => ("═══○═════", false),
+            "reset" => ("[ Reset ]", false),
+            "submit" => ("[ Submit ]", false),
+            _ => ("[_______]", true)
         };
-        _accumulator.Add(text);
+        if (whiteBox) {
+            using (_accumulator.CreateHighlightScope(Brushes.White)) {
+                _accumulator.Add(text);
+            }
+        } else {
+            _accumulator.Add(text);
+        }
     }
 
     private void HtmlHeading(XElement el, double aspectFactor)

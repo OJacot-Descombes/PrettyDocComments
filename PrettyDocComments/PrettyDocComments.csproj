@@ -55,6 +55,7 @@
     <Compile Include="Helpers\StringExtensions.cs" />
     <Compile Include="Model\Cell.cs" />
     <Compile Include="Model\Comment.cs" />
+    <Compile Include="Model\FormattedTextEx.cs" />
     <Compile Include="Model\RenderInfo.cs" />
     <Compile Include="Model\HorizontalLineShape.cs" />
     <Compile Include="CustomOptions\GeneralOptions.cs" />

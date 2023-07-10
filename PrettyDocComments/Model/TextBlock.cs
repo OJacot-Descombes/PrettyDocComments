@@ -8,7 +8,7 @@ namespace PrettyDocComments.Model;
 [DebuggerDisplay("{nameof(Text)}: \"{Text.Text}\", {nameof(Left)}: {Left}, {nameof(DeltaY)}: {DeltaY}, {nameof(Height)}: {Height}, {nameof(BackgroundType)}: {BackgroundType}")]
 internal readonly struct TextBlock
 {
-    public TextBlock(FormattedText text, double left, BackgroundType backgroundType = BackgroundType.Default)
+    public TextBlock(FormattedTextEx text, double left, BackgroundType backgroundType = BackgroundType.Default)
     {
         Text = text;
         Left = left;
@@ -16,7 +16,7 @@ internal readonly struct TextBlock
         BackgroundType = backgroundType;
     }
 
-    public TextBlock(FormattedText text, double left, double deltaY, double height, BackgroundType backgroundType = BackgroundType.Default)
+    public TextBlock(FormattedTextEx text, double left, double deltaY, double height, BackgroundType backgroundType = BackgroundType.Default)
     {
         Text = text;
         Left = left;
@@ -25,7 +25,7 @@ internal readonly struct TextBlock
         BackgroundType = backgroundType;
     }
 
-    public readonly FormattedText Text;
+    public readonly FormattedTextEx Text;
 
     public readonly double Left;
 

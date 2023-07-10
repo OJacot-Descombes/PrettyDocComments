@@ -34,6 +34,12 @@ internal class GeneralOptions : BaseOptionModel<GeneralOptions>
     [TypeConverter(typeof(System.Drawing.ColorConverter))]
     public System.Drawing.Color CodeBlockBackColor { get; set; } = System.Drawing.Color.Gainsboro;
 
+    [Category("Shape Colors")]
+    [DisplayName("Highlight color")]
+    [Description("Default background color of <mark>blocks</mark> (default is Yellow).")]
+    [TypeConverter(typeof(System.Drawing.ColorConverter))]
+    public System.Drawing.Color HighlightColor { get; set; } = System.Drawing.Color.Yellow;
+
     [Category("Text Colors")]
     [DisplayName("Text color")]
     [Description("Color of normal text (default is Black).")]

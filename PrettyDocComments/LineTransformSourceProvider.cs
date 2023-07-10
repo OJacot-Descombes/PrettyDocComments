@@ -1,9 +1,12 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using Microsoft;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
@@ -11,6 +14,7 @@ using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Outlining;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
+using PrettyDocComments.Model;
 using PrettyDocComments.Services;
 
 namespace PrettyDocComments;
@@ -30,7 +34,9 @@ internal sealed class LineTransformSourceProvider : ILineTransformSourceProvider
     [SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "<Pending>")]
     public LineTransformSourceProvider()
     {
+#pragma warning disable VSSDK006 //  Check whether the result of GetService calls is null.
         var textManager = (IConnectionPointContainer)ServiceProvider.GlobalProvider.GetService(typeof(SVsTextManager));
+#pragma warning restore VSSDK006
         Guid interfaceGuid = typeof(IVsTextManagerEvents).GUID;
         textManager.FindConnectionPoint(ref interfaceGuid, out var tmConnectionPoint);
         tmConnectionPoint.Advise(new TextManagerEvents(), out _);
