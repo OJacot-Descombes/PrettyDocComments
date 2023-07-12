@@ -9,9 +9,38 @@ internal static class Options
 {
     public static event Action OptionsChanged;
 
-    public static readonly Typeface NormalTypeFace;
-    public static readonly Typeface CaptionsTypeFace;
-    public static readonly Typeface CodeTypeFace;
+    private static readonly FontFamily _fallbackTextFontFamily = new FontFamily("Arial");
+    private static readonly FontFamily _fallbackCodeFontFamily = new FontFamily("Consolas");
+
+    private static Typeface _normalTypeFace;
+    public static Typeface NormalTypeFace
+    {
+        get {
+            _normalTypeFace ??= new Typeface(new FontFamily(GeneralOptions.Instance.TextFont),
+                FontStyles.Normal, FontWeights.Normal, FontStretches.Normal, _fallbackTextFontFamily);
+            return _normalTypeFace;
+        }
+    }
+
+    private static Typeface _captionsTypeFace;
+    public static Typeface CaptionsTypeFace
+    {
+        get {
+            _captionsTypeFace ??= new Typeface(new FontFamily(GeneralOptions.Instance.TextFont),
+                FontStyles.Normal, FontWeights.Bold, FontStretches.Normal, _fallbackTextFontFamily);
+            return _captionsTypeFace;
+        }
+    }
+
+    private static Typeface _codeTypeFace;
+    public static Typeface CodeTypeFace
+    {
+        get {
+            _codeTypeFace ??= new Typeface(new FontFamily(GeneralOptions.Instance.CodeFont),
+                FontStyles.Normal, FontWeights.Normal, FontStretches.Normal, _fallbackCodeFontFamily);
+            return _codeTypeFace;
+        }
+    }
 
     private static Brush _commentBackground;
     public static Brush CommentBackground =>
@@ -70,23 +99,12 @@ internal static class Options
     public static double GetNormalEmSize(IWpfTextView view) =>
         view.FormattedLineSource.DefaultTextProperties.FontRenderingEmSize * FontScaling;
 
-    static Options()
-    {
-        var textFontFamily = new FontFamily("Segoe UI");
-        var fallbackTextFontFamily = new FontFamily("Arial");
-
-        NormalTypeFace = new Typeface(textFontFamily,
-            FontStyles.Normal, FontWeights.Normal, FontStretches.Normal, fallbackTextFontFamily);
-
-        CaptionsTypeFace = new Typeface(textFontFamily,
-            FontStyles.Normal, FontWeights.Bold, FontStretches.Normal, fallbackTextFontFamily);
-
-        CodeTypeFace = new Typeface(new FontFamily("Cascadia Mono"),
-            FontStyles.Normal, FontWeights.Normal, FontStretches.Normal, new FontFamily("Consolas"));
-    }
-
     public static void Refresh()
     {
+        _captionsTypeFace = null;
+        _codeTypeFace = null;
+        _normalTypeFace = null;
+
         _commentBackground = null;
         _codeBackground = null;
         _defaultTextBrush = null;

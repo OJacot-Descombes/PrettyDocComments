@@ -50,6 +50,10 @@
     <Compile Include="CustomOptions\BaseOptionPage`1.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CustomOptions\Design\FontFamilyListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomOptions\Design\FontFamilyTypeEditor.cs" />
     <Compile Include="CustomOptions\DialogPageProvider.cs" />
     <Compile Include="Helpers\ColorExtensions.cs" />
     <Compile Include="Helpers\StringExtensions.cs" />
@@ -100,6 +104,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
