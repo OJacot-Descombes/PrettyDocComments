@@ -3,6 +3,8 @@ A Visual Studio extension that overlays XML doc comments with a rendered image. 
 
 [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=OlivierJacot-Descombes.PrettyDocComments)
 
+[Changelog](./changelog.md)
+
 ### Compatibility
 It works with single line comments in **C#**, **C++**, **F#** (`///`) and **VB** (`'''`). Multiline comments (`/**  */`) are ignored.
 

@@ -49,8 +49,37 @@ internal sealed partial class FormatParser
                     _accumulator.Add(xText.Value.NormalizeSpace(normalizeWS));
                     previousTag = null;
                     break;
+                case XBrush xBrush:
+                    switch (xBrush.Name.LocalName) {
+                        case "color":
+                            using (_accumulator.CreateTextColorScope(xBrush.Brush)) {
+                                ParseElement(xBrush);
+                            }
+                            break;
+                        case "background-color":
+                            using (_accumulator.CreateHighlightScope(xBrush.Brush)) {
+                                ParseElement(xBrush);
+                            }
+                            break;
+                    }
+                    break;
                 case XElement el:
                     string normalizedTag = el.Name.LocalName.ToLowerInvariant();
+                    if (normalizedTag is "dir" or "dl" or "list" or "menu" or "ol" or "table" or "ul") {
+                        // We are not ready yet to process styles in lists and tables.
+                        normalizedTag = "_list_";
+                    } else {
+                        if (CssStyle.Get(el) is { } style) {
+                            XElement current = el;
+                            if (style.Color is { } colorBrush) {
+                                current = InsertLevel(current, "color", colorBrush);
+                            }
+                            if (style.BackgroundColor is { } backBrush) {
+                                current = InsertLevel(current, "background-color", backBrush);
+                            }
+                        }
+                    }
+
                     switch (normalizedTag) {
                         case "a" or "embed" or "frame" or "img" or "paramref" or "permission" or "typeparamref":
                             Reference(el); // "name"
@@ -73,7 +102,7 @@ internal sealed partial class FormatParser
                                 CloseBlock();
                             }
                             break;
-                        case "body" or "figure" or "html" or "label" or "nav" or "summary" or "time":
+                        case "body" or "figure" or "html" or "label" or "nav" or "summary" or "time" or "span":
                             // Parse the children and IGNORE the tag itself.
                             // Note: Top-level <summary> tags are handled in the ShapeParser.
                             ParseElement(el);
@@ -130,9 +159,6 @@ internal sealed partial class FormatParser
                                 ParseElement(el);
                                 CloseBlock(BackgroundType.Framed);
                             }
-                            break;
-                        case "dir" or "dl" or "list" or "menu" or "ol" or "table" or "ul":
-                            ParseList(el, normalizedTag);
                             break;
                         case "div" or "figcaption" or "footer" or "form" or "header" or "section":
                             // Insert line break before and after <div> as most browsers do. No processing of CSS styles so far.
@@ -192,6 +218,9 @@ internal sealed partial class FormatParser
                             CloseBlock();
                             ParseElement(el);
                             CloseBlock(BackgroundType.Framed);
+                            break;
+                        case "_list_":
+                            ParseList(el, normalizedTag);
                             break;
                         case "mark":
                             using (_accumulator.CreateHighlightScope(Options.HighlightBrush)) {
@@ -326,6 +355,13 @@ internal sealed partial class FormatParser
                     break;
             }
         }
+    }
+
+    private static XElement InsertLevel(XElement current, string name, Brush colorBrush)
+    {
+        var newEl = new XBrush(name, colorBrush, current.DescendantNodes());
+        current.ReplaceNodes(newEl);
+        return newEl;
     }
 
     private TextBlock? CloseBlock(double height, BackgroundType backgroundType = BackgroundType.Default)

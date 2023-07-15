@@ -17,7 +17,9 @@
 /// <br/>
 /// <br/>
 /// <h4>Mark Tag</h4>
-/// <mark  style="color: green;">Marked text</mark>
-/// <mark style="background: white;">Marked text</mark>
-/// <mark style="background: #00ced1!important">Marked text</mark>
+/// <mark style="color: green;">Marked text 1</mark><br/>
+/// <mark style="background-color: white;">Marked text 2</mark><br/>
+/// <mark style="background: #00ced1!important">Marked text 3</mark><br/>
+/// <mark style="color:red;background: #80FF80!important">Marked text 4</mark><br/>
+/// <mark>Marked text 5</mark>
 internal class CustomTagsBy_K_L_Carter_Sr{ }

@@ -56,7 +56,7 @@ internal class MiscExamples<T, U>
     /// <param name="divisor"><c>int</c> divisor</param>
     /// <returns>The integer part of the division</returns>
     /// <example>
-    /// C#:  <code>
+    /// C#:<code>
     /// 
     ///      int result =
     ///          Divide(40, 7);

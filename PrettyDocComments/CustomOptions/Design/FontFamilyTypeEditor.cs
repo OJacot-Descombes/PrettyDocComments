@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms.Design;
+using Microsoft;
 
 namespace PrettyDocComments.CustomOptions.Design;
 
@@ -16,6 +17,7 @@ internal class FontFamilyTypeEditor : UITypeEditor
     public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
     {
         _editorService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
+        Assumes.Present(_editorService);
 
         var lb = new FontFamilyListBox();
         lb.SelectedValueChanged += OnListBoxSelectedValueChanged;

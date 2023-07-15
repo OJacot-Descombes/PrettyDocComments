@@ -140,3 +140,21 @@ internal class AnotherTable
 /// </table>
 class WithCaption { }
 
+/// <list type="table" style="background-color:lightyellow">
+///   <listheader>
+///      <term>Column 1</term>
+///      <term>Column 2</term>
+///      <term/>
+///   </listheader>
+///   <item>
+///       <term>Row 1, Column 1</term>
+///       <term>Row 1<br/>Column 2</term>
+///   </item>
+///   <item>
+///       <term>Row 2<br/>Column 1</term>
+///       <term>Row 2, Column 2</term>
+///   </item>
+/// </list>
+internal class TableCssStyles
+{
+}

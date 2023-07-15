@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Drawing.Design;
-using System.Windows.Media;
 using PrettyDocComments.CustomOptions.Design;
 
 namespace PrettyDocComments.CustomOptions;

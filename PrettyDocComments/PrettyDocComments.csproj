@@ -59,10 +59,14 @@
     <Compile Include="Helpers\StringExtensions.cs" />
     <Compile Include="Model\Cell.cs" />
     <Compile Include="Model\Comment.cs" />
+    <Compile Include="Model\CssColor.cs" />
+    <Compile Include="Model\CssColors.cs" />
     <Compile Include="Model\FormattedTextEx.cs" />
     <Compile Include="Model\RenderInfo.cs" />
     <Compile Include="Model\HorizontalLineShape.cs" />
     <Compile Include="CustomOptions\GeneralOptions.cs" />
+    <Compile Include="Model\CssStyle.cs" />
+    <Compile Include="Model\XBrush.cs" />
     <Compile Include="Services\FormatAccumulator.cs" />
     <Compile Include="Model\Row.cs" />
     <Compile Include="Services\FormatParser.cs" />
