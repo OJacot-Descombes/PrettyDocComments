@@ -8,8 +8,9 @@ namespace PrettyDocComments.Model;
 [DebuggerDisplay("{nameof(Text)}: \"{Text.Text}\", {nameof(Left)}: {Left}, {nameof(DeltaY)}: {DeltaY}, {nameof(Height)}: {Height}, {nameof(BackgroundType)}: {BackgroundType}")]
 internal readonly struct TextBlock
 {
-    public TextBlock(FormattedTextEx text, double left, BackgroundType backgroundType = BackgroundType.Default)
+    public TextBlock(FormattedTextEx text, double left, BackgroundType backgroundType = BackgroundType.Default, Brush backgroundBrush = null)
     {
+        _backgroundBrush = backgroundBrush;
         Text = text;
         Left = left;
         DeltaY = Height = text.Height + (backgroundType is BackgroundType.Default ? 0.0 : Options.Padding.GetHeight());
@@ -34,9 +35,10 @@ internal readonly struct TextBlock
     public readonly double Height;
 
     public readonly BackgroundType BackgroundType;
+    private readonly Brush _backgroundBrush;
 
     public readonly Brush Fill => BackgroundType switch {
-        BackgroundType.CodeBlock or BackgroundType.FramedShaded => Options.CodeBackground,
+        BackgroundType.CodeBlock or BackgroundType.FramedShaded => _backgroundBrush ?? Options.CodeBackground,
         _ => null,
     };
 

@@ -64,12 +64,14 @@ internal sealed partial class FormatParser
                     }
                     break;
                 case XElement el:
+                    CssStyle style = null;
                     string normalizedTag = el.Name.LocalName.ToLowerInvariant();
                     if (normalizedTag is "dir" or "dl" or "list" or "menu" or "ol" or "table" or "ul") {
                         // We are not ready yet to process styles in lists and tables.
                         normalizedTag = "_list_";
                     } else {
-                        if (CssStyle.Get(el) is { } style) {
+                        style = CssStyle.Get(el);
+                        if (style is not null && normalizedTag != "code") {
                             XElement current = el;
                             if (style.Color is { } colorBrush) {
                                 current = InsertLevel(current, "color", colorBrush);
@@ -114,7 +116,7 @@ internal sealed partial class FormatParser
                             _accumulator.Add(" [ "); ParseElement(el); _accumulator.Add(" ] ");
                             break;
                         case "c" or "kbd" or "samp" or "tt":
-                            using (_accumulator.CreateCodeScope()) {
+                            using (_accumulator.CreateCodeScope(null)) {
                                 ParseElement(el, normalizeWS: false);
                             }
                             break;
@@ -132,11 +134,11 @@ internal sealed partial class FormatParser
                             break;
                         case "code":
                             CloseBlock();
-                            using (_accumulator.CreateCodeScope())
+                            using (_accumulator.CreateCodeScope(style?.Color))
                             using (_accumulator.CreateWidthScope(_accumulator.Width - Options.Padding.Right)) {
                                 RemoveTagIndent(el);
                                 ParseElement(el, normalizeWS: false);
-                                CloseBlock(BackgroundType.CodeBlock);
+                                CloseBlock(BackgroundType.CodeBlock, style?.BackgroundColor ?? Options.CodeBackground);
                             }
                             break;
                         case "del" or "s" or "strike":
@@ -266,7 +268,7 @@ internal sealed partial class FormatParser
                             break;
                         case "pre": // We display it like <code> but without a special background color.
                             CloseBlock();
-                            using (_accumulator.CreateCodeScope()) {
+                            using (_accumulator.CreateCodeScope(null)) {
                                 RemoveTagIndent(el);
                                 ParseElement(el, normalizeWS: false);
                                 CloseBlock();
@@ -376,12 +378,12 @@ internal sealed partial class FormatParser
         return null;
     }
 
-    private void CloseBlock(BackgroundType backgroundType = BackgroundType.Default)
+    private void CloseBlock(BackgroundType backgroundType = BackgroundType.Default, Brush backgroundBrush = null)
     {
         if (_accumulator.HasText) {
             double padding = backgroundType is BackgroundType.Default ? 0.0 : Options.Padding.GetWidth();
             FormattedTextEx text = _accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
-            _textBlocks.Add(new TextBlock(text, _accumulator.Indent, backgroundType));
+            _textBlocks.Add(new TextBlock(text, _accumulator.Indent, backgroundType, backgroundBrush));
         }
     }
 

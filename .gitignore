@@ -28,6 +28,7 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 .vs/
 .cr/
+Corel Auto-Preserve/
 #Nuget packages folder
 packages/
 

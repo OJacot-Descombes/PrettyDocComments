@@ -134,15 +134,24 @@ internal class FormatAccumulator
     {
         private readonly FormatAccumulator _originator;
         private readonly bool _code;
+        private readonly Brush _textColor;
 
-        internal CodeMemento(FormatAccumulator originator)
+        internal CodeMemento(FormatAccumulator originator, Brush textColor)
         {
             _originator = originator;
+
             _code = originator._code;
             originator._code = true;
+
+            _textColor = originator._textBrush;
+            originator._textBrush = textColor ?? _textColor; // Do not change if brush is null
         }
 
-        void IDisposable.Dispose() => _originator._code = _code;
+        void IDisposable.Dispose()
+        {
+            _originator._code = _code;
+            _originator._textBrush = _textColor;
+        }
     }
 
     public readonly struct TextColorMemento : IDisposable
@@ -227,7 +236,7 @@ internal class FormatAccumulator
     public ItalicMemento CreateItalicScope() => new(this);
     public StrikethroughMemento CreateStrikethroughScope() => new(this);
     public UnderlineMemento CreateUnderlineScope() => new(this);
-    public CodeMemento CreateCodeScope() => new(this);
+    public CodeMemento CreateCodeScope(Brush textColor) => new(this, textColor);
     public TextColorMemento CreateTextColorScope(Brush textColor) => new(this, textColor);
     public HighlightMemento CreateHighlightScope(Brush highlight) => new(this, highlight);
     public AlignmentMemento CreateAlignmentScope(TextAlignment alignment) => new(this, alignment);

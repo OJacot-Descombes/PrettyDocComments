@@ -74,6 +74,10 @@ internal class MiscExamples<T, U>
     /// </code></example>
     /// 
     /// <example>Empty code tag:<code></code></example>
+    /// <example>Code tag with syle foreground/background color:<code style="background-color:black;color:limegreen">
+    /// console> input
+    /// console> output
+    /// </code></example>
     public static int Divide(int dividend, int divisor)
     {
         return dividend / divisor;
