@@ -1,10 +1,8 @@
-﻿using Microsoft.VisualStudio.OLE.Interop;
-
-namespace PrettyDocComments.Model;
+﻿namespace PrettyDocComments.Model;
 
 // Adapted from: https://github.com/TylerBrinks/ExCSS/blob/master/src/ExCSS
 
-public struct CssColor
+public readonly struct CssColor
 {
     private readonly byte _red;
     private readonly byte _green;

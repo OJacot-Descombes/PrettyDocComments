@@ -32,7 +32,7 @@ internal sealed class Adornment
         if (view == null) {
             throw new ArgumentNullException("view");
         }
-        _layer = view.GetAdornmentLayer("TextAdornment");
+        _layer = view.GetAdornmentLayer("DocCommentImage");
 
         _view = view;
         _view.LayoutChanged += View_LayoutChanged;

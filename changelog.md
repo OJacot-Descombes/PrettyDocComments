@@ -1,4 +1,8 @@
 # Changelog
+- **0.3.4** - 2023-09-14
+    - **Fixed**: Indentation of "seealso" text.
+    - **Fixed**: "View White Space" displays above doc comment image.
+    - **Changed**: Applied suggested code fixes.
 - **0.3.3** - 2023-07-16
     - **Added**: Support for style-attributes **color** and **background-color** at various places.
 - **0.3.2** - 2023-07-12

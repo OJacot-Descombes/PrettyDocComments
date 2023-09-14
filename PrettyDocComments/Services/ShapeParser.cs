@@ -214,7 +214,7 @@ internal sealed class ShapeParser
         } else {
             FormattedTextEx formattedText = "●".AsFormatted(Options.NormalTypeFace, width, _view);
             _shapes.Add(new TextShape(formattedText, new Point(indent, _y)));
-            ParseBlock(el, 1.3 * _emSize);
+            ParseBlock(el, 3.0 * _emSize);
         }
     }
 

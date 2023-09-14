@@ -9,8 +9,8 @@ internal static class Options
 {
     public static event Action OptionsChanged;
 
-    private static readonly FontFamily _fallbackTextFontFamily = new FontFamily("Arial");
-    private static readonly FontFamily _fallbackCodeFontFamily = new FontFamily("Consolas");
+    private static readonly FontFamily _fallbackTextFontFamily = new("Arial");
+    private static readonly FontFamily _fallbackCodeFontFamily = new("Consolas");
 
     private static Typeface _normalTypeFace;
     public static Typeface NormalTypeFace

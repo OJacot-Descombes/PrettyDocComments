@@ -44,8 +44,8 @@ internal sealed class LineTransformSourceProvider : ILineTransformSourceProvider
     /// Defines the adornment layer for the adornment. This layer is ordered after the text layer in the Z-order.
     /// </summary>
     [Export(typeof(AdornmentLayerDefinition))]
-    [Name("TextAdornment")]
-    [Order(After = PredefinedAdornmentLayers.Text, Before = PredefinedAdornmentLayers.Caret)]
+    [Name("DocCommentImage")]
+    [Order(After = PredefinedAdornmentLayers.Caret)]
     private AdornmentLayerDefinition _editorAdornmentLayer;
 
     [Import]
