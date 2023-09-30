@@ -1,4 +1,7 @@
 # Changelog
+- **0.3.5** - 2023-09-30
+    - **Changed**: Now pretty comment is hidden and XML revealed when start or end of text selection is inside comment
+      in addition to caret.
 - **0.3.4** - 2023-09-14
     - **Fixed**: Indentation of "seealso" text.
     - **Fixed**: "View White Space" displays above doc comment image.

@@ -59,12 +59,11 @@ internal sealed class Adornment
 
     private void SetAdornmentVisibility()
     {
-        int caretlineNumber = _view.Caret?.Position.BufferPosition.GetContainingLineNumber() ?? -1;
         bool anyVisibilityChanged = false;
         bool isLeftMouseButtonPressed = Mouse.LeftButton == MouseButtonState.Pressed;
         foreach (var comment in _renderedComments) {
             Visibility newVisibility =
-                comment.ContainsLine(caretlineNumber) ? Visibility.Hidden : Visibility.Visible;
+                comment.ContainsCaretOrSelStartOrEnd(_view) ? Visibility.Hidden : Visibility.Visible;
             if (newVisibility != comment.Data.Visibility) {
                 if (isLeftMouseButtonPressed) {
                     _delayVisibilityChange = true; // Otherwise changing line height might unintentionally select text.
@@ -84,9 +83,8 @@ internal sealed class Adornment
     {
         int i = _renderedComments.FindIndex(c => c.Data == image);
         if (i >= 0) {
-            int caretlineNumber = _view.Caret?.Position.BufferPosition.GetContainingLineNumber() ?? -1;
             var comment = _renderedComments[i];
-            comment.Data.Visibility = comment.ContainsLine(caretlineNumber) ? Visibility.Hidden : Visibility.Visible;
+            comment.Data.Visibility = comment.ContainsCaretOrSelStartOrEnd(_view) ? Visibility.Hidden : Visibility.Visible;
         }
     }
 

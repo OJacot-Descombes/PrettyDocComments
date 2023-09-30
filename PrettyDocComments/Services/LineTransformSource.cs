@@ -69,8 +69,7 @@ internal sealed class LineTransformSource : ILineTransformSource
         } else if (!TryAddRenderInfo(line, out comment)) {
             return new LineTransform(1.0);
         }
-        int caretLineNumber = _view.Caret?.Position.BufferPosition.GetContainingLineNumber() ?? -1;
-        if (!comment.ContainsLine(caretLineNumber) && !IsLineCollapsed(line)) {
+        if (!comment.ContainsCaretOrSelStartOrEnd(_view) && !IsLineCollapsed(line)) {
             return new LineTransform(comment.Data.VerticalScale);
         }
         return new LineTransform(1.0);
