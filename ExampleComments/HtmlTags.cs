@@ -10,13 +10,13 @@
 /// </remarks>
 class HtmlTags
 {
-    static int x = 5;
-    public int X => x;
-    public int Y { get; } = x;
+    static readonly int _x = 5;
+    public static int X => _x;
+    public int Y { get; } = _x;
 
     /// <!--This is a comment. Comments are not displayed in the browser-->
     /// <p>We display them because they may contain information valuable to the developer. After all, we are in the development environment.</p>
-    void Comment() { }
+    public static void Comment() { }
 
     /// <!DOCTYPE html>
     /// <html>
@@ -29,50 +29,50 @@ class HtmlTags
     /// </body>
     ///
     /// </html>
-    void DocType() { }
+    public static void DocType() { }
 
     /// <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
     /// <p>HTML 4.01</p>
-    void DocTypeHtml_4_01() { }
+    public static void DocTypeHtml_4_01() { }
 
     ///  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
     ///  <p>XHTML 1.1</p>
-    void DocTypeHtml_1_1() { }
+    public static void DocTypeHtml_1_1() { }
 
     /// <a href="https://www.w3schools.com">Visit W3Schools.com!</a> 
-    void A() { }
+    public static void A() { }
 
     /// <a href="https://www.w3schools.com">
     /// <img border = "0" alt="W3Schools" src="logo_w3s.gif" width="100" height="100" />
     /// </a> 
-    void A_ImageAsLink() { }
+    public static void A_ImageAsLink() { }
 
     /// <a href="https://www.w3schools.com" target="_blank">Visit W3Schools.com!</a> 
-    void A_target_blank() { }
+    public static void A_target_blank() { }
 
     /// <a href="mailto:someone@example.com">Send email</a> 
-    void A_mailto() { }
+    public static void A_mailto() { }
 
     /// <a href="tel:+4733378901">+47 333 78 901</a> 
-    void A_phone() { }
+    public static void A_phone() { }
 
     /// <a href="#section2">Go to Section 2</a> 
-    void A_section() { }
+    public static void A_section() { }
 
     /// <a href="javascript:alert('Hello World!');">Execute JavaScript</a>
     /// <p>We don't execute any script of course. Let's just see how it renders.</p>
-    void A_JavaScript() { }
+    public static void A_JavaScript() { }
 
     /// The <abbr title="World Health Organization">WHO</abbr> was founded in 1948. 
-    void Abbr() { }
+    public static void Abbr() { }
 
     // Example from https://www.educative.io/answers/how-to-use-the-acronym-element-in-html
     /// <acronym title="English Capital Letters">ABC</acronym>
-    void Acronym() { }
+    public static void Acronym() { }
 
     /// <p><dfn><abbr title="Cascading Style Sheets">CSS</abbr>
     /// </dfn> is a language that describes the style of an HTML document.</p> 
-    void Addr_dfn() { }
+    public static void Addr_dfn() { }
 
     // I closed the <br> tags to make it work.
     ///  <address>
@@ -82,7 +82,7 @@ class HtmlTags
     /// Box 564, Disneyland<br/>
     /// USA
     /// </address>
-    void Address() { }
+    public static void Address() { }
 
     // Example from https://www.javatpoint.com/html-applet-tag
     /// <!DOCTYPE html>
@@ -97,7 +97,7 @@ class HtmlTags
     ///      </applet>
     ///   </body>
     /// </html>
-    void Applet() { }
+    public static void Applet() { }
 
     /// <img src="workplace.jpg" alt="Workplace" usemap="#workmap" width="400" height="379"/>
     ///
@@ -106,7 +106,7 @@ class HtmlTags
     ///   <area shape="rect" coords="290,172,333,250" alt="Phone" href="phone.htm"/>
     ///   <area shape="circle" coords="337,300,44" alt="Cup of coffee" href="coffee.htm"/>
     /// </map>
-    void Area() { }
+    public static void Area() { }
 
     /// <img src="planets.gif" width="145" height="126" alt="Planets" usemap="#planetmap"/>
     ///
@@ -115,7 +115,7 @@ class HtmlTags
     ///   <area shape="circle" coords="90,58,3" href="mercur.htm" alt="Mercury"/>
     ///   <area shape="circle" coords="124,58,8" href="venus.htm" alt="Venus"/>
     /// </map>
-    void Area_2() { }
+    public static void Area_2() { }
 
     /// <article>
     /// <h2>Google Chrome</h2>
@@ -131,7 +131,7 @@ class HtmlTags
     /// <h2>Microsoft Edge</h2>
     /// <p>Microsoft Edge is a web browser developed by Microsoft, released in 2015. Microsoft Edge replaced Internet Explorer.</p>
     /// </article>
-    void Article() { }
+    public static void Article() { }
 
     /// <html>
     /// <head>
@@ -177,7 +177,7 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Article_2() { }
+    public static void Article_2() { }
 
     /// <p>My family and I visited The Epcot center this summer. The weather was nice, and Epcot was amazing! I had a great summer together with my family!</p>
     ///
@@ -185,7 +185,7 @@ class HtmlTags
     /// <h4>Epcot Center</h4>
     /// <p>Epcot is a theme park at Walt Disney World Resort featuring exciting attractions, international pavilions, award-winning fireworks and seasonal special events.</p>
     /// </aside>
-    void Aside() { }
+    public static void Aside() { }
 
     /// <html>
     /// <head>
@@ -215,20 +215,20 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Aside_2() { }
+    public static void Aside_2() { }
 
     /// <audio controls="play">
     ///   <source src="horse.ogg" type="audio/ogg"/>
     ///   <source src="horse.mp3" type="audio/mpeg"/>
     ///   Your browser does not support the audio tag.
     /// </audio>
-    void Audio() { }
+    public static void Audio() { }
 
     /// <p>This is normal text - <b>and this is bold text</b>.</p> 
-    void B() { }
+    public static void B() { }
 
     /// <p>This is normal text - <span style="font-weight:bold;">and this is bold text</span>.</p> 
-    void B_CSS() { }
+    public static void B_CSS() { }
 
     /// <head>
     ///   <base href="https://www.w3schools.com/" target="_blank"/>
@@ -238,7 +238,7 @@ class HtmlTags
     /// <img src="images/stickman.gif" width="24" height="39" alt="Stickman"/>
     /// <a href="tags/tag_base.asp">HTML base Tag</a>
     /// </body>
-    void Base() { }
+    public static void Base() { }
 
     // Example from https://www.javatpoint.com/html-basefont-tag
     /// <!DOCTYPE html>
@@ -252,7 +252,7 @@ class HtmlTags
     /// <p>The basefornt tag is not supported in HTML5 use CSS to style the document</p>
     /// </body>
     /// </html>
-    void Basefont() { }
+    public static void Basefont() { }
 
     /// <html>
     /// <head>
@@ -269,24 +269,24 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Basefont_replacement() { }
+    public static void Basefont_replacement() { }
 
     /// <ul>
     ///   <li>User <bdi>hrefs</bdi>: 60 points</li>
     ///   <li>User <bdi>jdoe</bdi>: 80 points</li>
     ///   <li>User <bdi>إيان</bdi>: 90 points</li>
     /// </ul>
-    void Bdi() { }
+    public static void Bdi() { }
 
     /// <bdo dir="rtl">
     /// This text will go right-to-left.
     /// </bdo>
-    void Bdo() { }
+    public static void Bdo() { }
 
     /// <summary>
     /// The &lt;big&gt; tag was used in HTML 4 to <big>define <big>bigger</big> text</big>.
     /// </summary>
-    void Big() { }
+    public static void Big() { }
 
     /// <html>
     /// <head>
@@ -307,7 +307,7 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Big_replacement() { }
+    public static void Big_replacement() { }
 
     /// <summary>
     /// A section that is quoted from another source:
@@ -316,7 +316,7 @@ class HtmlTags
     /// </blockquote>
     /// End quote.
     /// </summary>
-    void Blockquote() { }
+    public static void Blockquote() { }
 
     /// <html>
     /// <head>
@@ -336,7 +336,7 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Blockquote_2() { }
+    public static void Blockquote_2() { }
 
     /// <html>
     /// <head>
@@ -349,7 +349,7 @@ class HtmlTags
     /// </body>
     ///
     /// </html>
-    void Body() { }
+    public static void Body() { }
 
     /// <example>
     /// <html>
@@ -459,7 +459,7 @@ class HtmlTags
     /// </body>
     /// </html>
     /// </example>
-    void Body_Examples() { }
+    public static void Body_Examples() { }
 
     // <br>-tags were unclosed in original example.
     /// <p>To force<br/> line breaks<br/> in a text,<br/> use the br<br/> element.</p>
@@ -472,10 +472,10 @@ class HtmlTags
     ///
     /// <p><em>-William Shakespeare</em></p>
     /// </example>
-    void Br() { }
+    public static void Br() { }
 
     /// <button type="button">Click Me!</button> 
-    void Button() { }
+    public static void Button() { }
 
     /// <canvas id="myCanvas">
     /// Your browser does not support the canvas tag.
@@ -506,7 +506,7 @@ class HtmlTags
     /// ctx.fillRect(80, 80, 75, 50);
     /// </script>
     /// </example>
-    void Canvas() { }
+    public static void Canvas() { }
 
     /// <table>
     ///   <caption>Monthly savings</caption>
@@ -545,13 +545,13 @@ class HtmlTags
     ///       </tr>
     ///     </table>
     /// </example>
-    void Caption() { }
+    public static void Caption() { }
 
     /// <center>
     ///   This text will be centered.
     ///   <p>So will this paragraph.</p>
     /// </center>
-    void Center() { }
+    public static void Center() { }
 
     /// <html>
     /// <head>
@@ -569,10 +569,10 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Center_replacement() { }
+    public static void Center_replacement() { }
 
     /// <p><cite>The Scream</cite> by Edward Munch. Painted in 1893.</p> 
-    void Cite() { }
+    public static void Cite() { }
 
     // Note: we use <c> for inline code and <code> for code blocks. HTML does not have a <c>-tag. Therefore, these
     // examples are not rendered as expected for HTML.
@@ -600,7 +600,7 @@ class HtmlTags
     ///     </body>
     ///     </html>
     /// </example>
-    void Code() { }
+    public static void Code() { }
 
     /// <table>
     ///   <colgroup>
@@ -618,15 +618,16 @@ class HtmlTags
     ///     <td>$53</td>
     ///   </tr>
     /// </table>
-    void Col() { }
-    void Colgroup() { }
+    public static void Col() { }
+
+    public static void Colgroup() { }
 
     /// <ul>
     ///   <li><data value="21053">Cherry Tomato</data></li>
     ///   <li><data value="21054">Beef Tomato</data></li>
     ///   <li><data value="21055">Snack Tomato</data></li>
     /// </ul>
-    void Data() { }
+    public static void Data() { }
 
     /// <label for="browser">Choose your browser from the list:</label>
     /// <input list="browsers" name="browser" id="browser"/>
@@ -638,7 +639,7 @@ class HtmlTags
     ///   <option value="Opera"/>
     ///   <option value="Safari"/>
     /// </datalist>
-    void Datalist() { }
+    public static void Datalist() { }
 
     /// <dl>
     ///   <dt>Coffee</dt>
@@ -646,18 +647,18 @@ class HtmlTags
     ///   <dt>Milk</dt>
     ///   <dd>White cold drink</dd>
     /// </dl>
-    void Dd() { }
+    public static void Dd() { }
 
     /// <summary>
     /// <p>My favorite color is <del>blue</del> <ins>red</ins>!</p> 
     /// </summary>
-    void Del() { }
+    public static void Del() { }
 
     /// <details>
     ///   <summary>Epcot Center</summary>
     ///   <p>Epcot is a theme park at Walt Disney World Resort featuring exciting attractions, international pavilions, award-winning fireworks and seasonal special events.</p>
     /// </details>
-    void Details() { }
+    public static void Details() { }
 
     /// <example>
     ///   1. Just as the content of the &lt;dfn&gt; element:<br/>
@@ -679,12 +680,12 @@ class HtmlTags
     ///   <p>This is some text...</p>
     ///   <p>Learn <a href="#html-def">HTML</a> now.</p>
     /// </example>
-    void Dfn() { }
+    public static void Dfn() { }
 
     /// <p>This is some text.</p>
     /// <dialog open="">This is an open dialog window</dialog>
     /// <p>This is some text.</p>
-    void Dialog() { }
+    public static void Dialog() { }
 
     // From: https://www.javatpoint.com/html-dir-tag
     /// <p>List of javaTpoint popular Tutorials</p>
@@ -694,14 +695,14 @@ class HtmlTags
     /// <li>DataStructure-tutorial</li>
     /// <li>HTML-tutorial</li>
     /// </dir>
-    void Dir() { }
+    public static void Dir() { }
 
     /// <div class="myDiv">
     ///   <h2>This is a heading in a div element</h2>
     ///   <p>This is some text in a div element.</p>
     /// </div>
     /// <example>Example of an <div>inline</div> div-tag.</example>
-    void Div() { }
+    public static void Div() { }
 
     /// <dl>
     ///   <dt>Coffee</dt>
@@ -709,17 +710,18 @@ class HtmlTags
     ///   <dt>Milk</dt>
     ///   <dd>White cold drink</dd>
     /// </dl>
-    void Dl() { }
-    void Dt() { }
+    public static void Dl() { }
+
+    public static void Dt() { }
 
     /// <p>You <em>have</em> to hurry up!</p>
     /// <p>We <em>cannot</em> live like this.</p>
-    void Em() { }
+    public static void Em() { }
 
     /// <embed type="image/jpg" src="pic_trulli.jpg" width="300" height="200"/><br/> 
     /// <embed type="text/html" src="snippet.html" width="500" height="200"/><br/>  
     /// <embed type="video/webm" src="video.mp4" width="400" height="300"/> 
-    void Embed() { }
+    public static void Embed() { }
 
     /// <form action="/action_page.php">
     ///   <fieldset>
@@ -735,14 +737,15 @@ class HtmlTags
     ///     <input type="submit" value="Submit"/>
     ///   </fieldset>
     /// </form>
-    void Fieldset() { }
+    public static void Fieldset() { }
 
     /// <figure>
     ///   <img src="pic_trulli.jpg" alt="Trulli" style="width:100%"/>
     ///   <figcaption>Fig.1 - Trulli, Puglia, Italy.</figcaption>
     /// </figure>
-    void Figcaption() { }
-    void Figure() { }
+    public static void Figcaption() { }
+
+    public static void Figure() { }
 
     /// <h2>Example of font tag</h2>
     /// <p>This is normal text without any font styling</p>
@@ -755,7 +758,7 @@ class HtmlTags
     /// <p>
     ///   <font color="red" face="cursive">Text with Changed face</font>
     /// </p>
-    void Font() { }
+    public static void Font() { }
 
     /// <example>
     ///   Set the <b>color</b> of text (with CSS):
@@ -774,14 +777,14 @@ class HtmlTags
     ///   <p style="font-size:30px">This is a paragraph.</p>
     ///   <p style="font-size:11px">This is another paragraph.</p>
     /// </example>
-    void Font_replacement() { }
+    public static void Font_replacement() { }
 
     /// A footer section in a document:
     /// <footer>
     ///   <p>Author: Hege Refsnes</p>
     ///   <p><a href="mailto:hege@example.com">hege@example.com</a></p>
     /// </footer>
-    void Footer() { }
+    public static void Footer() { }
 
     /// <form action="/action_page.php" method="get">
     ///   <label for="fname">First name:</label>
@@ -790,7 +793,7 @@ class HtmlTags
     ///   <input type="text" id="lname" name="lname"/><br/><br/>
     ///   <input type="submit" value="Submit"/>
     /// </form>
-    void Form() { }
+    public static void Form() { }
 
     /// From: https://www.javatpoint.com/html-frame-tag<br/>
     /// <frameset cols="25%,50%,25%">
@@ -798,8 +801,9 @@ class HtmlTags
     ///   <frame src="frame2.html"/>
     ///   <frame src="frame3.html"/>
     /// </frameset>
-    void Frame() { }
-    void Frameset() { }
+    public static void Frame() { }
+
+    public static void Frameset() { }
 
     /// <h1>This is heading 1</h1>
     /// <h2>This is heading 2</h2>
@@ -808,7 +812,7 @@ class HtmlTags
     /// <h5>This is heading 5</h5>
     /// <h6>This is heading 6</h6>
     /// Normal Text
-    void H1_h6() { }
+    public static void H1_h6() { }
 
     /// <!DOCTYPE html>
     /// <html lang="en">
@@ -823,7 +827,7 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Head() { }
+    public static void Head() { }
 
     /// <article>
     ///   <header>
@@ -833,7 +837,7 @@ class HtmlTags
     ///   </header>
     ///   <p>Lorem Ipsum dolor set amet....</p>
     /// </article>
-    void Header() { }
+    public static void Header() { }
 
     /// <h4>Use the <hr/> tag to define thematic changes in the content:</h4>
     /// <h1>The Main Languages of the Web</h1>
@@ -884,7 +888,7 @@ class HtmlTags
     ///   </item>
     /// </list>
     /// </example>
-    void Hr() { }
+    public static void Hr() { }
 
     /// <!DOCTYPE html>
     /// <html lang="en">
@@ -898,15 +902,15 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Html() { }
+    public static void Html() { }
 
     /// <p><i>Lorem ipsum</i> is the most popular filler text in history.</p>
     ///
     /// <p>The <i>RMS Titanic</i>, a luxury steamship, sank on April 15, 1912 after striking an iceberg.</p>
-    void I() { }
+    public static void I() { }
 
     /// <iframe src="https://www.w3schools.com" title="W3Schools Free Online Web Tutorials"></iframe> 
-    void Iframe() { }
+    public static void Iframe() { }
 
     /// <img src="img_girl.jpg" alt="Girl in a jacket" width="500" height="600"/> 
     /// <example>
@@ -943,7 +947,7 @@ class HtmlTags
     ///   <area shape="circle" coords="337,300,44" alt="Cup of coffee" href="coffee.htm"/>
     /// </map>
     /// </example>
-    void Img() { }
+    public static void Img() { }
 
     /// <table>
     /// <tr><td>Button:</td><td><input type="button" value="Hello world"/></td></tr>
@@ -971,15 +975,15 @@ class HtmlTags
     /// <tr><td>Week:</td><td><input type="week"/></td>
     /// </tr>
     /// </table>
-    void Input() { }
+    public static void Input() { }
 
     /// A text with a deleted part, and a new, inserted part:
     /// <p>My favorite color is <del>blue</del> <ins>red</ins>!</p> 
-    void Ins() { }
+    public static void Ins() { }
 
     /// <p>Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to copy text (Windows).</p>
     /// <p>Press <kbd>Cmd</kbd> + <kbd>C</kbd> to copy text (Mac OS).</p>
-    void Kbd() { }
+    public static void Kbd() { }
 
     /// <html>
     /// <head>
@@ -998,7 +1002,7 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Kbd_Css() { }
+    public static void Kbd_Css() { }
 
     /// <form action="/action_page.php">
     ///   <input type="radio" id="html" name="fav_language" value="HTML"/>
@@ -1009,7 +1013,7 @@ class HtmlTags
     ///   <label for="javascript">JavaScript</label><br/><br/>
     ///   <input type="submit" value="Submit"/>
     /// </form>
-    void Label() { }
+    public static void Label() { }
 
     /// <form action="/action_page.php">
     ///   <fieldset>
@@ -1025,7 +1029,7 @@ class HtmlTags
     ///     <input type="submit" value="Submit"/>
     ///   </fieldset>
     /// </form>
-    void Legend() { }
+    public static void Legend() { }
 
     /// One ordered (&lt;ol&gt;) and one unordered (&lt;ul&gt;) HTML list:<br/>
     /// <ol>
@@ -1095,12 +1099,12 @@ class HtmlTags
     ///   <li>Milk</li>
     /// </ul>
     /// </example>
-    void Li() { }
+    public static void Li() { }
 
     /// <head>
     ///   <link rel="stylesheet" href="styles.css"/>
     /// </head>
-    void Link() { }
+    public static void Link() { }
 
     /// <main>
     ///   <h1>Most Popular Browsers</h1>
@@ -1121,7 +1125,7 @@ class HtmlTags
     ///     <p>Microsoft Edge is a web browser developed by Microsoft, released in 2015. Microsoft Edge replaced Internet Explorer.</p>
     ///   </article>
     /// </main>
-    void Main() { }
+    public static void Main() { }
 
     /// <html>
     /// <head>
@@ -1168,7 +1172,7 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Main_Css() { }
+    public static void Main_Css() { }
 
     /// <img src="workplace.jpg" alt="Workplace" usemap="#workmap" width="400" height="379"/>
     ///
@@ -1187,10 +1191,10 @@ class HtmlTags
     ///   <area shape="circle" coords="124,58,8" href="venus.htm" alt="Venus"/>
     /// </map>
     /// </example>
-    void Map() { }
+    public static void Map() { }
 
     /// <p>Do not forget to buy <mark>milk</mark> today.</p> 
-    void Mark() { }
+    public static void Mark() { }
 
     /// <head>
     ///   <meta charset="UTF-8"/>
@@ -1211,14 +1215,14 @@ class HtmlTags
     ///   <!-- Setting the Viewport -->
     ///   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     /// </head>
-    void Meta() { }
+    public static void Meta() { }
 
     /// <label for="disk_c">Disk usage C:</label>
     /// <meter id="disk_c" value="2" min="0" max="10">2 out of 10</meter><br/>
     ///
     /// <label for="disk_d">Disk usage D:</label>
     /// <meter id="disk_d" value="0.6">60%</meter>
-    void Meter() { }
+    public static void Meter() { }
 
     /// <nav>
     ///   <a href="/html/">HTML</a> |
@@ -1226,7 +1230,7 @@ class HtmlTags
     ///   <a href="/js/">JavaScript</a> |
     ///   <a href="/python/">Python</a>
     /// </nav>
-    void Nav() { }
+    public static void Nav() { }
 
     /// <!DOCTYPE html>
     /// <html lang="en-US">
@@ -1245,18 +1249,18 @@ class HtmlTags
     ///     </noframes>
     ///   </frameset>
     /// </html>
-    void Noframes() { }
+    public static void Noframes() { }
 
     /// <script>
     /// document.write("Hello World!")
     /// </script>
     /// <noscript>Your browser does not support JavaScript!</noscript>
-    void Noscript() { }
+    public static void Noscript() { }
 
     /// <object data="pic_trulli.jpg" width="300" height="200"></object>
     /// <object data="snippet.html" width="500" height="200"></object>
     /// <object data="video.mp4" width="400" height="300"></object> 
-    void Object() { }
+    public static void Object() { }
 
     /// <ol>
     ///   <li>Coffee</li>
@@ -1385,7 +1389,7 @@ class HtmlTags
     /// <li>Milk</li>
     /// </ol>
     /// </example>
-    void Ol() { }
+    public static void Ol() { }
 
     /// <label for="cars">Choose a car:</label>
     /// <select  name="cars" id="cars">
@@ -1398,7 +1402,7 @@ class HtmlTags
     ///     <option value="audi">Audi</option>
     ///   </optgroup>
     /// </select>
-    void Optgroup() { }
+    public static void Optgroup() { }
 
     /// <label for="cars">Choose a car:</label>
     ///
@@ -1437,7 +1441,7 @@ class HtmlTags
     ///   </optgroup>
     /// </select>
     /// </example>
-    void Option() { }
+    public static void Option() { }
 
     /// <!DOCTYPE html>
     /// <html>
@@ -1455,7 +1459,7 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Output() { }
+    public static void Output() { }
 
     /// <p>This is some text in a paragraph.</p>
     /// <p style="text-align:right">This is some text in a paragraph.</p>
@@ -1474,7 +1478,7 @@ class HtmlTags
     /// </p>
     ///
     /// <p>Note that the browser simply ignores the line breaks in the source code!</p>
-    void P() { }
+    public static void P() { }
 
     /// <h1>The HTML param element</h1>
     /// <object data="horse.wav">
@@ -1490,14 +1494,14 @@ class HtmlTags
     /// <param name="name">name description</param>
     /// <param name="key">key description</param>
     /// </example>
-    void Param() { }
+    public static void Param() { }
 
     /// <picture>
     ///   <source media="(min-width:650px)" srcset="img_pink_flowers.jpg"/>
     ///   <source media="(min-width:465px)" srcset="img_white_flower.jpg"/>
     ///   <img src="img_orange_flowers.jpg" alt="Flowers" style="width:auto;"/>
     /// </picture>
-    void Picture() { }
+    public static void Picture() { }
 
     /// <h1>The pre element</h1>
     /// Before
@@ -1509,38 +1513,40 @@ class HtmlTags
     /// line breaks
     /// </pre>
     /// After
-    void Pre() { }
+    public static void Pre() { }
 
     /// <label for="file">Downloading progress:</label>
     /// <progress id="file" value="32" max="100"> 32% </progress>
-    void Progress() { }
+    public static void Progress() { }
 
     /// <h1>The q element</h1>
     ///
     /// <p>WWF's goal is to:
     /// <q>Build a future where people live in harmony with nature.</q>
     /// We hope they succeed.</p>
-    void Q() { }
+    public static void Q() { }
 
     /// <ruby>
     /// Ruby <rp>(</rp><rt>annotation</rt><rp>)</rp>
     /// </ruby>
-    void Rp() { }
-    void Ruby() { }
-    void Rt() { }
+    public static void Rp() { }
+
+    public static void Ruby() { }
+
+    public static void Rt() { }
 
     /// <h1>The s element</h1>
     ///
     /// <p><s>Only 50 tickets left!</s></p>
     /// <p>SOLD OUT!</p>
-    void S() { }
+    public static void S() { }
 
     /// <h1>The samp element</h1>
     ///
     /// <p>Message from my computer:</p>
     ///
     /// <p>Before <samp>File not found.<br/>Press F1 to continue</samp> after</p>
-    void Samp() { }
+    public static void Samp() { }
 
     /// <!DOCTYPE html>
     /// <html>
@@ -1556,7 +1562,7 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Script() { }
+    public static void Script() { }
 
     /// <!DOCTYPE html>
     /// <html>
@@ -1580,7 +1586,7 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Section() { }
+    public static void Section() { }
 
     /// <h3>Create a drop-down list with four options:</h3>
     /// <label for="cars">Choose a car:</label>
@@ -1591,34 +1597,34 @@ class HtmlTags
     ///   <option value="mercedes">Mercedes</option>
     ///   <option value="audi">Audi</option>
     /// </select>
-    void Select() { }
+    public static void Select() { }
 
     /// <h1>The small element</h1>
     ///
     /// <p>This is some normal text.</p>
     /// <p><small>This is some smaller text.</small></p>
     /// This is a <small>small</small> word.
-    void Small() { }
+    public static void Small() { }
 
     /// <audio controls="">
     ///   <source src="horse.ogg" type="audio/ogg"/>
     ///   <source src="horse.mp3" type="audio/mpeg"/>
     ///   Your browser does not support the audio element.
     /// </audio>
-    void Source() { }
+    public static void Source() { }
 
     /// <h3>A &lt;span&gt; element which is used to color a part of a text:</h3>
     /// <p>My mother has <span style="color:blue">blue</span> eyes.</p> 
     /// The &lt;span&gt; tag is much like the &lt;div&gt; element, but &lt;div&gt; is a block-level element and &lt;span&gt; is an inline element.
-    void Span() { }
+    public static void Span() { }
 
     // From: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/strike
     /// &lt;strike&gt;: <strike>Today's Special: Salmon</strike> SOLD OUT<br />
     /// &lt;s&gt;: <s>Today's Special: Salmon</s> SOLD OUT
-    void Strike() { }
+    public static void Strike() { }
 
     /// <strong>This text is important!</strong> This one not.
-    void Strong() { }
+    public static void Strong() { }
 
     /// <html>
     /// <head>
@@ -1634,23 +1640,23 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Style() { }
+    public static void Style() { }
 
     ///<p>This text contains <sub>subscript</sub> text where some unicode subscipt variants are missing.</p>
     ///<p>F<sub>(x+5-β)</sub> (here all subscript variants exist).</p>
-    void Sub() { }
+    public static void Sub() { }
 
     /// <details>
     ///   <summary>Epcot Center</summary>
     ///   <p>Epcot is a theme park at Walt Disney World Resort featuring exciting attractions, international pavilions, award-winning fireworks and seasonal special events.</p>
     /// </details>
-    void Summary() { }
+    public static void Summary() { }
 
     /// <p>This text contains <sup>superscript</sup> text.</p> 
     /// <p>This text contains <sup>UPPER</sup> case supercript text.</p> 
     /// <p>This text contains missing <sup>supercase Variants</sup>.</p> 
     /// <p>F<sup>(x+5-β)</sup></p>
-    void Sup() { }
+    public static void Sup() { }
 
     /// <h5>Draw a circle:</h5>
     /// <svg width="100" height="100">
@@ -1690,7 +1696,7 @@ class HtmlTags
     /// <text fill="#ffffff" font-size="45" font-family="Verdana" x="50" y="86">SVG</text>
     /// </svg>
     /// </example>
-    void Svg() { }
+    public static void Svg() { }
 
     /// <table>
     ///   <tr>
@@ -1900,7 +1906,7 @@ class HtmlTags
     ///   </tr>
     /// </table>
     /// </example>
-    void Table() { }
+    public static void Table() { }
 
     /// <table>
     ///   <thead>
@@ -2009,7 +2015,7 @@ class HtmlTags
     ///   </tbody>
     /// </table>
     /// </example>
-    void Tbody() { }
+    public static void Tbody() { }
 
     /// <h5>A simple HTML table, with two rows and four table cells:</h5>
     /// <table>
@@ -2151,7 +2157,7 @@ class HtmlTags
     ///   </tr>
     /// </table>
     /// </example>
-    void Td() { }
+    public static void Td() { }
 
     /// <h5>Use &lt;template&gt; to hold some content that will be hidden when the page loads. Use JavaScript to display it:</h5>
     /// <button onclick="showContent()">Show hidden content</button>
@@ -2198,7 +2204,7 @@ class HtmlTags
     /// }
     /// </script>
     /// </example>
-    void Template() { }
+    public static void Template() { }
 
     /// <label for="w3review">Review of W3Schools:</label>
     ///
@@ -2226,7 +2232,7 @@ class HtmlTags
     /// </body>
     /// </html>
     /// </example>
-    void Textarea() { }
+    public static void Textarea() { }
 
     /// <h5>An HTML table with a &lt;thead&gt;, &lt;tbody&gt;, and a &lt;tfoot&gt; element:</h5>
     /// <table>
@@ -2342,7 +2348,7 @@ class HtmlTags
     ///   </tfoot>
     /// </table>
     /// </example>
-    void Tfoot() { }
+    public static void Tfoot() { }
 
     /// <table>
     ///   <tr>
@@ -2497,7 +2503,7 @@ class HtmlTags
     ///   </tr>
     /// </table>
     /// </example>
-    void Th() { }
+    public static void Th() { }
 
     /// <h5>An HTML table with a &lt;thead&gt;, &lt;tbody&gt;, and a &lt;tfoot&gt; element:</h5>
     /// <table>
@@ -2611,13 +2617,13 @@ class HtmlTags
     ///   </tbody>
     /// </table>
     /// </example>
-    void Thead() { }
+    public static void Thead() { }
 
     /// <h5>How to define a time and a date:</h5>
     /// <p>Open from <time>10:00</time> to <time>21:00</time> every weekday.</p>
     ///
     /// <p>I have a date on <time datetime="2008-02-14 20:00">Valentines day</time>.</p>
-    void Time() { }
+    public static void Time() { }
 
     /// <!DOCTYPE html>
     /// <html>
@@ -2632,7 +2638,7 @@ class HtmlTags
     ///
     /// </body>
     /// </html>
-    void Title() { }
+    public static void Title() { }
 
     /// <h5>A simple HTML table with three rows; one header row and two data rows:</h5>
     /// <table>
@@ -2724,7 +2730,7 @@ class HtmlTags
     ///   </tr>
     /// </table>
     /// </example>
-    void Tr() { }
+    public static void Tr() { }
 
     /// <h5>A video with subtitle tracks for two languages:</h5>
     /// <video width="320" height="240" controls="">
@@ -2733,7 +2739,7 @@ class HtmlTags
     ///   <track src="fgsubtitles_en.vtt" kind="subtitles" srclang="en" label="English"/>
     ///   <track src="fgsubtitles_no.vtt" kind="subtitles" srclang="no" label="Norwegian"/>
     /// </video>
-    void Track() { }
+    public static void Track() { }
 
     /// <h5>The Teletype Text element</h5>
     /// <p>
@@ -2741,11 +2747,11 @@ class HtmlTags
     ///
     ///   The telnet client should display: <tt>Local Echo is on</tt>
     /// </p>
-    void Tt() { }
+    public static void Tt() { }
 
     /// <h5>Mark up a misspelled word with the &lt;u&gt; tag:</h5>
     /// <p>This is some <u>mispeled</u> text.</p> 
-    void U() { }
+    public static void U() { }
 
     /// <h5>An unordered HTML list:</h5>
     /// <ul>
@@ -2822,19 +2828,19 @@ class HtmlTags
     ///   <li>Milk</li>
     /// </ul>
     /// </example>
-    void Ul() { }
+    public static void Ul() { }
 
     /// <p>The area of a triangle is: 1/2 x <var>b</var> x <var>h</var>, where <var>b</var> is the base, and <var>h</var> is the vertical height.</p>
-    void Var() { }
+    public static void Var() { }
 
     /// <video width="320" height="240" controls="">
     ///   <source src="movie.mp4" type="video/mp4"/>
     ///   <source src="movie.ogg" type="video/ogg"/>
     ///   Your browser does not support the video tag.
     /// </video>
-    void Video() { }
+    public static void Video() { }
 
     /// <p>To learn AJAX, you must be familiar with the XML<wbr/>Http<wbr/>Request Object.</p> 
     ///<p>This is a veryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryvery<wbr/>longwordthatwillbreakatspecific<wbr/>placeswhenthebrowserwindowisresized.</p>
-    void Wbr() { }
+    public static void Wbr() { }
 }

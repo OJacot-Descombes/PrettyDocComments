@@ -23,6 +23,12 @@ internal class GeneralOptions : BaseOptionModel<GeneralOptions>
     [DefaultValue(80)]
     public int CommentWidthInColumns { get; set; } = 80;
 
+    [Category(SizingCategory)]
+    [DisplayName("Collapse Comments to Summary")]
+    [Description("Whether to show only the Summary or the whole comments.\r\nYou can also toggle it from the Edit menu and assign it a key shortcut.")]
+    [DefaultValue(false)]
+    public bool CollapseToSummary { get; set; }
+
     [Category(ShapeColorsCategory)]
     [DisplayName("Comment background color")]
     [Description("Background color of rendred comments (default is LightGoldenrodYellow).")]

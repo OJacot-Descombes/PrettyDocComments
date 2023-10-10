@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
+using PrettyDocComments.CustomOptions;
 using PrettyDocComments.Helpers;
 using PrettyDocComments.Model;
 
@@ -53,6 +54,12 @@ internal sealed class ShapeParser
         int blockNo = 0;
         string previousTagName = null;
         foreach (XElement el in WrapTopLevelText(comment.Data)) {
+            if (previousTagName is "summary" && GeneralOptions.Instance.CollapseToSummary) {
+                if (_shapes.LastOrDefault(s => s is not HorizontalLineShape) is { } lastShape) {
+                    lastShape.HasContinuationSymbol = true;
+                }
+                return comment.ConvertTo(_shapes);
+            }
             blockNo++;
             string tagName = el.Name.LocalName.ToLowerInvariant();
             if (blockNo > 1 && !IsBetweenFriendBlocks(el)) {
@@ -110,13 +117,13 @@ internal sealed class ShapeParser
             }
             previousTagName = el.Name.LocalName;
         }
+        return comment.ConvertTo(_shapes);
+
 
         static bool IsBetweenFriendBlocks(XNode node) =>
             node.PreviousNode is XElement { Name.LocalName: var p } &&
             node is XElement { Name.LocalName: var e } &&
             p == e && p is "param" or "typeparam" or "exception" or "seealso";
-
-        return comment.ConvertTo(_shapes);
     }
 
     private static IEnumerable<XElement> WrapTopLevelText(IEnumerable<XNode> nodes)

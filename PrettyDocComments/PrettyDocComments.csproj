@@ -46,6 +46,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\PrettyDocCommentsPackage.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PrettyDocCommentsPackage.vsct</DependentUpon>
+    </Compile>
+    <Compile Include="Commands\ToggleCollapseComment.cs" />
     <Compile Include="CustomOptions\BaseOptionModel`1.cs" />
     <Compile Include="CustomOptions\BaseOptionPage`1.cs">
       <SubType>Component</SubType>
@@ -107,6 +113,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Drawing.Design" />
     <Reference Include="System.Windows.Forms" />
@@ -116,15 +123,21 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.6.36389" ExcludeAssets="runtime">
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.7.37357" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.6.2164">
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.7.2196">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <VSCTCompile Include="Commands\PrettyDocCommentsPackage.vsct">
+      <Generator>VsctGenerator</Generator>
+      <ResourceName>Menus.ctmenu</ResourceName>
+      <LastGenOutput>PrettyDocCommentsPackage.cs</LastGenOutput>
+    </VSCTCompile>
+    <Content Include="Commands\Resources\ToggleCollapseComment.png" />
     <Content Include="Documentation\Workflow.png" />
     <Content Include="PrettyDocComments.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

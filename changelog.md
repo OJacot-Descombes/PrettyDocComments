@@ -1,4 +1,6 @@
 # Changelog
+- **0.4.0** - 2023-10-10
+    - **Added**: Command to toggle collapsing comment to summary.
 - **0.3.5** - 2023-09-30
     - **Changed**: Now pretty comment is hidden and XML revealed when start or end of text selection is inside comment
       in addition to caret.

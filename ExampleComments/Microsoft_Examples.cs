@@ -1,4 +1,6 @@
-﻿namespace ExampleComments;
+﻿#pragma warning disable IDE0049 // Use framework type
+
+namespace ExampleComments;
 
 // https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/examples
 
@@ -174,7 +176,7 @@ class Test
 /// <include file='xml_include_tag.xml' path='MyDocs/MyMembers[@name="test2"]/*' />
 class Test2
 {
-    public void Test()
+    public static void Test()
     {
     }
 }
@@ -338,6 +340,7 @@ public class ParamsAndParamRefs
 public class Math
 {
     // Adds two integers and returns the result
+
     /// <summary>
     /// Adds two integers <paramref name="a"/> and <paramref name="b"/>
     ///  and returns the result.

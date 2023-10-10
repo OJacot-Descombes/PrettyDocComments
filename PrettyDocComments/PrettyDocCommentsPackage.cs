@@ -27,6 +27,7 @@ namespace PrettyDocComments;
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 [Guid(PrettyDocCommentsPackage.PackageGuidString)]
 [ProvideOptionPage(typeof(DialogPageProvider.General), "Pretty Doc Comments", "General", 0, 0, true)]
+[ProvideMenuResource("Menus.ctmenu", 1)]
 public sealed class PrettyDocCommentsPackage : AsyncPackage
 {
     public static PrettyDocCommentsPackage Instance { get; private set; }
@@ -54,6 +55,8 @@ public sealed class PrettyDocCommentsPackage : AsyncPackage
     /// Do not return null from this method.</returns>
     protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
+        _ = Commands.ToggleCollapseComment.InitializeAsync(this);
+
         // When initialized asynchronously, the current thread may be a background thread at this point.
         // Do any initialization that requires the UI thread after switching to the UI thread.
         return base.InitializeAsync(cancellationToken, progress);

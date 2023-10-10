@@ -16,5 +16,8 @@ internal sealed class TextShape : Shape
     public override void Draw(DrawingContext dc, double commentWidth)
     {
         _text.Draw(dc, _origin);
+        if (HasContinuationSymbol) {
+            DrawContinuationSymbol(dc, commentWidth);
+        }
     }
 }

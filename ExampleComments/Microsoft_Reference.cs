@@ -1,4 +1,7 @@
-﻿namespace ExampleComments;
+﻿#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable IDE0060 // Remove unused parameter
+
+namespace ExampleComments;
 
 // Examples from https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/documentation-comments#d36-include
 
@@ -11,7 +14,7 @@ public class Point
     /// <summary>
     /// Method <c>Draw</c> renders the point.
     /// </summary>
-    void Draw() { }
+    public void Draw() { }
 }
 
 // D.3.2 <c>
@@ -36,7 +39,7 @@ public class Point_code
     /// results in <c>p</c>'s having the value (2,8).
     /// </example>
     /// </summary>
-    public void Translate(int dx, int dy)
+    public static void Translate(int dx, int dy)
     {
     }
 }
@@ -109,7 +112,7 @@ public class Point_param
     /// </summary>
     /// <param name="xPosition">the new x-coordinate.</param>
     /// <param name="yPosition">the new y-coordinate.</param>
-    public void Move(int xPosition, int yPosition)
+    public static void Move(int xPosition, int yPosition)
     {
     }
 }
@@ -171,13 +174,13 @@ public class Point_see
     /// This method changes the point's location to
     /// the given coordinates. <see cref="Translate"/>
     /// </summary>
-    public void Move(int xPosition, int yPosition)
+    public static void Move(int xPosition, int yPosition)
     {
     }
     /// <summary>This method changes the point's location by
     /// the given x- and y-offsets. <see cref="Move"/>
     /// </summary>
-    public void Translate(int dx, int dy)
+    public static void Translate(int dx, int dy)
     {
     }
 }
@@ -231,7 +234,7 @@ public class MyClass_typeparamref
     /// <typeparamref name="T"/>.
     /// </summary>
     /// <param name="string">query to execute</param>
-    public List<T> FetchData<T>(string query)
+    public static List<T> FetchData<T>(string query)
     {
         return new List<T>();
     }
@@ -333,7 +336,7 @@ public class Graphics_Point
             return true;
         }
         if (GetType() == o.GetType()) {
-            Graphics_Point p = (Graphics_Point)o;
+            var p = (Graphics_Point)o;
             return (X == p.X) && (Y == p.Y);
         }
         return false;
@@ -370,7 +373,7 @@ public class Graphics_Point
     /// <seealso cref="operator!="/>
     public static bool operator ==(Graphics_Point p1, Graphics_Point p2)
     {
-        if ((object)p1 == null || (object)p2 == null) {
+        if (p1 is null || p2 is null) {
             return false;
         }
         if (p1.GetType() == p2.GetType()) {

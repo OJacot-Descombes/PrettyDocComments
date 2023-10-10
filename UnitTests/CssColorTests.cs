@@ -38,7 +38,7 @@ public class CssColorTests
     public void TestRgbFail1()
     {
         // Arrange, Act
-        bool result = CssColor.TryFromRgb("rgb(100, 50, 2, 3)", out CssColor color);
+        bool result = CssColor.TryFromRgb("rgb(100, 50, 2, 3)", out _);
 
         // Assert
         Assert.IsFalse(result);
@@ -48,7 +48,7 @@ public class CssColorTests
     public void TestRgbFail2()
     {
         // Arrange, Act
-        bool result = CssColor.TryFromRgb("rgb(100, 50, five)", out CssColor color);
+        bool result = CssColor.TryFromRgb("rgb(100, 50, five)", out _);
 
         // Assert
         Assert.IsFalse(result);
@@ -86,7 +86,7 @@ public class CssColorTests
     public void TestRgbaFail1()
     {
         // Arrange, Act
-        bool result = CssColor.TryFromRgba("rgba(100, 50, 25)", out CssColor color);
+        bool result = CssColor.TryFromRgba("rgba(100, 50, 25)", out _);
 
         // Assert
         Assert.IsFalse(result);
@@ -96,7 +96,7 @@ public class CssColorTests
     public void TestRgbaFail2()
     {
         // Arrange, Act
-        bool result = CssColor.TryFromRgba("rgb(100, 50, 25)", out CssColor color);
+        bool result = CssColor.TryFromRgba("rgb(100, 50, 25)", out _);
 
         // Assert
         Assert.IsFalse(result);

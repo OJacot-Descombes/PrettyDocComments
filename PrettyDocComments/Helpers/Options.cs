@@ -121,6 +121,11 @@ internal static class Options
         OptionsChanged?.Invoke();
     }
 
+    public static void RefreshViews()
+    {
+        OptionsChanged?.Invoke();
+    }
+
     private static Brush CreateBrush(ref Brush backingField, DrawingColor? brushColor)
     {
         if (backingField is null && brushColor is { } color) {

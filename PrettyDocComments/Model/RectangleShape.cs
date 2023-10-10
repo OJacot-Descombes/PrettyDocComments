@@ -21,5 +21,8 @@ internal sealed class RectangleShape : Shape
     public override void Draw(DrawingContext dc, double commentWidth)
     {
         dc.DrawRectangle(_brush, _pen, new Rect(_origin.X, _origin.Y, _width, _height));
+        if (HasContinuationSymbol) {
+            DrawContinuationSymbol(dc, commentWidth);
+        }
     }
 }
