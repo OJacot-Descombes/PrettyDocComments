@@ -83,7 +83,7 @@ public class MyClass
     /// </item>
     /// </list>
     /// </summary>
-    public static void Main()
+    public static void Test()
     {
     }
 }

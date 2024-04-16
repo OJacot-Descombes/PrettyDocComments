@@ -18,7 +18,7 @@ internal sealed class Adornment
     private readonly IAdornmentLayer _layer;
     private readonly IWpfTextView _view;
     private readonly Renderer _renderer;
-    private readonly List<Comment<Image>> _renderedComments = new();
+    private readonly List<Comment<Image>> _renderedComments = [];
 
     private bool _delayVisibilityChange;
 
@@ -41,7 +41,7 @@ internal sealed class Adornment
         _view.VisualElement.MouseLeave += VisualElement_DelayedRefresh;
     }
 
-    public List<Comment<RenderInfo>> RenderingInformation { get; } = new();
+    public List<Comment<RenderInfo>> RenderingInformation { get; } = [];
     public bool WasLayouted { get; set; }
 
     private void VisualElement_DelayedRefresh(object sender, MouseEventArgs e)

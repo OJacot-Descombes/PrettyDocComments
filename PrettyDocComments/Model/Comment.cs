@@ -5,31 +5,22 @@ using Microsoft.VisualStudio.Text.Editor;
 
 namespace PrettyDocComments.Model;
 
-internal readonly struct Comment<TData>
+internal readonly struct Comment<TData>(SnapshotSpan span, int commentLeftCharIndex, int firstLineNumber,
+    int lastLineNumber, double width, TData data)
 {
-    public Comment(SnapshotSpan span, int commentLeftCharIndex, int firstLineNumber, int lastLineNumber, double width, TData data)
-    {
-        Span = span;
-        CommentLeftCharIndex = commentLeftCharIndex;
-        FirstLineNumber = firstLineNumber;
-        LastLineNumber = lastLineNumber;
-        Width = width;
-        Data = data;
-    }
+    public readonly SnapshotSpan Span = span;
 
-    public readonly SnapshotSpan Span;
+    public readonly int CommentLeftCharIndex = commentLeftCharIndex;
 
-    public readonly int CommentLeftCharIndex;
+    public readonly int FirstLineNumber = firstLineNumber;
 
-    public readonly int FirstLineNumber;
-
-    public readonly int LastLineNumber;
+    public readonly int LastLineNumber = lastLineNumber;
 
     public int NumberOfLines => LastLineNumber - FirstLineNumber + 1;
 
-    public readonly double Width;
+    public readonly double Width = width;
 
-    public readonly TData Data;
+    public readonly TData Data = data;
 
     public bool ContainsLine(int lineNumber) => FirstLineNumber <= lineNumber && lineNumber <= LastLineNumber;
 

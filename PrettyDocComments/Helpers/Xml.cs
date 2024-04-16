@@ -20,7 +20,7 @@ internal static class Xml
             } catch {
             }
             LastXmlException = ex;
-            nodes = Enumerable.Empty<XNode>();
+            nodes = [];
             return true; // Return true to have error rendered.
         } catch {
             nodes = null;

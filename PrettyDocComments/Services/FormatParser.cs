@@ -9,30 +9,19 @@ using PrettyDocComments.Model;
 
 namespace PrettyDocComments.Services;
 
-internal sealed partial class FormatParser
+internal sealed partial class FormatParser(double indent, double emSize, double width, double fontAspect, 
+    IWpfTextView view)
 {
-    private static readonly string[] _levelBullets = { "●", "■", "○" };
+    private static readonly string[] _levelBullets = ["●", "■", "○"];
     private static readonly WidthEstimator _estimator = new();
-
-    private readonly double _emSize;
-    private readonly IWpfTextView _view; // TODO: remove when ParseTable is done.
-
     private List<TextBlock> _textBlocks;
     private int _listLevel = -1;
 
-    private readonly FormatAccumulator _accumulator;
-    public FormatAccumulator Accumulator => _accumulator;
-
-    public FormatParser(double indent, double emSize, double width, double fontAspect, IWpfTextView view)
-    {
-        _accumulator = new FormatAccumulator(view, indent, width, fontAspect);
-        _emSize = emSize;
-        _view = view;
-    }
+    public FormatAccumulator Accumulator { get; } = new(view, indent, width, fontAspect);
 
     public List<TextBlock> Parse(XElement node)
     {
-        _textBlocks = new List<TextBlock>();
+        _textBlocks = [];
         ParseElement(node);
         CloseBlock();
         var temp = _textBlocks;
@@ -46,18 +35,18 @@ internal sealed partial class FormatParser
         foreach (XNode child in node.Nodes()) {
             switch (child) {
                 case XText xText:
-                    _accumulator.Add(xText.Value.NormalizeSpace(normalizeWS));
+                    Accumulator.Add(xText.Value.NormalizeSpace(normalizeWS));
                     previousTag = null;
                     break;
                 case XBrush xBrush:
                     switch (xBrush.Name.LocalName) {
                         case "color":
-                            using (_accumulator.CreateTextColorScope(xBrush.Brush)) {
+                            using (Accumulator.CreateTextColorScope(xBrush.Brush)) {
                                 ParseElement(xBrush);
                             }
                             break;
                         case "background-color":
-                            using (_accumulator.CreateHighlightScope(xBrush.Brush)) {
+                            using (Accumulator.CreateHighlightScope(xBrush.Brush)) {
                                 ParseElement(xBrush);
                             }
                             break;
@@ -87,19 +76,19 @@ internal sealed partial class FormatParser
                             Reference(el); // "name"
                             break;
                         case "b" or "strong":
-                            using (_accumulator.CreateBoldScope()) {
+                            using (Accumulator.CreateBoldScope()) {
                                 ParseElement(el);
                             }
                             break;
                         case "big":
-                            using (_accumulator.CreateFontAspect(_accumulator.FontAspect * 1.2)) {
+                            using (Accumulator.CreateFontAspect(Accumulator.FontAspect * 1.2)) {
                                 ParseElement(el);
                             }
                             break;
                         case "blockquote":
                             CloseBlock();
-                            using (_accumulator.CreateItalicScope())
-                            using (_accumulator.CreateIndentScope(_emSize)) {
+                            using (Accumulator.CreateItalicScope())
+                            using (Accumulator.CreateIndentScope(emSize)) {
                                 ParseElement(el);
                                 CloseBlock();
                             }
@@ -110,39 +99,39 @@ internal sealed partial class FormatParser
                             ParseElement(el);
                             break;
                         case "br":
-                            _accumulator.AddLineBreak();
+                            Accumulator.AddLineBreak();
                             break;
                         case "button":
-                            _accumulator.Add(" [ "); ParseElement(el); _accumulator.Add(" ] ");
+                            Accumulator.Add(" [ "); ParseElement(el); Accumulator.Add(" ] ");
                             break;
                         case "c" or "kbd" or "samp" or "tt":
-                            using (_accumulator.CreateCodeScope(null)) {
+                            using (Accumulator.CreateCodeScope(null)) {
                                 ParseElement(el, normalizeWS: false);
                             }
                             break;
                         case "center":
                             CloseBlock();
-                            using (_accumulator.CreateAlignmentScope(TextAlignment.Center)) {
+                            using (Accumulator.CreateAlignmentScope(TextAlignment.Center)) {
                                 ParseElement(el);
                                 CloseBlock();
                             }
                             break;
                         case "cite" or "dfn" or "em" or "i" or "var":
-                            using (_accumulator.CreateItalicScope()) {
+                            using (Accumulator.CreateItalicScope()) {
                                 ParseElement(el);
                             }
                             break;
                         case "code":
                             CloseBlock();
-                            using (_accumulator.CreateCodeScope(style?.Color))
-                            using (_accumulator.CreateWidthScope(_accumulator.Width - Options.Padding.Right)) {
+                            using (Accumulator.CreateCodeScope(style?.Color))
+                            using (Accumulator.CreateWidthScope(Accumulator.Width - Options.Padding.Right)) {
                                 RemoveTagIndent(el);
                                 ParseElement(el, normalizeWS: false);
                                 CloseBlock(BackgroundType.CodeBlock, style?.BackgroundColor ?? Options.CodeBackground);
                             }
                             break;
                         case "del" or "s" or "strike":
-                            using (_accumulator.CreateStrikethroughScope()) {
+                            using (Accumulator.CreateStrikethroughScope()) {
                                 ParseElement(el);
                             }
                             break;
@@ -157,7 +146,7 @@ internal sealed partial class FormatParser
                             break;
                         case "dialog" or "fieldset":
                             CloseBlock();
-                            using (_accumulator.CreateWidthScope(_accumulator.Width - Options.Padding.Right)) {
+                            using (Accumulator.CreateWidthScope(Accumulator.Width - Options.Padding.Right)) {
                                 ParseElement(el);
                                 CloseBlock(BackgroundType.Framed);
                             }
@@ -169,7 +158,7 @@ internal sealed partial class FormatParser
                             CloseBlock();
                             break;
                         case "example":
-                            ParseWithTitle(el, "Example: ", 1.7 * _emSize);
+                            ParseWithTitle(el, "Example: ", 1.7 * emSize);
                             break;
                         case "h1":
                             HtmlHeading(el, 1.8);
@@ -196,23 +185,23 @@ internal sealed partial class FormatParser
                             break;
                         case "hr":
                             CloseBlock();
-                            int count = (int)(0.9 * _accumulator.RemainingWidth / _view.FormattedLineSource.ColumnWidth);
-                            _accumulator.Add(new string('─', count));
+                            int count = (int)(0.9 * Accumulator.RemainingWidth / view.FormattedLineSource.ColumnWidth);
+                            Accumulator.Add(new string('─', count));
                             CloseBlock();
                             break;
                         case "include" or "inheritdoc":
-                            using (_accumulator.CreateTextColorScope(Options.SpecialTextBrush)) {
-                                _accumulator.Add(normalizedTag);
-                                _accumulator.Add("(");
-                                _accumulator.Add(String.Join(" ", el.Attributes().Select(a => $"{a.Name}='{a.Value}'")));
-                                _accumulator.Add(")");
+                            using (Accumulator.CreateTextColorScope(Options.SpecialTextBrush)) {
+                                Accumulator.Add(normalizedTag);
+                                Accumulator.Add("(");
+                                Accumulator.Add(String.Join(" ", el.Attributes().Select(a => $"{a.Name}='{a.Value}'")));
+                                Accumulator.Add(")");
                             }
                             break;
                         case "input":
                             HtmlInputField(el);
                             break;
                         case "ins" or "u":
-                            using (_accumulator.CreateUnderlineScope()) {
+                            using (Accumulator.CreateUnderlineScope()) {
                                 ParseElement(el);
                             }
                             break;
@@ -225,26 +214,26 @@ internal sealed partial class FormatParser
                             ParseList(el, normalizedTag);
                             break;
                         case "mark":
-                            using (_accumulator.CreateHighlightScope(Options.HighlightBrush)) {
+                            using (Accumulator.CreateHighlightScope(Options.HighlightBrush)) {
                                 ParseElement(el);
                             }
                             break;
                         case "output":
-                            _accumulator.Add("_______");
+                            Accumulator.Add("_______");
                             break;
                         case "p" or "para":
                             CloseBlock();
 
                             // Don't add space twice between two param tags. Don't add space before first element.
                             if (previousTag is not ("para" or "p") && el.PreviousNode is not null) {
-                                _accumulator.Add(" ");
-                                CloseBlock(height: _emSize / 2.5);
+                                Accumulator.Add(" ");
+                                CloseBlock(height: emSize / 2.5);
                             }
                             ParseElement(el);
                             CloseBlock();
                             if (el.NextNode is not null) { // Don't add space after last element.
-                                _accumulator.Add(" ");
-                                CloseBlock(height: _emSize / 2.5);
+                                Accumulator.Add(" ");
+                                CloseBlock(height: emSize / 2.5);
                             }
                             break;
                         case "param":
@@ -254,30 +243,30 @@ internal sealed partial class FormatParser
                             string title = (name is { Length: > 0 } ? name : normalizedTag);
                             if (el.Value is { Length: > 0 }) { // XML-doc-comment version
                                 CloseBlock();
-                                using (_accumulator.CreateBoldScope()) {
-                                    _accumulator.Add(title + ":  ");
+                                using (Accumulator.CreateBoldScope()) {
+                                    Accumulator.Add(title + ":  ");
                                 }
                                 ParseElement(el);
                                 CloseBlock();
                             } else { // HTML version
-                                _accumulator.Add(title);
+                                Accumulator.Add(title);
                                 if (el.Attribute("value")?.Value is { Length: > 0 } v) {
-                                    _accumulator.Add(" = " + v);
+                                    Accumulator.Add(" = " + v);
                                 }
                             }
                             break;
                         case "pre": // We display it like <code> but without a special background color.
                             CloseBlock();
-                            using (_accumulator.CreateCodeScope(null)) {
+                            using (Accumulator.CreateCodeScope(null)) {
                                 RemoveTagIndent(el);
                                 ParseElement(el, normalizeWS: false);
                                 CloseBlock();
                             }
                             break;
                         case "q":
-                            _accumulator.Add("“");
+                            Accumulator.Add("“");
                             ParseElement(el);
-                            _accumulator.Add("”");
+                            Accumulator.Add("”");
                             break;
                         case "remarks":
                             ParseWithTitle(el, "Remarks");
@@ -288,12 +277,12 @@ internal sealed partial class FormatParser
                             Reference(el); // "cref", "langword", "href"
                             break;
                         case "select":
-                            using (_accumulator.CreateHighlightScope(Brushes.White)) {
-                                _accumulator.Add("[_____|v]");
+                            using (Accumulator.CreateHighlightScope(Brushes.White)) {
+                                Accumulator.Add("[_____|v]");
                             }
                             break;
                         case "small":
-                            using (_accumulator.CreateFontAspect(_accumulator.FontAspect / 1.2)) {
+                            using (Accumulator.CreateFontAspect(Accumulator.FontAspect / 1.2)) {
                                 ParseElement(el);
                             }
                             break;
@@ -304,40 +293,40 @@ internal sealed partial class FormatParser
                             Superscript(el);
                             break;
                         case "term" when _listLevel >= 0:
-                            using (_accumulator.CreateBoldScope()) {
+                            using (Accumulator.CreateBoldScope()) {
                                 ParseElement(el);
-                                _accumulator.Add(" – ");
+                                Accumulator.Add(" – ");
                             }
                             break;
                         case "textarea":
                             CloseBlock();
-                            using (_accumulator.CreateWidthScope(_accumulator.Width - Options.Padding.Right)) {
+                            using (Accumulator.CreateWidthScope(Accumulator.Width - Options.Padding.Right)) {
                                 //RemoveTagIndent(el);
                                 //ParseElement(el);
-                                _accumulator.Add(String.Concat(el.Nodes()));
+                                Accumulator.Add(String.Concat(el.Nodes()));
                                 CloseBlock(BackgroundType.Framed);
                             }
                             break;
                         case "wbr":
-                            _accumulator.Add("\u200B"); // Zero-length space.
+                            Accumulator.Add("\u200B"); // Zero-length space.
                             break;
                         default: // UNSUPPORTED including some HTML tags as well as custom tags.
                             string formattedTag = el.Name.LocalName.SplitCamelCase().FirstCap();
                             if (el.Attributes().Any()) {
-                                using (_accumulator.CreateBoldScope()) {
-                                    _accumulator.Add(formattedTag);
+                                using (Accumulator.CreateBoldScope()) {
+                                    Accumulator.Add(formattedTag);
                                 }
-                                using (_accumulator.CreateItalicScope()) {
+                                using (Accumulator.CreateItalicScope()) {
                                     foreach (var attribute in el.Attributes()) {
-                                        _accumulator.Add($" \"{attribute.Value}\"");
+                                        Accumulator.Add($" \"{attribute.Value}\"");
                                     }
                                 }
-                                using (_accumulator.CreateBoldScope()) {
-                                    _accumulator.Add(": ");
+                                using (Accumulator.CreateBoldScope()) {
+                                    Accumulator.Add(": ");
                                 }
                             } else {
-                                using (_accumulator.CreateBoldScope()) {
-                                    _accumulator.Add(formattedTag + ": ");
+                                using (Accumulator.CreateBoldScope()) {
+                                    Accumulator.Add(formattedTag + ": ");
                                 }
                             }
                             ParseElement(el);
@@ -347,13 +336,13 @@ internal sealed partial class FormatParser
                     break;
                 case XComment comment:
                     CloseBlock();
-                    using (_accumulator.CreateTextColorScope(Options.CommentTextBrush)) {
-                        _accumulator.Add(comment.Value);
+                    using (Accumulator.CreateTextColorScope(Options.CommentTextBrush)) {
+                        Accumulator.Add(comment.Value);
                     }
                     CloseBlock();
                     break;
                 default:
-                    _accumulator.Add(child.ToString().NormalizeSpace(normalizeWS));
+                    Accumulator.Add(child.ToString().NormalizeSpace(normalizeWS));
                     break;
             }
         }
@@ -368,10 +357,10 @@ internal sealed partial class FormatParser
 
     private TextBlock? CloseBlock(double height, BackgroundType backgroundType = BackgroundType.Default)
     {
-        if (_accumulator.HasText) {
+        if (Accumulator.HasText) {
             double padding = backgroundType is BackgroundType.Default ? 0.0 : Options.Padding.GetWidth();
-            FormattedTextEx text = _accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
-            var textBlock = new TextBlock(text, _accumulator.Indent, height, height, backgroundType);
+            FormattedTextEx text = Accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
+            var textBlock = new TextBlock(text, Accumulator.Indent, height, height, backgroundType);
             _textBlocks.Add(textBlock);
             return textBlock;
         }
@@ -380,16 +369,16 @@ internal sealed partial class FormatParser
 
     private void CloseBlock(BackgroundType backgroundType = BackgroundType.Default, Brush backgroundBrush = null)
     {
-        if (_accumulator.HasText) {
+        if (Accumulator.HasText) {
             double padding = backgroundType is BackgroundType.Default ? 0.0 : Options.Padding.GetWidth();
-            FormattedTextEx text = _accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
-            _textBlocks.Add(new TextBlock(text, _accumulator.Indent, backgroundType, backgroundBrush));
+            FormattedTextEx text = Accumulator.GetFormattedText(backgroundType != BackgroundType.CodeBlock, padding);
+            _textBlocks.Add(new TextBlock(text, Accumulator.Indent, backgroundType, backgroundBrush));
         }
     }
 
     private void Reference(XElement el)
     {
-        using (_accumulator.CreateTextColorScope(Options.SpecialTextBrush)) {
+        using (Accumulator.CreateTextColorScope(Options.SpecialTextBrush)) {
             if (el.Value is { Length: > 0 }) {
                 ParseElement(el);
             } else {
@@ -397,7 +386,7 @@ internal sealed partial class FormatParser
                      (el.Attribute("src") ?? el.Attributes().FirstOrDefault())?.Value is { Length: > 0 } attributeValue
                           ? attributeValue
                           : el.Name.LocalName;
-                _accumulator.Add(text);
+                Accumulator.Add(text);
             }
         }
     }
@@ -405,11 +394,11 @@ internal sealed partial class FormatParser
     private void ParseWithTitle(XElement el, string title, double indent = 0.0)
     {
         CloseBlock();
-        using (_accumulator.CreateBoldScope()) {
-            _accumulator.Add(title);
+        using (Accumulator.CreateBoldScope()) {
+            Accumulator.Add(title);
         }
         CloseBlock();
-        using (_accumulator.CreateIndentScope(indent)) {
+        using (Accumulator.CreateIndentScope(indent)) {
             ParseElement(el);
             CloseBlock();
         }
@@ -485,9 +474,9 @@ internal sealed partial class FormatParser
             foreach (char ch in el.Value) {
                 sb.Append(_subScripts[ch]);
             }
-            _accumulator.Add(sb.ToString());
+            Accumulator.Add(sb.ToString());
         } else {
-            using (_accumulator.CreateFontAspect(0.7 * _accumulator.FontAspect)) {
+            using (Accumulator.CreateFontAspect(0.7 * Accumulator.FontAspect)) {
                 ParseElement(el);
             }
         }
@@ -519,11 +508,11 @@ internal sealed partial class FormatParser
             foreach (char ch in el.Value) {
                 sb.Append(_superScripts[ch]);
             }
-            _accumulator.Add(sb.ToString());
+            Accumulator.Add(sb.ToString());
         } else {
-            _accumulator.Add("^(");
+            Accumulator.Add("^(");
             ParseElement(el);
-            _accumulator.Add(")");
+            Accumulator.Add(")");
         }
     }
 
@@ -546,19 +535,19 @@ internal sealed partial class FormatParser
             _ => ("[_______]", true)
         };
         if (whiteBox) {
-            using (_accumulator.CreateHighlightScope(Brushes.White)) {
-                _accumulator.Add(text);
+            using (Accumulator.CreateHighlightScope(Brushes.White)) {
+                Accumulator.Add(text);
             }
         } else {
-            _accumulator.Add(text);
+            Accumulator.Add(text);
         }
     }
 
     private void HtmlHeading(XElement el, double aspectFactor)
     {
         CloseBlock();
-        using (_accumulator.CreateBoldScope())
-        using (_accumulator.CreateFontAspect(aspectFactor)) {
+        using (Accumulator.CreateBoldScope())
+        using (Accumulator.CreateFontAspect(aspectFactor)) {
             ParseElement(el);
             CloseBlock();
         }

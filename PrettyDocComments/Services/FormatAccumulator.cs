@@ -6,19 +6,9 @@ using PrettyDocComments.Model;
 
 namespace PrettyDocComments.Services;
 
-internal class FormatAccumulator
+internal class FormatAccumulator(IWpfTextView view, double indent, double width, double fontAspect)
 {
-    public FormatAccumulator(IWpfTextView view, double indent, double width, double fontAspect)
-    {
-        _view = view;
-        _indent = indent;
-        _width = width;
-        _fontAspect = fontAspect;
-    }
-
-    private readonly IWpfTextView _view;
-
-    private readonly List<FormatRun> _runs = new();
+    private readonly List<FormatRun> _runs = [];
 
     public readonly struct FontAspectMemento : IDisposable
     {
@@ -29,11 +19,11 @@ internal class FormatAccumulator
         internal FontAspectMemento(FormatAccumulator originator, double fontAspect)
         {
             _originator = originator;
-            _fontAspect = originator._fontAspect;
-            originator._fontAspect = fontAspect;
+            _fontAspect = originator.FontAspect;
+            originator.FontAspect = fontAspect;
         }
 
-        void IDisposable.Dispose() => _originator._fontAspect = _fontAspect;
+        void IDisposable.Dispose() => _originator.FontAspect = _fontAspect;
     }
 
     public readonly struct IndentMemento : IDisposable
@@ -45,11 +35,11 @@ internal class FormatAccumulator
         internal IndentMemento(FormatAccumulator originator, double deltaIndent)
         {
             _originator = originator;
-            _indent = originator._indent;
-            originator._indent += deltaIndent;
+            _indent = originator.Indent;
+            originator.Indent += deltaIndent;
         }
 
-        void IDisposable.Dispose() => _originator._indent = _indent;
+        void IDisposable.Dispose() => _originator.Indent = _indent;
     }
 
     public readonly struct WidthMemento : IDisposable
@@ -61,11 +51,11 @@ internal class FormatAccumulator
         internal WidthMemento(FormatAccumulator originator, double width)
         {
             _originator = originator;
-            _width = originator._width;
-            originator._width = width;
+            _width = originator.Width;
+            originator.Width = width;
         }
 
-        void IDisposable.Dispose() => _originator._width = _width;
+        void IDisposable.Dispose() => _originator.Width = _width;
     }
 
     public readonly struct BoldMemento : IDisposable
@@ -208,9 +198,6 @@ internal class FormatAccumulator
         }
     }
 
-    private double _indent;
-    private double _width;
-    private double _fontAspect;
     private bool _bold;
     private bool _italic;
     private bool _strikethrough;
@@ -222,12 +209,12 @@ internal class FormatAccumulator
 
     private bool _trimNextStart;
 
-    public double Indent { get => _indent; }
-    public double Width { get => _width; }
-    public double FontAspect { get => _fontAspect; }
+    public double Indent { get; private set; } = indent;
+    public double Width { get; private set; } = width;
+    public double FontAspect { get; private set; } = fontAspect;
 
     public bool HasText => _runs.Count > 0;
-    public double RemainingWidth => _width - _indent;
+    public double RemainingWidth => Width - Indent;
 
     public FontAspectMemento CreateFontAspect(double aspect) => new(this, aspect);
     public IndentMemento CreateIndentScope(double deltaIndent) => new(this, deltaIndent);
@@ -247,12 +234,12 @@ internal class FormatAccumulator
             _trimNextStart = false;
             text = text.TrimStart();
         }
-        _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textBrush, _highlight, _fontAspect));
+        _runs.Add(new FormatRun(text, _bold, _italic, _strikethrough, _underline, _code, _textBrush, _highlight, FontAspect));
     }
 
     public void AddLineBreak()
     {
-        _runs.Add(new FormatRun("\r\n", _bold, _italic, _strikethrough, _underline, _code, _textBrush, _highlight, _fontAspect));
+        _runs.Add(new FormatRun("\r\n", _bold, _italic, _strikethrough, _underline, _code, _textBrush, _highlight, FontAspect));
         _trimNextStart = true;
     }
 
@@ -263,7 +250,7 @@ internal class FormatAccumulator
             _runs[_runs.Count - 1].TrimEnd();
         }
         string text = String.Concat(_runs.Select(r => r.Text));
-        FormattedTextEx formattedText = text.AsFormatted(Options.NormalTypeFace, _width - _indent - horizontalPadding, _view);
+        FormattedTextEx formattedText = text.AsFormatted(Options.NormalTypeFace, Width - Indent - horizontalPadding, view);
         formattedText.TextAlignment = _alignment;
         int startIndex = 0;
         foreach (FormatRun run in _runs) {
@@ -274,7 +261,7 @@ internal class FormatAccumulator
             formattedText.SetForegroundBrush(run.TextBrush, startIndex, length);
             formattedText.SetHighlightBrush(run.HighlightBrush, startIndex, length);
             if (run.FontAspect != 1.0) {
-                formattedText.SetFontSize(Options.GetNormalEmSize(_view) * run.FontAspect, startIndex, length);
+                formattedText.SetFontSize(Options.GetNormalEmSize(view) * run.FontAspect, startIndex, length);
             }
             var textDecorations = new TextDecorationCollection(2);
             if (run.Underline) {

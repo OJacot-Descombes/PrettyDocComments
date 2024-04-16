@@ -10,22 +10,22 @@ internal sealed partial class FormatParser
 {
     private void ParseTable(XElement el)
     {
-        double MinRowHeight = _view.FormattedLineSource.LineHeight / 2;
+        double MinRowHeight = view.FormattedLineSource.LineHeight / 2;
 
         List<Row> rows = GatherTableElements(el);
         double[] columnWidths = _estimator.EstimateColumnWidths(rows);
         if (columnWidths is null) {
             return;
         }
-        ScaleColumnWidths(columnWidths, _accumulator.RemainingWidth);
+        ScaleColumnWidths(columnWidths, Accumulator.RemainingWidth);
 
-        var parser = new FormatParser(_accumulator.Indent + Options.Padding.Left, _emSize, 0, _accumulator.FontAspect, _view);
+        var parser = new FormatParser(Accumulator.Indent + Options.Padding.Left, emSize, 0, Accumulator.FontAspect, view);
 
         CloseBlock();
         foreach (Row row in rows) {
             if (row.IsCaption) {
-                using (_accumulator.CreateWidthScope(_accumulator.Indent + columnWidths.Sum()))
-                using (_accumulator.CreateAlignmentScope(TextAlignment.Center)) {
+                using (Accumulator.CreateWidthScope(Accumulator.Indent + columnWidths.Sum()))
+                using (Accumulator.CreateAlignmentScope(TextAlignment.Center)) {
                     ParseElement(row.Cells[0].Element);
                     CloseBlock();
                 }
@@ -37,13 +37,13 @@ internal sealed partial class FormatParser
                 .DefaultIfEmpty(0)
                 .Max());
             BackgroundType backgroundType = row.IsHeader ? BackgroundType.FramedShaded : BackgroundType.Framed;
-            double left = _accumulator.Indent;
+            double left = Accumulator.Indent;
             for (int i = 0; i < columnWidths.Length; i++) {
                 double columnWidth = columnWidths[i];
 
                 // Add single TextBlock as Frame.
                 _textBlocks.Add(new TextBlock(
-                    "".AsFormatted(Options.NormalTypeFace, columnWidth - Options.Padding.GetWidth(), _view),
+                    "".AsFormatted(Options.NormalTypeFace, columnWidth - Options.Padding.GetWidth(), view),
                     left, +Options.Padding.Top, height: rowHeight, backgroundType));
                 double deltaY;
                 if (row.Cells.Count > i) {
@@ -118,8 +118,8 @@ internal sealed partial class FormatParser
         double deltaIndent = 0;
         for (int i = 0; i < columnWidths.Length; i++) {
             double columnWidth = columnWidths[i];
-            using (_accumulator.CreateIndentScope(deltaIndent))
-            using (_accumulator.CreateWidthScope(_accumulator.Indent + columnWidth - Options.Padding.GetWidth())) {
+            using (Accumulator.CreateIndentScope(deltaIndent))
+            using (Accumulator.CreateWidthScope(Accumulator.Indent + columnWidth - Options.Padding.GetWidth())) {
                 if (row.Cells.Count > i) {
                     Cell cell = row.Cells[i];
                     cell.TextBlocks = Parse(cell.Element);

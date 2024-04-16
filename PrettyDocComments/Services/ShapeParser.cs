@@ -10,7 +10,7 @@ using PrettyDocComments.Model;
 
 namespace PrettyDocComments.Services;
 
-internal sealed class ShapeParser
+internal sealed class ShapeParser(IWpfTextView view)
 {
     private const char NonBreakingSpace = '\u00A0';
     private const string SubtitleIdentSpaces = "      ";
@@ -19,8 +19,6 @@ internal sealed class ShapeParser
         "example", "exception", "param", "permission", "remarks", "returns",
         "seealso", "summary", "typeparam", "value"
     }.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
-
-    private readonly IWpfTextView _view;
     private double _emSize;
     private double _initialY;
     private double _width;
@@ -28,16 +26,11 @@ internal sealed class ShapeParser
     private double _y;
     private List<Shape> _shapes;
 
-    public ShapeParser(IWpfTextView view)
-    {
-        _view = view;
-    }
-
     private void Initialize()
     {
         _initialY = Options.Padding.Top;
-        _emSize = Options.GetNormalEmSize(_view);
-        _width = Options.CommentWidthInColumns * _view.FormattedLineSource.ColumnWidth;
+        _emSize = Options.GetNormalEmSize(view);
+        _width = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
     }
 
     /// <summary>
@@ -49,7 +42,7 @@ internal sealed class ShapeParser
     public Comment<List<Shape>> Parse(Comment<IEnumerable<XNode>> comment)
     {
         Initialize();
-        _shapes = new List<Shape>();
+        _shapes = [];
         _y = _initialY;
         int blockNo = 0;
         string previousTagName = null;
@@ -186,7 +179,7 @@ internal sealed class ShapeParser
 
     private void ParseBlock(XElement element, double indent, double fontAspect = 1.0)
     {
-        var parser = new FormatParser(indent, _emSize, _width, fontAspect, _view);
+        var parser = new FormatParser(indent, _emSize, _width, fontAspect, view);
         foreach (TextBlock textBlock in parser.Parse(element)) {
             if (textBlock.BackgroundType is BackgroundType.Default) {
                 _shapes.Add(new TextShape(textBlock.Text, new Point(textBlock.Left, _y)));
@@ -215,15 +208,15 @@ internal sealed class ShapeParser
         double width = _width - indent - Options.Padding.Right;
         if (String.IsNullOrWhiteSpace(el.Value)) { // There is no text, just add the attribute values(s).
             string text = "● " + String.Join(" ", el.Attributes().Select(a => a.Value));
-            FormattedTextEx formattedText = text.AsFormatted(Options.NormalTypeFace, width, _view);
+            FormattedTextEx formattedText = text.AsFormatted(Options.NormalTypeFace, width, view);
             _shapes.Add(new TextShape(formattedText, new Point(indent, _y)));
             _y += formattedText.Height;
         } else {
-            FormattedTextEx formattedText = "●".AsFormatted(Options.NormalTypeFace, width, _view);
+            FormattedTextEx formattedText = "●".AsFormatted(Options.NormalTypeFace, width, view);
             _shapes.Add(new TextShape(formattedText, new Point(indent, _y)));
             ParseBlock(el, 3.0 * _emSize);
         }
     }
 
-    private FormattedTextEx CaptionText(string text) => text.AsFormatted(Options.CaptionsTypeFace, _width, _view);
+    private FormattedTextEx CaptionText(string text) => text.AsFormatted(Options.CaptionsTypeFace, _width, view);
 }

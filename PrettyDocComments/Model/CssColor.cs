@@ -2,20 +2,12 @@
 
 // Adapted from: https://github.com/TylerBrinks/ExCSS/blob/master/src/ExCSS
 
-public readonly struct CssColor
+public readonly struct CssColor(int red, int green, int blue, int alpha = 255)
 {
-    private readonly byte _red;
-    private readonly byte _green;
-    private readonly byte _blue;
-    private readonly byte _alpha;
-
-    public CssColor(int red, int green, int blue, int alpha = 255)
-    {
-        _red = (byte)red;
-        _green = (byte)green;
-        _blue = (byte)blue;
-        _alpha = (byte)alpha;
-    }
+    private readonly byte _red = (byte)red;
+    private readonly byte _green = (byte)green;
+    private readonly byte _blue = (byte)blue;
+    private readonly byte _alpha = (byte)alpha;
 
     /// <summary>
     /// Tries to convert from a string like <c>"#faf"</c> or <c>"#ffaaff"</c> to a <c>CssColor</c> if the string
@@ -202,16 +194,10 @@ public readonly struct CssColor
 
     public readonly MediaColor ToMediaColor() => MediaColor.FromArgb(_alpha, _red, _green, _blue);
 
-    private readonly struct Value
+    private readonly struct Value(float number, bool isPercent)
     {
-        public Value(float number, bool isPercent)
-        {
-            Number = number;
-            IsPercent = isPercent;
-        }
-
-        public readonly float Number;
-        public readonly bool IsPercent;
+        public readonly float Number = number;
+        public readonly bool IsPercent = isPercent;
 
         public readonly int To255Range()
         {

@@ -39,21 +39,21 @@ internal sealed partial class FormatParser
             string localName = listItem.Name.LocalName;
             if (localName == "listheader") {
                 CloseBlock();
-                using (_accumulator.CreateUnderlineScope()) {
+                using (Accumulator.CreateUnderlineScope()) {
                     foreach (var headerElement in listItem.Elements()) {
                         if (headerElement.Name.LocalName is "term") {
-                            using (_accumulator.CreateBoldScope()) {
+                            using (Accumulator.CreateBoldScope()) {
                                 ParseElement(headerElement);
-                                _accumulator.Add(" – ");
+                                Accumulator.Add(" – ");
                             }
                         } else {
                             ParseElement(headerElement);
-                            _accumulator.Add("\r\n");
+                            Accumulator.Add("\r\n");
                         }
                     }
                 }
             } else if (localName == "dd" || lastLocalName == "dt") {  // HTML description list description.
-                using (_accumulator.CreateIndentScope(itemIndent)) {
+                using (Accumulator.CreateIndentScope(itemIndent)) {
                     ParseElement(listItem);
                     CloseBlock();
                 }
@@ -67,14 +67,14 @@ internal sealed partial class FormatParser
                     "i" => number.ToRoman(lowerCase: true) + ". ",
                     _ => number.ToString() + ". "
                 };
-                _accumulator.Add(actualBullet);
+                Accumulator.Add(actualBullet);
                 TextBlock? textBlock = CloseBlock(height: 0.0);
-                itemIndent = type == "table" ? 0.0 : Math.Max(textBlock?.Text.Width ?? 0.0, _emSize) + 0.5 * _emSize;
-                using (_accumulator.CreateIndentScope(itemIndent)) {
+                itemIndent = type == "table" ? 0.0 : Math.Max(textBlock?.Text.Width ?? 0.0, emSize) + 0.5 * emSize;
+                using (Accumulator.CreateIndentScope(itemIndent)) {
                     if (localName == "dt") { // HTML description list term.
-                        using (_accumulator.CreateBoldScope()) {
+                        using (Accumulator.CreateBoldScope()) {
                             ParseElement(listItem);
-                            _accumulator.Add(" – ");
+                            Accumulator.Add(" – ");
                         }
                     } else {
                         ParseElement(listItem);

@@ -5,7 +5,7 @@ namespace PrettyDocComments.Helpers;
 public static class NumberExtensions
 {
     // See also: https://en.wikipedia.org/wiki/Roman_numerals
-    private static readonly (int number, string roman)[] _numbers = {
+    private static readonly (int number, string roman)[] _numbers = [
         (100_000, "ↈ"  ),
         ( 90_000, "ↂↈ"),
         ( 50_000, "ↇ"   ),
@@ -27,7 +27,7 @@ public static class NumberExtensions
         (      5, "V"   ),
         (      4, "IV"  ),
         (      1, "I"   )
-    };
+    ];
 
     // Improved version of https://www.c-sharpcorner.com/article/convert-numbers-to-roman-characters-in-c-sharp/
     public static string ToRoman(this int n, bool lowerCase = false)

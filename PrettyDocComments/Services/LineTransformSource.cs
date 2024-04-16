@@ -82,7 +82,7 @@ internal sealed class LineTransformSource : ILineTransformSource
 
             if (Xml.LastXmlException is not null) {
                 var errorInfo = new RenderInfo(
-                    new List<Shape> { GetCaretRectangle(commentWithXmlText), GetErrorText(commentWithXmlText) },
+                    [GetCaretRectangle(commentWithXmlText), GetErrorText(commentWithXmlText)],
                     calculatedHeight: (commentWithXmlText.LastLineNumber - commentWithXmlText.FirstLineNumber + 1) *
                         _view.FormattedLineSource.LineHeight,
                     verticalScale: 1.0,

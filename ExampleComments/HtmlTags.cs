@@ -1125,7 +1125,7 @@ class HtmlTags
     ///     <p>Microsoft Edge is a web browser developed by Microsoft, released in 2015. Microsoft Edge replaced Internet Explorer.</p>
     ///   </article>
     /// </main>
-    public static void Main() { }
+    public static void MainTag() { }
 
     /// <html>
     /// <head>

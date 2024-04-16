@@ -1,4 +1,4 @@
-﻿#pragma warning disable IDE0049 // Use framework type
+﻿//#pragma warning disable IDE0049 // Use framework type
 
 namespace ExampleComments;
 
@@ -168,9 +168,6 @@ public class ExampleClass
 /// <include file='xml_include_tag.xml' path='MyDocs/MyMembers[@name="test"]/*' />
 class Test
 {
-    static void Main()
-    {
-    }
 }
 
 /// <include file='xml_include_tag.xml' path='MyDocs/MyMembers[@name="test2"]/*' />

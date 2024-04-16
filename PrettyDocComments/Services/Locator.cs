@@ -7,21 +7,12 @@ using PrettyDocComments.Model;
 
 namespace PrettyDocComments.Services;
 
-internal sealed class Locator
+internal sealed class Locator(Regex docCommentRegex, IWpfTextView view)
 {
-    private readonly Regex _docCommentRegex;
-    private readonly IWpfTextView _view;
-
-    public Locator(Regex docCommentRegex, IWpfTextView view)
-    {
-        _view = view;
-        _docCommentRegex = docCommentRegex;
-    }
-
     public bool TryGetComment(ITextSnapshot textSnapshot, ITextViewLine line, out Comment<string> comment)
     {
         int lineNumber = textSnapshot.GetLineNumberFromPosition(line.Start.Position);
-        Match match = _docCommentRegex.Match(textSnapshot.GetLineFromLineNumber(lineNumber).GetText());
+        Match match = docCommentRegex.Match(textSnapshot.GetLineFromLineNumber(lineNumber).GetText());
         if (match.Success) {
             StringBuilder sb = new();
             int maxTextLength = 0;
@@ -30,14 +21,14 @@ internal sealed class Locator
 
             // Find first comment line
             while (lineNumber > 0 &&
-                _docCommentRegex.IsMatch(textSnapshot.GetLineFromLineNumber(lineNumber - 1).GetText())) {
+                docCommentRegex.IsMatch(textSnapshot.GetLineFromLineNumber(lineNumber - 1).GetText())) {
                 lineNumber--;
             }
             SnapshotPoint startPoint = textSnapshot.GetLineFromLineNumber(lineNumber).Start;
             int firstLineNumber = lineNumber;
             while (lineNumber < textSnapshot.LineCount) {
                 string text = textSnapshot.GetLineFromLineNumber(lineNumber).GetText();
-                match = _docCommentRegex.Match(text);
+                match = docCommentRegex.Match(text);
                 if (!match.Success) {
                     break;
                 }
@@ -52,7 +43,7 @@ internal sealed class Locator
             }
             SnapshotPoint endPoint = textSnapshot.GetLineFromLineNumber(lastLineNumber).Start;
             comment = new Comment<string>(new SnapshotSpan(startPoint, endPoint), commentLeftCharIndex,
-                firstLineNumber, lastLineNumber, _view.FormattedLineSource.ColumnWidth * (maxTextLength + 3),
+                firstLineNumber, lastLineNumber, view.FormattedLineSource.ColumnWidth * (maxTextLength + 3),
                 sb.Replace("&nbsp;", "\u00A0").ToString());
             return true;
         }
