@@ -44,3 +44,8 @@ You can change this setting in three ways:
   
   Here you can search for commands containing "summ". The name of our command is **Edit.ToggleCollapseCommentstoSummary**.
   Assign it your desired shortcut key. On my GB-Ascii keyboard **Ctr+Shift+\\** works well.
+
+### Shink Empty Lines extension
+If you also have installed and enabled the **Shrink Empty Lines** extensions from the Microsoft Productivity Power Tools, it might interfere with this extension as both are changing the line heights. This can be avoided by disabling 
+*Tools -> Options -> Productivity Power Tools -> General -> <u>Compress lines that do not have any alphanumeric characters</u>*. You can leave the other option *<u>Compress blank lines</u>* enabled.<br/>
+![collapsed](./ShrinkEmptyLinesOptions.png?raw=true)
