@@ -18,6 +18,11 @@ It works with single line comments in **C#**, **C++**, **F#** (`///`) and **VB**
 ### Editing XML doc comments
 When the text cursor (or the text selection start or end) is on a doc comment line, the pretty image is hidden and the original XML text is revealed and ready to be edited the usual way.
 
+The XML must be valid XML. If it is not, the original comment text and an error message are displayed.
+For example, a **'&lt;'** character must be written as **\&lt;**
+
+Note that Visual Studio cannot display tooltips from comments containing invalid XML.
+
 ### Configuration
 
 You can configure the appearance of the prettyfied comments in menu ***Tools / Options...***, section ***Pretty Doc Comments***

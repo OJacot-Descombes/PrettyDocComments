@@ -98,7 +98,7 @@ public class Point_para
     /// been performed on the Point class.
     /// </para>
     /// </summary>
-    public static void Main()
+    public static void Main_example()
     {
     }
 }

@@ -154,8 +154,10 @@ internal sealed class Adornment
                 _renderedComments.Add(renderedComment);
             }
             WasLayouted = true; // Synchronizes the LineTransformSource.
+#if !DEBUG
+        } catch {
+#elif DEBUG
         } catch (Exception ex) {
-#if DEBUG
             MessageBox.Show(ex.ToString());
 #endif
         }

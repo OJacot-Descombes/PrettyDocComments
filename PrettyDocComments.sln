@@ -13,13 +13,14 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "ExamplesVisualBasic", "Exam
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E2968F2C-3FAD-471E-BCC3-75986059C50E}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
 		changelog.md = changelog.md
+		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
 		options.png = options.png
 		original.png = original.png
 		prettyfied.png = prettyfied.png
 		README.md = README.md
+		ShrinkEmptyLinesOptions.png = ShrinkEmptyLinesOptions.png
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{B13CFEFD-93C1-4C79-A000-44BDA5EE72E5}"
