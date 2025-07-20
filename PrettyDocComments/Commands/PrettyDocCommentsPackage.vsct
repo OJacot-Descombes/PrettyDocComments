@@ -57,6 +57,7 @@
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
           <ButtonText>Toggle Collapse Comments to Summay</ButtonText>
+          <!--<CanonicalName>.PrettyDocComments.ToggleCollapseComment</CanonicalName>-->
         </Strings>
       </Button>
     </Buttons>

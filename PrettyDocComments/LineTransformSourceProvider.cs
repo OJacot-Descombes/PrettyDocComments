@@ -21,8 +21,11 @@ namespace PrettyDocComments;
 /// <see cref="Adornment"/>, so that doc comments can be properly sized and rendered.
 /// </summary>
 [Export(typeof(ILineTransformSourceProvider))]
-[ContentType("code")]
+[ContentType("text")]
 [TextViewRole(PredefinedTextViewRoles.Document)]
+[TextViewRole(PredefinedTextViewRoles.EmbeddedPeekTextView)]
+[TextViewRole(PredefinedTextViewRoles.PreviewTextView)]
+[Name("PrettyDocCommentsLineTransformSourceProvider")]
 internal sealed class LineTransformSourceProvider : ILineTransformSourceProvider
 {
     private static readonly Regex _cSharpDocCommentRecoginzer = new(@"^\s*(///)([^/]|$)", RegexOptions.Compiled);
@@ -65,8 +68,8 @@ internal sealed class LineTransformSourceProvider : ILineTransformSourceProvider
         }
 
         Regex docCommentRegex = view.TextBuffer.ContentType.TypeName switch {
-            "CSharp" or "F#" or "C/C++" => _cSharpDocCommentRecoginzer,
-            "Basic" => _visualBasicDocCommentRecoginzer,
+            "CSharp" or "F#" or "FSharp" or "C" or "C/C++" => _cSharpDocCommentRecoginzer,
+            "Basic" or "VisualBasic" => _visualBasicDocCommentRecoginzer,
             _ => null
         };
 

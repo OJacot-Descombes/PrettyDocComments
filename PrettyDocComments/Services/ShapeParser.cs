@@ -46,6 +46,7 @@ internal sealed class ShapeParser(IWpfTextView view)
         _y = _initialY;
         int blockNo = 0;
         string previousTagName = null;
+        double minSpace = 30;
         foreach (XElement el in WrapTopLevelText(comment.Data)) {
             if (previousTagName is "summary" && GeneralOptions.Instance.CollapseToSummary) {
                 if (_shapes.LastOrDefault(s => s is not HorizontalLineShape) is { } lastShape) {
@@ -58,36 +59,19 @@ internal sealed class ShapeParser(IWpfTextView view)
             if (blockNo > 1 && !IsBetweenFriendBlocks(el)) {
                 AddSeparator(previousTagName, tagName);
             }
+            double width;
             switch (tagName) {
                 case "example":
                     ParseBlockWithTitle(el, "Example", 1.7 * _emSize);
                     break;
                 case "exception":
-                    if (previousTagName != tagName) {
-                        AddMainTitle("Exceptions");
-                    }
-                    string exeptionName = el.Attributes("cref").FirstOrDefault()?.Value;
-                    if (String.IsNullOrWhiteSpace(exeptionName)) {
-                        exeptionName = "Exception";
-                    }
-                    ParseBlockWithInlineHeading(el, SubtitleIdentSpaces + exeptionName + ":");
+                    AlignBlockWithInlineHeading(el, tagName, "Exceptions", GetExecptionCref);
                     break;
                 case "param":
-                    if (previousTagName != tagName) {
-                        AddMainTitle("Parameters");
-                    }
-
-                    string name = el.Attributes("name").FirstOrDefault()?.Value;
-                    string title = SubtitleIdentSpaces + (name is { Length: > 0 } ? name : tagName);
-                    ParseBlockWithInlineHeading(el, title + ":");
+                    AlignBlockWithInlineHeading(el, tagName, "Parameters", GetName);
                     break;
                 case "typeparam":
-                    if (previousTagName != tagName) {
-                        AddMainTitle("Type parameters");
-                    }
-                    name = el.Attributes("name").FirstOrDefault()?.Value;
-                    title = SubtitleIdentSpaces + (name is { Length: > 0 } ? name : tagName);
-                    ParseBlockWithInlineHeading(el, title + ":");
+                    AlignBlockWithInlineHeading(el, tagName, "Type parameters", GetName);
                     break;
                 case "returns":
                     ParseBlockWithInlineHeading(el, "Returns", 1, 0.0);
@@ -117,6 +101,46 @@ internal sealed class ShapeParser(IWpfTextView view)
             node.PreviousNode is XElement { Name.LocalName: var p } &&
             node is XElement { Name.LocalName: var e } &&
             p == e && p is "param" or "typeparam" or "exception" or "seealso";
+
+        void GetTitleInfo(XElement el, string tagName, int indent, Func<XElement,string> getName, 
+            out string title, out double width)
+        {
+            string name = getName(el);
+            title = SubtitleIdentSpaces + (name is { Length: > 0 } ? name : tagName) + ":";
+
+            FormattedTextEx formattedCaption = CaptionText(title);
+            double blockIndent = indent * _emSize;
+            width = formattedCaption.Width - blockIndent;
+        }
+
+        static string GetName(XElement el) => el.Attributes("name").FirstOrDefault()?.Value;
+        static string GetExecptionCref(XElement el)
+        {
+            string name = el.Attributes("cref").FirstOrDefault()?.Value;
+            if (String.IsNullOrWhiteSpace(name)) {
+                name = "Exception";
+            }
+            return name;
+        }
+
+        void AlignBlockWithInlineHeading(XElement el, string tagName, string mainTitle, Func<XElement, string> getName)
+        {
+            double width;
+            if (previousTagName != tagName) {
+                AddMainTitle(mainTitle);
+                var allParams = el.ElementsAfterSelf()
+                    .TakeWhile(e => e.Name.LocalName.ToLowerInvariant() == tagName);
+                minSpace = 30;
+                foreach (XElement param in allParams) {
+                    GetTitleInfo(param, tagName, 4, getName, out _, out width);
+                    minSpace = Math.Max(minSpace, width);
+                }
+            }
+
+            GetTitleInfo(el, tagName, 4, getName, out string title, out width);
+            minSpace = Math.Max(minSpace, width);
+            ParseBlockWithInlineHeading(el, title, minSpace: minSpace);
+        }
     }
 
     private static IEnumerable<XElement> WrapTopLevelText(IEnumerable<XNode> nodes)
