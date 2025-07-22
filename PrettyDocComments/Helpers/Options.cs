@@ -88,6 +88,14 @@ internal static class Options
     public static int CommentWidthInColumns =>
         CreateValue(ref _commentWidthInColumns, GeneralOptions.Instance.CommentWidthInColumns, 80);
 
+    private static int? _rightMarginInColumns;
+    public static int RightMarginInColumns =>
+        CreateValue(ref _rightMarginInColumns, GeneralOptions.Instance.RightMarginInColumns, 120);
+
+    private static bool? _adjustWidthToViewPort;
+    public static bool AdjustWidthToViewPort =>
+        CreateValue(ref _adjustWidthToViewPort, GeneralOptions.Instance.AdjustWidthToViewPort, false);
+
     private static double? _fontScaling;
     /// <summary>
     /// By how much we multiply the editor font size to get the comment font size.
@@ -116,6 +124,8 @@ internal static class Options
         _errorOutline = null;
         _frameStroke = null;
         _commentWidthInColumns = null;
+        _rightMarginInColumns = null;
+        _adjustWidthToViewPort = null;
         _fontScaling = null;
 
         OptionsChanged?.Invoke();
@@ -151,5 +161,17 @@ internal static class Options
             backingField = v;
         }
         return backingField ?? defaultValue;
+    }
+
+    public static double GetCommentWidthInPixels(IWpfTextView view, int indentationInColumns)
+    {
+        double columnWidth = view.FormattedLineSource.ColumnWidth;
+        double maxWidth = (RightMarginInColumns - indentationInColumns) * columnWidth;
+        double minWidth = CommentWidthInColumns * columnWidth;
+        if (AdjustWidthToViewPort) {
+            double viewPortWidth = view.ViewportWidth - Padding.Left - Padding.Right;
+            maxWidth = Math.Min(maxWidth, viewPortWidth - indentationInColumns * columnWidth);
+        }
+        return Math.Max(minWidth, maxWidth);
     }
 }

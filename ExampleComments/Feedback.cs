@@ -45,7 +45,7 @@ class WordWrapIssue
 
 class ParameterAlignment
 {
-    // Athari: Example shows unaligned parameter descriptions in version 0.4.1. 
+    // Athari: Example shows unaligned parameter descriptions in version 0.4.0. 
     // https://github.com/OJacot-Descombes/PrettyDocComments/issues/9
 
     /// <summary>

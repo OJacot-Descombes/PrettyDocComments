@@ -14,6 +14,7 @@ internal sealed class ShapeParser(IWpfTextView view)
 {
     private const char NonBreakingSpace = '\u00A0';
     private const string SubtitleIdentSpaces = "      ";
+    private const int MinSpace = 25;
 
     private static readonly ImmutableHashSet<string> _topLevelElements = new[] {
         "example", "exception", "param", "permission", "remarks", "returns",
@@ -30,7 +31,6 @@ internal sealed class ShapeParser(IWpfTextView view)
     {
         _initialY = Options.Padding.Top;
         _emSize = Options.GetNormalEmSize(view);
-        _width = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
     }
 
     /// <summary>
@@ -42,11 +42,12 @@ internal sealed class ShapeParser(IWpfTextView view)
     public Comment<List<Shape>> Parse(Comment<IEnumerable<XNode>> comment)
     {
         Initialize();
+        _width = Options.GetCommentWidthInPixels(view, comment.CommentLeftCharIndex);
         _shapes = [];
         _y = _initialY;
         int blockNo = 0;
         string previousTagName = null;
-        double minSpace = 30;
+        double minSpace = MinSpace;
         foreach (XElement el in WrapTopLevelText(comment.Data)) {
             if (previousTagName is "summary" && GeneralOptions.Instance.CollapseToSummary) {
                 if (_shapes.LastOrDefault(s => s is not HorizontalLineShape) is { } lastShape) {
@@ -102,7 +103,7 @@ internal sealed class ShapeParser(IWpfTextView view)
             node is XElement { Name.LocalName: var e } &&
             p == e && p is "param" or "typeparam" or "exception" or "seealso";
 
-        void GetTitleInfo(XElement el, string tagName, int indent, Func<XElement,string> getName, 
+        void GetTitleInfo(XElement el, string tagName, int indent, Func<XElement, string> getName,
             out string title, out double width)
         {
             string name = getName(el);
@@ -130,7 +131,7 @@ internal sealed class ShapeParser(IWpfTextView view)
                 AddMainTitle(mainTitle);
                 var allParams = el.ElementsAfterSelf()
                     .TakeWhile(e => e.Name.LocalName.ToLowerInvariant() == tagName);
-                minSpace = 30;
+                minSpace = MinSpace;
                 foreach (XElement param in allParams) {
                     GetTitleInfo(param, tagName, 4, getName, out _, out width);
                     minSpace = Math.Max(minSpace, width);

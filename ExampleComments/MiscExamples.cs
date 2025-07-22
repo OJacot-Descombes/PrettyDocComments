@@ -144,11 +144,11 @@ internal class MiscExamples<T, U>
     /// The ampersand (&amp;) is escaped.
     /// </summary
     public static void XmlError_AfterLastLine()
-    {
+    
     }
 
     /// <summary>
-    /// The <c>ampersand (&amp;) is escaped.
+    /// The <c>ampersand (&amp;) is escaped xxxxxxxxxxxxx yyyyy zzzzzzzzzzzzzzz.
     /// </summary>
     public static void XmlError_NonClosedTag()
     {

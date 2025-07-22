@@ -34,7 +34,13 @@ internal sealed class LineTransformSource : ILineTransformSource
         _shapeParser = new ShapeParser(view);
 
         Options.OptionsChanged += OnOptionChanged;
+        _view.ViewportWidthChanged += View_ViewportWidthChanged;
         _view.Closed += OnClosed;
+    }
+
+    private void View_ViewportWidthChanged(object sender, EventArgs e)
+    {
+        OnOptionChanged();
     }
 
     private void OnOptionChanged()
@@ -48,6 +54,7 @@ internal sealed class LineTransformSource : ILineTransformSource
     private void OnClosed(object sender, System.EventArgs e)
     {
         Options.OptionsChanged -= OnOptionChanged;
+        _view.ViewportWidthChanged -= View_ViewportWidthChanged;
         _view.Closed -= OnClosed;
     }
 
@@ -116,11 +123,12 @@ internal sealed class LineTransformSource : ILineTransformSource
 
         TextShape GetErrorText(Comment<string> commentWithXmlText)
         {
-            double columnWidth = _view.FormattedLineSource.ColumnWidth;
             FormattedTextEx errorText = Xml.LastXmlException.Message.AsFormatted(
-                Options.NormalTypeFace, 0.5 * Options.CommentWidthInColumns * columnWidth, _view);
+                Options.NormalTypeFace,
+                    0.5 * Options.GetCommentWidthInPixels(_view, commentWithXmlText.CommentLeftCharIndex),
+                _view);
             errorText.SetForegroundBrush(Options.ErrorOutline.Brush);
-            var errorOrigin = new Point(2 * columnWidth + commentWithXmlText.Width, 0);
+            var errorOrigin = new Point(2 * _view.FormattedLineSource.ColumnWidth + commentWithXmlText.Width, 0);
             var errorTextShape = new TextShape(errorText, errorOrigin);
             return errorTextShape;
         }

@@ -32,7 +32,7 @@ internal sealed class Renderer
                 dc.DrawRectangle(null, Options.ErrorOutline, new Rect(0, 0, rectWidth, height));
             } else {
                 double originalCommentWidth = comment.Width + CollpasedTextSurplusLength * view.FormattedLineSource.ColumnWidth;
-                rectWidth = Options.CommentWidthInColumns * view.FormattedLineSource.ColumnWidth;
+                rectWidth = Options.GetCommentWidthInPixels(view, comment.CommentLeftCharIndex);
                 if (originalCommentWidth > rectWidth) {
                     var coverRect = new Rect(rectWidth, 0, originalCommentWidth - rectWidth, height);
                     dc.DrawRectangle(view.Background, null, coverRect);
