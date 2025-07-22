@@ -23,7 +23,7 @@ internal abstract class Shape(Point origin, double height)
         var point1 = new Point(commentWidth - RightMargin - CWidth, bottom - CHeight);
         var point2 = new Point(commentWidth - RightMargin, bottom - CHeight / 2);
         var point3 = new Point(commentWidth - RightMargin - CWidth, bottom);
-        dc.DrawLine(Options.CommentOutline, point1, point2);
-        dc.DrawLine(Options.CommentOutline, point2, point3);
+        dc.DrawLine(Options.ContinuationSymbolPen, point1, point2);
+        dc.DrawLine(Options.ContinuationSymbolPen, point2, point3);
     }
 }

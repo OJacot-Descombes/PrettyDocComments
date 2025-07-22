@@ -70,6 +70,22 @@ internal static class Options
     public static Pen CommentOutline =>
         CreatePen(ref _commentOutline, GeneralOptions.Instance.CommentLineColor, 2.0, Brushes.DarkKhaki);
 
+    private static Pen _continuationSymbolPen;
+    public static Pen ContinuationSymbolPen
+    {
+        get {
+            if (_continuationSymbolPen is null) {
+                var (h, s, _) = GeneralOptions.Instance.CommentLineColor.ToHSV();
+                var (_, _, v) = GeneralOptions.Instance.CommentBackColor.ToHSV();
+                v = v < 0.5 ? 0.667 : 0.4;
+                DrawingColor penColor = ColorExtensions.ColorFromHSV(h, s, v);
+                return CreatePen(ref _continuationSymbolPen, penColor, 2.0, Brushes.DarkKhaki);
+            } else {
+                return _continuationSymbolPen;
+            }
+        }
+    }
+
     private static Pen _commentSeparator;
     public static Pen CommentSeparator =>
         CreatePen(ref _commentSeparator, GeneralOptions.Instance.CommentLineColor, 0.5, Brushes.DarkKhaki);
@@ -120,6 +136,7 @@ internal static class Options
         _commentTextBrush = null;
         _highlightBrush = null;
         _commentOutline = null;
+        _continuationSymbolPen = null;
         _commentSeparator = null;
         _errorOutline = null;
         _frameStroke = null;

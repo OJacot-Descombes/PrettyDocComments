@@ -60,7 +60,6 @@ internal sealed class ShapeParser(IWpfTextView view)
             if (blockNo > 1 && !IsBetweenFriendBlocks(el)) {
                 AddSeparator(previousTagName, tagName);
             }
-            double width;
             switch (tagName) {
                 case "example":
                     ParseBlockWithTitle(el, "Example", 1.7 * _emSize);
