@@ -41,6 +41,12 @@ internal class GeneralOptions : BaseOptionModel<GeneralOptions>
     [DefaultValue(false)]
     public bool CollapseToSummary { get; set; }
 
+    [Category(SizingCategory)]
+    [DisplayName("Compensate line height rounding (experimental)")]
+    [Description("Compensate for Visual Studio's line height rounding (experimental).")]
+    [DefaultValue(true)]
+    public bool CompensateLineHeight { get; set; } = true;
+
     [Category(ShapeColorsCategory)]
     [DisplayName("Comment background color")]
     [Description("Background color of rendred comments (default is LightGoldenrodYellow).")]

@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using EnvDTE;
 using Microsoft.VisualStudio.Text.Editor;
 using PrettyDocComments.Helpers;
 using PrettyDocComments.Model;
@@ -9,6 +10,8 @@ namespace PrettyDocComments.Services;
 
 internal sealed class Renderer
 {
+    private readonly Dictionary<int, double> _lastLineScales = new Dictionary<int, double>();
+
     public Comment<RenderInfo> GetRenderInfo(Comment<List<Shape>> comment, IWpfTextView view)
     {
         List<Shape> shapes = comment.Data;
@@ -17,7 +20,11 @@ internal sealed class Renderer
             : view.LineHeight;
 
         double verticalScale = height / (comment.NumberOfLines * view.LineHeight);
-        return comment.ConvertTo(new RenderInfo(shapes, height, verticalScale));
+        double lastLineVerticalScale = _lastLineScales.TryGetValue(comment.FirstLineNumber, out double v)
+            ? v
+            : verticalScale;
+
+        return comment.ConvertTo(new RenderInfo(shapes, height, verticalScale, lastLineVerticalScale));
     }
 
     public Comment<Image> Render(Comment<RenderInfo> comment, double height, double topPadding, IWpfTextView view)
@@ -45,6 +52,16 @@ internal sealed class Renderer
                 if (topPadding != 0.0) {
                     dc.PushTransform(new TranslateTransform(0, topPadding));
                 }
+
+                if (Options.CompensateLineHeight && comment.NumberOfLines > 1) {
+                    double diff = comment.Data.CalculatedHeight - height;
+                    if (diff is < -2.0 or > 1.0) {
+                        const double Damping = 0.99;
+                        double lastLineHeight = diff * Damping + view.LineHeight * comment.Data.LastLineVerticalScale;
+                        double f = Math.Max(0.1, lastLineHeight / view.LineHeight);
+                        _lastLineScales[comment.FirstLineNumber] = f;
+                    }
+                }
             }
             foreach (var shape in comment.Data.Shapes) {
                 shape.Draw(dc, rectWidth);
@@ -60,5 +77,10 @@ internal sealed class Renderer
             Source = drawingImage
         };
         return comment.ConvertTo(image);
+    }
+
+    public void RefreshLineHeightsBuffer()
+    {
+        _lastLineScales.Clear();
     }
 }

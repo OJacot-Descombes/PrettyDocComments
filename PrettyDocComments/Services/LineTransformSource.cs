@@ -15,7 +15,7 @@ namespace PrettyDocComments.Services;
 /// </summary>
 internal sealed class LineTransformSource : ILineTransformSource
 {
-    private static readonly Renderer _renderer = new();
+    private readonly Renderer _renderer = new();
 
     private readonly IWpfTextView _view;
     private readonly IOutliningManager _outliningManager;
@@ -46,6 +46,7 @@ internal sealed class LineTransformSource : ILineTransformSource
     private void OnOptionChanged()
     {
         if (_view is { IsClosed: false, InLayout: false }) {
+            _renderer.RefreshLineHeightsBuffer();
             var firstLine = _view.TextViewLines.FirstVisibleLine;
             _view.DisplayTextLineContainingBufferPosition(firstLine.Start, firstLine.Top - _view.ViewportTop, ViewRelativePosition.Top);
         }
@@ -77,7 +78,11 @@ internal sealed class LineTransformSource : ILineTransformSource
             return new LineTransform(1.0);
         }
         if (!comment.ContainsCaretOrSelStartOrEnd(_view) && !IsLineCollapsed(line)) {
-            return new LineTransform(comment.Data.VerticalScale);
+            if (Options.CompensateLineHeight && line.Start.GetContainingLineNumber() == comment.LastLineNumber) {
+                return new LineTransform(comment.Data.LastLineVerticalScale);
+            } else {
+                return new LineTransform(comment.Data.VerticalScale);
+            }
         }
         return new LineTransform(1.0);
     }
@@ -92,7 +97,7 @@ internal sealed class LineTransformSource : ILineTransformSource
                     [GetCaretRectangle(commentWithXmlText), GetErrorText(commentWithXmlText)],
                     calculatedHeight: (commentWithXmlText.LastLineNumber - commentWithXmlText.FirstLineNumber + 1) *
                         _view.FormattedLineSource.LineHeight,
-                    verticalScale: 1.0,
+                    verticalScale: 1.0, lastLineVerticalScale: 1.0,
                     containsErrorHint: true
                 );
                 commentWithRenderInfo = commentWithXmlText.ConvertTo(errorInfo);

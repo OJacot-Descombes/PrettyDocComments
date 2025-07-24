@@ -144,7 +144,7 @@ internal class MiscExamples<T, U>
     /// The ampersand (&amp;) is escaped.
     /// </summary
     public static void XmlError_AfterLastLine()
-    
+    {
     }
 
     /// <summary>

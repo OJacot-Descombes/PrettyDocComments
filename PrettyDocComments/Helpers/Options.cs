@@ -112,6 +112,10 @@ internal static class Options
     public static bool AdjustWidthToViewPort =>
         CreateValue(ref _adjustWidthToViewPort, GeneralOptions.Instance.AdjustWidthToViewPort, false);
 
+    private static bool? _compensateLineHeight;
+    public static bool CompensateLineHeight =>
+        CreateValue(ref _compensateLineHeight, GeneralOptions.Instance.CompensateLineHeight, true);
+
     private static double? _fontScaling;
     /// <summary>
     /// By how much we multiply the editor font size to get the comment font size.
@@ -143,6 +147,7 @@ internal static class Options
         _commentWidthInColumns = null;
         _rightMarginInColumns = null;
         _adjustWidthToViewPort = null;
+        _compensateLineHeight = null;
         _fontScaling = null;
 
         OptionsChanged?.Invoke();
