@@ -1,4 +1,9 @@
 # Changelog
+- **0.5.0** - 2025-07-24
+    - Improved alignment of Parameter, Type Parameter and Exception descriptions.
+    - Added more options for customizing comment widths.
+    - Enhanced continuation symbol (">") contrast (when comment is collapsed to summary).
+    - Compensate line hight roundings (experimental, optional)
 - **0.4.0** - 2023-10-10
     - **Added**: Command to toggle collapsing comment to summary.
 - **0.3.5** - 2023-09-30
