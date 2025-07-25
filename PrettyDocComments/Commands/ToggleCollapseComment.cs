@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using PrettyDocComments.CustomOptions;
 using PrettyDocComments.Helpers;
 using Task = System.Threading.Tasks.Task;

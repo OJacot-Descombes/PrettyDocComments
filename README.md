@@ -55,8 +55,10 @@ You can change this setting in three ways:
 ### Comment Width Options
 Three settings control the width of the prettified comments:
 - **Minimum comment width in columns**: This minimum width has precedence over the other two settings. The right edge of the comment can surpass the right margin setting when the comment has a large indentation.
-- **Right margin column of comment**: If this value is larger than the minimum comment width, the right edges of the comments will be aligned at this column. Otherwise, the comments will have a fixed width, and their right edges will vary according to the comment indentations.
+- **Right edge of comment**: If this value is larger than the minimum comment width, the right edges of the comments will be aligned at this column. Otherwise, the comments will have a fixed width, and their right edges will vary according to the comment indentations.
 - **Adjust width to view port**: If this option is enabled, the right edge of the comment will be adjusted to the right edge of the editor window within the limits given by the two other settings. This is useful when you have a wide screen and want to use the full width of the editor.
+
+## Advanced
 
 ### Compensate Line Height Rounding (experimental)
 This option is enabled by default. It compensates for the rounding of the line height by Visual Studio.

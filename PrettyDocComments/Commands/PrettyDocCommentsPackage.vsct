@@ -56,7 +56,7 @@
         <Parent guid="guidPrettyDocCommentsPackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
-          <ButtonText>Toggle Collapse Comments to Summay</ButtonText>
+          <ButtonText>Toggle Collapse Comments to Summary</ButtonText>
           <!--<CanonicalName>.PrettyDocComments.ToggleCollapseComment</CanonicalName>-->
         </Strings>
       </Button>

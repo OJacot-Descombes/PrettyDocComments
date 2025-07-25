@@ -110,7 +110,7 @@ internal static class Options
 
     private static bool? _adjustWidthToViewPort;
     public static bool AdjustWidthToViewPort =>
-        CreateValue(ref _adjustWidthToViewPort, GeneralOptions.Instance.AdjustWidthToViewPort, false);
+        CreateValue(ref _adjustWidthToViewPort, GeneralOptions.Instance.AdjustWidthToViewPort, true);
 
     private static bool? _compensateLineHeight;
     public static bool CompensateLineHeight =>

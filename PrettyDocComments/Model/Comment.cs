@@ -1,6 +1,4 @@
-﻿using System.Windows.Forms;
-using System.Windows.Shapes;
-using Microsoft.VisualStudio.Text;
+﻿using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 
 namespace PrettyDocComments.Model;

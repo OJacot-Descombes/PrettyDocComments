@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		changelog.md = changelog.md
 		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
+		menu_collapse.png = menu_collapse.png
 		options.png = options.png
 		original.png = original.png
 		prettyfied.png = prettyfied.png

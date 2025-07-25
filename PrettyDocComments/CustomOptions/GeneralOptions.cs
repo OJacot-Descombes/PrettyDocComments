@@ -24,16 +24,16 @@ internal class GeneralOptions : BaseOptionModel<GeneralOptions>
     public int CommentWidthInColumns { get; set; } = 80;
 
     [Category(SizingCategory)]
-    [DisplayName("Right margin column of comment")]
-    [Description("Right margin of the rendered doc comment in columns (default is 120).")]
+    [DisplayName("Right edge of comment")]
+    [Description("Right edge of the rendered doc comment in columns (default is 120).")]
     [DefaultValue(120)]
     public int RightMarginInColumns { get; set; } = 120;
 
     [Category(SizingCategory)]
     [DisplayName("Adjust width to view port")]
-    [Description("Automatically adjusts the width of the comment to the editor window within the limits set by the minimum width and the right margin settings (default is false).")]
-    [DefaultValue(false)]
-    public bool AdjustWidthToViewPort { get; set; } = false;
+    [Description("Automatically adjusts the width of the comment to the editor window within the limits set by the minimum width and the right margin settings (default is true).")]
+    [DefaultValue(true)]
+    public bool AdjustWidthToViewPort { get; set; } = true;
 
     [Category(SizingCategory)]
     [DisplayName("Collapse Comments to Summary")]

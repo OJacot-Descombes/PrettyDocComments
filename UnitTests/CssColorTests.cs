@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using PrettyDocComments.Model;
 
 namespace UnitTests;
