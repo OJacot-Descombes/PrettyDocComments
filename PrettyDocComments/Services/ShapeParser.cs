@@ -191,6 +191,9 @@ internal sealed class ShapeParser(IWpfTextView view)
         _shapes.Add(new TextShape(formattedCaption, new Point(Options.Padding.Left, _y)));
         double blockIndent = indent * _emSize;
         int firstLineIndentChars = (int)(3.7 * Math.Max(formattedCaption.Width - blockIndent, minSpace) / _emSize) + 4;
+        if (element.FirstNode is XText text) {
+            text.Value = text.Value.TrimStart();
+        }
         element.AddFirst(new string(NonBreakingSpace, firstLineIndentChars));
         ParseBlock(element, Options.Padding.Left + blockIndent);
     }

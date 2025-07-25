@@ -52,9 +52,9 @@ class ParameterAlignment
     /// Creates a handler to translate an interpolated string into a string.
     /// </summary>
     /// <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
-    /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
-    /// <param name="stringBuilder">The assiciated StringBuilder to which to append.</param>
-    /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+    /// <param name="formattedCount"> The number of interpolation expressions in the interpolated string.</param>
+    /// <param name="stringBuilder">- The assiciated StringBuilder to which to append.</param>
+    /// <param name="provider"> - An object that supplies culture-specific formatting information.</param>
     /// <remarks>This is intended to be called only by compiler-generated code. Arguments are not valid as they'd otherwise be for members intended to be used directly.</remarks>
     public ParameterAlignment(int literalLength, int formattedCount, StringBuilder stringBuilder, IFormatProvider provider)
     {
