@@ -1,4 +1,9 @@
 # Changelog
+- **0.5.1** - 2025-07-25
+    - Trimming start of <param> text for better alignment if it is a text node.
+    - Fixed typo in "Toggle Collapse Comments to Summay" (should be "Summary").
+    - Renamed option "Right margin column of comment" to "Right edge of comment".
+    - Now default value for option "Adjust width to view port" is "true".
 - **0.5.0** - 2025-07-24
     - Improved alignment of Parameter, Type Parameter and Exception descriptions.
     - Added more options for customizing comment widths.
