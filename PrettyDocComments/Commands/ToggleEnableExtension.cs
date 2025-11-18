@@ -9,20 +9,20 @@ namespace PrettyDocComments.Commands;
 /// <summary>
 /// Command handler
 /// </summary>
-internal sealed class ToggleCollapseComment : Command
+internal sealed class ToggleEnableExtension : Command
 {
     /// <summary>
     /// Command ID.
     /// </summary>
-    override protected int CommandId => 0x0100;
+    override protected int CommandId => 0x0200;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ToggleCollapseComment"/> class.
+    /// Initializes a new instance of the <see cref="ToggleEnableExtension"/> class.
     /// Adds our command handlers for menu (commands must exist in the command table file)
     /// </summary>
     /// <param name="package">Owner package, not null.</param>
     /// <param name="commandService">Command service to add command to, not null.</param>
-    private ToggleCollapseComment(AsyncPackage package, OleMenuCommandService commandService)
+    private ToggleEnableExtension(AsyncPackage package, OleMenuCommandService commandService)
         : base(package, commandService)
     {
     }
@@ -36,7 +36,7 @@ internal sealed class ToggleCollapseComment : Command
     /// <param name="e">Event args.</param>
     protected override void Execute(object sender, EventArgs e)
     {
-        GeneralOptions.Instance.CollapseToSummary = !GeneralOptions.Instance.CollapseToSummary;
+        GeneralOptions.Instance.Enabled = !GeneralOptions.Instance.Enabled;
         Options.RefreshViews();
         GeneralOptions.Instance.Save();
     }
@@ -44,7 +44,7 @@ internal sealed class ToggleCollapseComment : Command
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static ToggleCollapseComment Instance
+    public static ToggleEnableExtension Instance
     {
         get;
         private set;
@@ -56,11 +56,11 @@ internal sealed class ToggleCollapseComment : Command
     /// <param name="package">Owner package, not null.</param>
     public static async Task InitializeAsync(AsyncPackage package)
     {
-        // Switch to the main thread - the call to AddCommand in ToggleCollapseComment's constructor requires
+        // Switch to the main thread - the call to AddCommand in ToggleEnableExtension's constructor requires
         // the UI thread.
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
         var commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-        Instance = new ToggleCollapseComment(package, commandService);
+        Instance = new ToggleEnableExtension(package, commandService);
     }
 }

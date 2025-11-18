@@ -52,8 +52,8 @@ internal class MiscExamples<T, U>
     /// <summary>
     /// Performs an <b>integer</b> division
     /// </summary>
-    /// <param name="dividend"><c>int</c> dividend</param>
-    /// <param name="divisor"><c>int</c> divisor</param>
+    /// <param name="dividend">The <c>int</c> dividend.</param>
+    /// <param name="divisor">The <c>int</c> divisor.</param>
     /// <returns>The integer part of the division</returns>
     /// <example>
     /// C#:<code>

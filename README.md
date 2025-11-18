@@ -31,6 +31,17 @@ You can configure the appearance of the prettified comments in menu ***Tools / O
 
 ![options](./options.png?raw=true)
 
+### Enable Extension
+You can enable (show) or disable (hide) the Pretty Doc Comments globally in three ways:
+- In the <u>Options dialog</u> described above in the section **General**, option **Enable extension** 
+- Through the <u>menu item</u> **Edit > Enable/Disable Pretty Doc Comments**
+  ![menu_collapse](./menu_enable.png?raw=true)
+- Through a <u>shortcut key</u>. No default key binding is assigned to this command as we want to avoid any clashes with existing shortcuts.
+  You can assign a shortcut key through the menu **Tools / Options...** by selecting the option **Environment > Keyboard**.
+  
+  Here you can search for commands containing "comments". The name of our command is **Edit.EnableDisablePrettyDocComments**.
+  Assign it your desired shortcut key. On my GB-Ascii keyboard **Ctrl+Shift+`** works well.
+
 ### Collapse to Summary
 You can collapse the comments so that text following the &lt;summary&gt; tag will be hidden. This is a global setting affecting all the comments.
 
@@ -49,7 +60,7 @@ You can change this setting in three ways:
 - Through a <u>shortcut key</u>. No default key binding is assigned to this toggle command as we want to avoid any clashes with existing shortcuts.
   You can assign a shortcut key through the menu **Tools / Options...** by selecting the option **Environment > Keyboard**.
   
-  Here you can search for commands containing "summ". The name of our command is **Edit.ToggleCollapseCommentstoSummary**.
+  Here you can search for commands containing "comments". The name of our command is **Edit.ToggleCollapseCommentstoSummary**.
   Assign it your desired shortcut key. On my GB-Ascii keyboard **Ctrl+Shift+\\** works well.
 
 ### Comment Width Options

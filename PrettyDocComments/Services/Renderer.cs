@@ -75,6 +75,9 @@ internal sealed class Renderer
         var image = new Image {
             Source = drawingImage
         };
+
+        // Remove color bleeding on LCD screens
+        TextOptions.SetTextRenderingMode(image, TextRenderingMode.Grayscale);
         return comment.ConvertTo(image);
     }
 

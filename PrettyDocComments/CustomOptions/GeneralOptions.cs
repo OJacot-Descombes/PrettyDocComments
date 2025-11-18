@@ -6,10 +6,17 @@ namespace PrettyDocComments.CustomOptions;
 
 internal class GeneralOptions : BaseOptionModel<GeneralOptions>
 {
-    private const string TestColorsCategory = "Text Colors";
+    private const string GeneralCategory = "General";
+    private const string TextColorsCategory = "Text Colors";
     private const string SizingCategory = "Sizing";
     private const string ShapeColorsCategory = "Shape Colors";
     private const string FontsCategory = "Fonts";
+
+    [Category(GeneralCategory)]
+    [DisplayName("Enable extension")]
+    [Description("Whether this extention is enabled and overlays XML doc comments with a rendered image.\r\nYou can also toggle it from the Edit menu and assign it a key shortcut.")]
+    [DefaultValue(true)]
+    public bool Enabled { get; set; } = true;
 
     [Category(SizingCategory)]
     [DisplayName("Font scaling")]
@@ -71,25 +78,25 @@ internal class GeneralOptions : BaseOptionModel<GeneralOptions>
     [TypeConverter(typeof(System.Drawing.ColorConverter))]
     public System.Drawing.Color HighlightColor { get; set; } = System.Drawing.Color.Yellow;
 
-    [Category(TestColorsCategory)]
+    [Category(TextColorsCategory)]
     [DisplayName("Text color")]
     [Description("Color of normal text (default is Black).")]
     [TypeConverter(typeof(System.Drawing.ColorConverter))]
     public System.Drawing.Color TextColor { get; set; } = System.Drawing.Color.Black;
 
-    [Category(TestColorsCategory)]
+    [Category(TextColorsCategory)]
     [DisplayName("Special text color")]
     [Description("Color of special text, e.g. links and references (default is DarkSlateBlue).")]
     [TypeConverter(typeof(System.Drawing.ColorConverter))]
     public System.Drawing.Color SpecialTextColor { get; set; } = System.Drawing.Color.DarkSlateBlue;
 
-    [Category(TestColorsCategory)]
+    [Category(TextColorsCategory)]
     [DisplayName("HTML comment text color")]
     [Description("Color of HTML <!-- comment --> text (default is ForestGreen).")]
     [TypeConverter(typeof(System.Drawing.ColorConverter))]
     public System.Drawing.Color HtmlCommentTextColor { get; set; } = System.Drawing.Color.ForestGreen;
 
-    [Category(TestColorsCategory)]
+    [Category(TextColorsCategory)]
     [DisplayName("Error text and frame color")]
     [Description("Color used to display XML parsing errors (default is Red).")]
     [TypeConverter(typeof(System.Drawing.ColorConverter))]

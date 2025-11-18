@@ -49,11 +49,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\PrettyDocCommentsPackage.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>PrettyDocCommentsPackage.vsct</DependentUpon>
     </Compile>
+    <Compile Include="Commands\ToggleEnableExtension.cs" />
     <Compile Include="Commands\ToggleCollapseComment.cs" />
     <Compile Include="CustomOptions\BaseOptionModel`1.cs" />
     <Compile Include="CustomOptions\BaseOptionPage`1.cs">
@@ -129,7 +131,7 @@
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2094">
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -140,7 +142,7 @@
       <ResourceName>Menus.ctmenu</ResourceName>
       <LastGenOutput>PrettyDocCommentsPackage.cs</LastGenOutput>
     </VSCTCompile>
-    <Content Include="Commands\Resources\ToggleCollapseComment.png" />
+    <Content Include="Commands\Resources\EditCommands.png" />
     <Content Include="Documentation\Workflow.png" />
     <Content Include="PrettyDocComments.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

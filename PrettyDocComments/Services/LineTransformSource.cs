@@ -1,11 +1,12 @@
-﻿using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Media;
-using Microsoft.VisualStudio.Text.Editor;
+﻿using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Outlining;
+using PrettyDocComments.CustomOptions;
 using PrettyDocComments.Helpers;
 using PrettyDocComments.Model;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Media;
 
 namespace PrettyDocComments.Services;
 
@@ -61,6 +62,11 @@ internal sealed class LineTransformSource : ILineTransformSource
 
     public LineTransform GetLineTransform(ITextViewLine line, double yPosition, ViewRelativePosition placement)
     {
+        if (!GeneralOptions.Instance.Enabled) {
+            _adornment.RenderingInformation.Clear();
+            return new LineTransform(1.0);
+        }
+
         int index;
         if (_adornment.WasLayouted) {
             // This is the first call of GetLineTransform occurring before a new layout run.

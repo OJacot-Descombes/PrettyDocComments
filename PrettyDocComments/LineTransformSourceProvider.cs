@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.Composition;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
-using Microsoft;
+﻿using Microsoft;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -12,7 +9,11 @@ using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Outlining;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
+using PrettyDocComments.CustomOptions;
 using PrettyDocComments.Services;
+using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace PrettyDocComments;
 
@@ -28,8 +29,8 @@ namespace PrettyDocComments;
 [Name("PrettyDocCommentsLineTransformSourceProvider")]
 internal sealed class LineTransformSourceProvider : ILineTransformSourceProvider
 {
-    private static readonly Regex _cSharpDocCommentRecoginzer = new(@"^\s*(///)([^/]|$)", RegexOptions.Compiled);
-    private static readonly Regex _visualBasicDocCommentRecoginzer = new(@"^\s*(''')([^/]|$)", RegexOptions.Compiled);
+    private static readonly Regex _cSharpDocCommentRecognizer = new(@"^\s*(///)([^/]|$)", RegexOptions.Compiled);
+    private static readonly Regex _visualBasicDocCommentRecognizer = new(@"^\s*(''')([^/]|$)", RegexOptions.Compiled);
 
     [SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "<Pending>")]
     public LineTransformSourceProvider()
@@ -68,8 +69,8 @@ internal sealed class LineTransformSourceProvider : ILineTransformSourceProvider
         }
 
         Regex docCommentRegex = view.TextBuffer.ContentType.TypeName switch {
-            "CSharp" or "F#" or "FSharp" or "C" or "C/C++" => _cSharpDocCommentRecoginzer,
-            "Basic" or "VisualBasic" => _visualBasicDocCommentRecoginzer,
+            "CSharp" or "F#" or "FSharp" or "C" or "C/C++" => _cSharpDocCommentRecognizer,
+            "Basic" or "VisualBasic" => _visualBasicDocCommentRecognizer,
             _ => null
         };
 

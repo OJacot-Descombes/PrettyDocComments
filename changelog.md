@@ -1,4 +1,7 @@
 # Changelog
+- **0.6** - 2025-11-18
+    - Added command and option to enable or disable the Pretty Doc Comments
+    - Eliminated color bleeding in rendered text.
 - **0.5.1** - 2025-07-25
     - Trimming start of <param> text for better alignment if it is a text node.
     - Fixed typo in "Toggle Collapse Comments to Summay" (should be "Summary").

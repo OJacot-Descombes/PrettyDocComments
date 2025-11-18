@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.5.1" Language="en-US" Publisher="Olivier Jacot-Descombes" />
+        <Identity Id="PrettyDocComments.46054037-6cbf-4b09-ba20-1ee4a01a8fd7" Version="0.6" Language="en-US" Publisher="Olivier Jacot-Descombes" />
         <DisplayName>Pretty Doc Comments</DisplayName>
         <Description xml:space="preserve">Displays XML doc comments in a more readable and less cluttered way. It works with C#, VB, F#, and C++ languages.
 
@@ -22,7 +22,7 @@ When you place the cursor on a comment line, the original XML text is shown and 
         <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
     </Dependencies>
     <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,19.0)" DisplayName="Visual Studio core editor" />
     </Prerequisites>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />

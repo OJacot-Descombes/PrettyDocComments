@@ -24,7 +24,7 @@ using System.Text;
 /// <mark style="background: #00ced1!important">Marked text 3</mark><br/>
 /// <mark style="color:red;background: #80FF80!important">Marked text 4</mark><br/>
 /// <mark>Marked text 5</mark>
-internal class CustomTagsBy_K_L_Carter_Sr{ }
+internal class CustomTagsBy_K_L_Carter_Sr { }
 
 class WordWrapIssue
 {
@@ -39,7 +39,7 @@ class WordWrapIssue
     /// </remarks>
     public void MethodName()
     {
-        
+
     }
 }
 

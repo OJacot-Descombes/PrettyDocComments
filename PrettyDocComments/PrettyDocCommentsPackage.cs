@@ -56,6 +56,7 @@ public sealed class PrettyDocCommentsPackage : AsyncPackage
     protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
         _ = Commands.ToggleCollapseComment.InitializeAsync(this);
+        _ = Commands.ToggleEnableExtension.InitializeAsync(this);
 
         // When initialized asynchronously, the current thread may be a background thread at this point.
         // Do any initialization that requires the UI thread after switching to the UI thread.
